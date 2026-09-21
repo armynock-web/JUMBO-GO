@@ -202,3 +202,34 @@ Stage Summary:
 - Movement is tied to timeline step (not random/independent)
 - Green traveled-path + progress bar provide visual feedback of journey progress
 - ETA and distance text adapt to whether truck is going to pickup or dropoff
+
+---
+Task ID: icon-cleanup
+Agent: main
+Task: Replace ALL emojis with SVG icons (blueprint rule: ห้ามใช้ Emoji แทน Icon)
+
+Work Log:
+- Audited entire codebase: found 15 emoji usages across 10 files
+- Created reusable JumboAvatar component (SVG-based, no emoji)
+- Replaced every emoji with proper Lucide SVG icons:
+  * 🚚 (truck) → Truck icon (lucide) + custom SVG path inside tracking map
+  * 👤/👨/👩 (person) → UserRound icon (lucide)
+  * 📲 (phone) → Smartphone icon (lucide)
+  * 🗺️ (map) → Map icon (lucide)
+  * ⚡/✅/📦 (features) → Zap/ShieldCheck/Package icons (lucide)
+  * ⚠️ (warning) → AlertTriangle icon (lucide)
+  * 🔔 (bell in rail label) → removed emoji prefix
+  * ✓ (checkmark text) → Check icon (lucide) in styled <ul>
+  * 🚨 (siren in admin notif title) → removed emoji prefix
+- Files modified: searching, tracking, driver-found, home, profile, verify-otp, pickup, onboarding, driver/dashboard, driver/profile, driver/onboarding, summary, phone-frame, notifications.ts
+
+Verification:
+- Regex scan: 0 emoji characters remaining in src/
+- agent-browser: Home screen = "NO EMOJI", Searching = "NO TRUCK EMOJI", OTP = "NO PHONE EMOJI"
+- VLM confirms truck on searching screen is now "clean white vector graphic" (not emoji)
+- ESLint: 0 errors, 0 warnings
+
+Stage Summary:
+- All emojis replaced with consistent Lucide SVG icon library
+- Complies with blueprint Design System rule: "ห้ามใช้ Emoji แทน Icon ใน Production"
+- Complies with blueprint rule: "ใช้ Icon Library เดียวกันทั้งระบบ" (Lucide throughout)

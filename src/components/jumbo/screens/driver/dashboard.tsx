@@ -11,6 +11,7 @@ import {
   Power,
   Star,
   ChevronRight,
+  UserRound,
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -50,9 +51,10 @@ export function DriverDashboardScreen() {
             </button>
             <button
               onClick={() => go("driver-profile")}
-              className="flex h-12 w-12 items-center justify-center rounded-full bg-white/15 text-2xl"
+              className="flex h-12 w-12 items-center justify-center rounded-full bg-white/15"
+              aria-label="โปรไฟล์"
             >
-              👤
+              <UserRound className="h-7 w-7 text-white" strokeWidth={2} />
             </button>
           </div>
         </div>

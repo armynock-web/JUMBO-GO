@@ -18,6 +18,7 @@ import {
   Upload,
   X,
   AlertCircle,
+  UserRound,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
@@ -228,8 +229,8 @@ function SelfieStep() {
       <div className="relative flex h-52 w-44 items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-line bg-surface">
         <div className="absolute inset-0 bg-grid opacity-30" />
         <div className="relative flex flex-col items-center gap-2">
-          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-jumbo-light text-3xl">
-            👤
+          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-jumbo-light">
+            <UserRound className="h-10 w-10 text-jumbo" strokeWidth={2} />
           </div>
           <span className="text-[11px] font-medium text-ink-muted">
             แตะเพื่อถ่ายรูป
@@ -243,12 +244,18 @@ function SelfieStep() {
         </button>
       </div>
       <div className="w-full rounded-xl bg-jumbo-light p-3">
-        <p className="text-[11px] font-medium text-jumbo-dark">
-          ✓ หน้าตรง ไม่สวมหมวก/แว่น
-          <br />
-          ✓ แสงสว่างพอเพียง
-          <br />✓ ไม่มีผู้อื่นในภาพ
-        </p>
+        <ul className="flex flex-col gap-1">
+          {[
+            "หน้าตรง ไม่สวมหมวก/แว่น",
+            "แสงสว่างพอเพียง",
+            "ไม่มีผู้อื่นในภาพ",
+          ].map((t, i) => (
+            <li key={i} className="flex items-center gap-1.5 text-[11px] font-medium text-jumbo-dark">
+              <Check className="h-3 w-3 flex-shrink-0" strokeWidth={3} />
+              {t}
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );
@@ -449,7 +456,7 @@ function ConsentStep() {
       </button>
       <Note>
         {allChecked
-          ? "✓ ยินยอมครบทุกข้อ สามารถส่งตรวจสอบได้"
+          ? "ยินยอมครบทุกข้อแล้ว สามารถส่งตรวจสอบได้"
           : "ต้องยินยอมทุกข้อจึงจะส่งตรวจสอบได้"}
       </Note>
     </div>

@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useJumbo } from "@/store/jumbo";
 import { StatusBar } from "../status-bar";
-import { Check, X, Loader2 } from "lucide-react";
+import { Check, X, Loader2, Truck } from "lucide-react";
 import { motion } from "framer-motion";
 
 export function SearchingScreen() {
@@ -78,9 +78,9 @@ export function SearchingScreen() {
           <motion.div
             animate={{ scale: [1, 1.06, 1] }}
             transition={{ duration: 1.6, repeat: Infinity }}
-            className="relative z-10 flex h-24 w-24 items-center justify-center rounded-full bg-jumbo text-4xl text-white shadow-xl"
+            className="relative z-10 flex h-24 w-24 items-center justify-center rounded-full bg-jumbo text-white shadow-xl"
           >
-            🚚
+            <Truck className="h-12 w-12" strokeWidth={2.5} />
           </motion.div>
         </div>
 

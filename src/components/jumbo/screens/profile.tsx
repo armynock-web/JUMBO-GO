@@ -40,8 +40,8 @@ export function ProfileScreen() {
           </button>
         </div>
         <div className="relative mt-3 flex items-center gap-3">
-          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/20 text-3xl">
-            👤
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/20">
+            <User className="h-7 w-7 text-white" strokeWidth={2} />
           </div>
           <div className="flex-1">
             <p className="text-[16px] font-bold">สมชาย ใจดี</p>

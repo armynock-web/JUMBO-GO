@@ -15,6 +15,7 @@ import {
   ShieldCheck,
   Clock,
   X,
+  UserRound,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
@@ -291,8 +292,8 @@ export function HomeScreen() {
         <div className="mt-5 overflow-hidden rounded-2xl border border-line bg-gradient-to-br from-surface to-white shadow-sm">
           <div className="flex items-center">
             <div className="relative flex h-20 w-20 flex-shrink-0 items-center justify-center bg-jumbo-light">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-jumbo text-2xl text-white">
-                👨
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-jumbo text-white">
+                <UserRound className="h-7 w-7" strokeWidth={2.5} />
               </div>
               <span className="absolute bottom-1 rounded bg-white px-1 text-[8px] font-bold text-jumbo">
                 Driver

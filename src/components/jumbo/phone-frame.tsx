@@ -114,7 +114,7 @@ export function DesktopRail({
                 { id: "driver-earnings", label: "D16 — รายได้" },
                 { id: "driver-history", label: "D17 — ประวัติงาน" },
                 { id: "driver-profile", label: "D18 — โปรไฟล์ Driver" },
-                { id: "notifications", label: "🔔 การแจ้งเตือน Driver" },
+                { id: "notifications", label: "การแจ้งเตือน Driver" },
               ],
             },
           ]

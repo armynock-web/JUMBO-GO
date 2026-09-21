@@ -129,9 +129,14 @@ export function TrackingScreen() {
             {/* pulse halo */}
             <circle r="18" fill="#ED1C2422" className="animate-jumbo-pulse" />
             <circle r="12" fill="#ED1C24" />
-            <text x="0" y="4" textAnchor="middle" fontSize="13">
-              🚚
-            </text>
+            {/* truck icon as SVG path (no emoji) */}
+            <path
+              d="M-6 -2 L-6 4 L-2 4 L-2 2 L2 2 L2 4 L6 4 L6 -2 Z M-5 -1 L-3 -1 L-3 1 L-5 1 Z M-1 0 L1 0"
+              fill="white"
+              stroke="none"
+            />
+            <circle cx="-3" cy="4" r="1.5" fill="#ED1C24" />
+            <circle cx="3" cy="4" r="1.5" fill="#ED1C24" />
           </motion.g>
         </svg>
 

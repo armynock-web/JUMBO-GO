@@ -14,6 +14,7 @@ import {
   LogOut,
   Bell,
   HelpCircle,
+  UserRound,
 } from "lucide-react";
 
 export function DriverProfileScreen() {
@@ -42,8 +43,8 @@ export function DriverProfileScreen() {
       <div className="relative overflow-hidden bg-jumbo px-5 pb-5 pt-2 text-white">
         <div className="bg-grid absolute inset-0 opacity-10" />
         <div className="relative flex items-center gap-3">
-          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/20 text-3xl">
-            👨
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/20">
+            <UserRound className="h-7 w-7 text-white" strokeWidth={2} />
           </div>
           <div className="flex-1">
             <p className="text-[16px] font-bold">สมชาย ใจดี</p>

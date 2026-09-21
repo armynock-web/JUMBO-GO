@@ -7,7 +7,7 @@ import { JumboLockup } from "../logo";
 import { VehicleIcon } from "../vehicle-icon";
 import { StatusBar } from "../status-bar";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronRight, X, ShieldCheck, MapPin, Tag } from "lucide-react";
+import { ChevronRight, X, ShieldCheck, MapPin, Tag, Zap, Package, UserRound } from "lucide-react";
 
 export function OnboardingScreen() {
   const go = useJumbo((s) => s.go);
@@ -88,16 +88,16 @@ export function OnboardingScreen() {
               {step === 1 && (
                 <div className="mt-1 flex w-full max-w-[320px] flex-col gap-1.5">
                   {[
-                    { icon: "⚡", t: "เร่งด่วนทันใจ" },
-                    { icon: "✅", t: "คุ้มครองความเสียหาย" },
-                    { icon: "📦", t: "ขนของไปทั่วประเทศ" },
+                    { Icon: Zap, t: "เร่งด่วนทันใจ" },
+                    { Icon: ShieldCheck, t: "คุ้มครองความเสียหาย" },
+                    { Icon: Package, t: "ขนของไปทั่วประเทศ" },
                   ].map((f) => (
                     <div
                       key={f.t}
                       className="flex items-center gap-2 rounded-lg bg-surface px-3 py-1.5"
                     >
-                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-jumbo text-[12px] text-white">
-                        {f.icon}
+                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-jumbo text-white">
+                        <f.Icon className="h-3.5 w-3.5" strokeWidth={2.5} />
                       </span>
                       <span className="text-[12px] font-medium text-ink">
                         {f.t}
@@ -223,8 +223,8 @@ function Slide2Art() {
           animate={{ x: 0, opacity: 1 }}
           className="flex flex-col items-center"
         >
-          <div className="flex h-24 w-24 items-center justify-center rounded-full bg-jumbo text-5xl">
-            👨
+          <div className="flex h-24 w-24 items-center justify-center rounded-full bg-jumbo">
+            <UserRound className="h-12 w-12 text-white" strokeWidth={2} />
           </div>
           <div className="-mt-2 rounded-md bg-jumbo px-2 py-0.5 text-[10px] font-bold text-white">
             Driver
@@ -235,8 +235,8 @@ function Slide2Art() {
           animate={{ x: 0, opacity: 1 }}
           className="flex flex-col items-center"
         >
-          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-ink text-4xl">
-            👩
+          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-ink">
+            <UserRound className="h-10 w-10 text-white" strokeWidth={2} />
           </div>
           <div className="-mt-2 rounded-md bg-ink px-2 py-0.5 text-[10px] font-bold text-white">
             ลูกค้า
@@ -286,8 +286,8 @@ function Slide3Art() {
           {/* driver card */}
           <div className="absolute bottom-1 left-1 right-1 rounded-md bg-white p-1 shadow">
             <div className="flex items-center gap-1">
-              <div className="flex h-5 w-5 items-center justify-center rounded-full bg-jumbo text-[8px] text-white">
-                👨
+              <div className="flex h-5 w-5 items-center justify-center rounded-full bg-jumbo">
+                <UserRound className="h-3 w-3 text-white" strokeWidth={2.5} />
               </div>
               <div className="flex-1">
                 <p className="text-[8px] font-bold leading-tight text-ink">

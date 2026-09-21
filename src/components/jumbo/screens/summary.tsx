@@ -5,7 +5,7 @@ import { useJumbo } from "@/store/jumbo";
 import { StatusBar } from "../status-bar";
 import { StepIndicator } from "../step-indicator";
 import { VEHICLES, formatTHB } from "@/lib/brand";
-import { ChevronLeft, MapPin, Truck, Route, Wallet } from "lucide-react";
+import { ChevronLeft, MapPin, Truck, Route, Wallet, AlertTriangle } from "lucide-react";
 import { motion } from "framer-motion";
 
 export function SummaryScreen() {
@@ -203,9 +203,12 @@ export function SummaryScreen() {
         </motion.div>
 
         <div className="mb-3 rounded-xl bg-jumbo-light p-3">
-          <p className="text-[11px] font-medium text-jumbo-dark">
-            ⚠️ ราคานี้เป็นราคาโดยประมาณ ราคาจริงคำนวณฝั่ง Server
-            ตามระยะทางและค่าทางด่วนจริง
+          <p className="flex items-start gap-1.5 text-[11px] font-medium text-jumbo-dark">
+            <AlertTriangle className="mt-0.5 h-3.5 w-3.5 flex-shrink-0" />
+            <span>
+              ราคานี้เป็นราคาโดยประมาณ ราคาจริงคำนวณฝั่ง Server
+              ตามระยะทางและค่าทางด่วนจริง
+            </span>
           </p>
         </div>
       </div>

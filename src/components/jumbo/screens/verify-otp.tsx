@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useJumbo } from "@/store/jumbo";
 import { StatusBar } from "../status-bar";
-import { ChevronLeft, RefreshCw } from "lucide-react";
+import { ChevronLeft, RefreshCw, Smartphone } from "lucide-react";
 import { motion } from "framer-motion";
 
 export function VerifyOtpScreen() {
@@ -82,7 +82,7 @@ export function VerifyOtpScreen() {
           animate={{ scale: 1, opacity: 1 }}
           className="flex h-16 w-16 items-center justify-center rounded-2xl bg-jumbo-light"
         >
-          <span className="text-3xl">📲</span>
+          <Smartphone className="h-8 w-8 text-jumbo" strokeWidth={2.5} />
         </motion.div>
 
         <div className="text-center">

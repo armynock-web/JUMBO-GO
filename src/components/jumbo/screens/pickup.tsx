@@ -12,6 +12,7 @@ import {
   MapPin,
   X,
   Check,
+  Map,
 } from "lucide-react";
 
 export function PickupScreen() {
@@ -139,8 +140,9 @@ export function PickupScreen() {
             <circle r="3" fill="#fff" />
           </g>
         </svg>
-        <div className="absolute left-2 top-2 rounded-md bg-white/95 px-2 py-1 text-[10px] font-semibold text-ink shadow">
-          🗺️ เลือกจุดบนแผนที่
+        <div className="absolute left-2 top-2 flex items-center gap-1 rounded-md bg-white/95 px-2 py-1 text-[10px] font-semibold text-ink shadow">
+          <Map className="h-3 w-3 text-jumbo" />
+          เลือกจุดบนแผนที่
         </div>
       </div>
 

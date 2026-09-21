@@ -12,6 +12,8 @@ import {
   Clock,
   MapPin,
   ChevronRight,
+  UserRound,
+  Check,
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -64,8 +66,13 @@ export function DriverFoundScreen() {
                 fontSize="14"
                 fill="white"
               >
-                🚚
+                {/* truck SVG path (no emoji) */}
               </text>
+              <path
+                d="M-6 -2 L-6 4 L-2 4 L-2 2 L2 2 L2 4 L6 4 L6 -2 Z M-5 -1 L-3 -1 L-3 1 L-5 1 Z M-1 0 L1 0"
+                fill="white"
+                stroke="none"
+              />
             </motion.g>
           </g>
         </svg>
@@ -98,11 +105,11 @@ export function DriverFoundScreen() {
         >
           <div className="flex items-center gap-3">
             <div className="relative">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-jumbo text-2xl text-white">
-                👨
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-jumbo">
+                <UserRound className="h-7 w-7 text-white" strokeWidth={2} />
               </div>
-              <span className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-green-500 text-[9px] font-bold text-white ring-2 ring-white">
-                ✓
+              <span className="absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-green-500 text-white ring-2 ring-white">
+                <Check className="h-3 w-3" strokeWidth={3} />
               </span>
             </div>
             <div className="flex-1">
