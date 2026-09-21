@@ -18,6 +18,7 @@ import { DriverFoundScreen } from "./screens/driver-found";
 import { TrackingScreen } from "./screens/tracking";
 import { CompletedScreen } from "./screens/completed";
 import { JobsScreen } from "./screens/jobs";
+import { JobDetailScreen } from "./screens/job-detail";
 import { NotificationsScreen } from "./screens/notifications";
 import { ProfileScreen } from "./screens/profile";
 import { SupportScreen } from "./screens/support";
@@ -31,6 +32,7 @@ import { DriverOnboardingScreen } from "./screens/driver/onboarding";
 import { DriverOnboardingStatusScreen } from "./screens/driver/status";
 import { DriverDashboardScreen } from "./screens/driver/dashboard";
 import { DriverJobsScreen } from "./screens/driver/jobs";
+import { DriverJobDetailScreen } from "./screens/driver/job-detail";
 import { DriverEarningsScreen } from "./screens/driver/earnings";
 import { DriverHistoryScreen } from "./screens/driver/history";
 import { DriverProfileScreen } from "./screens/driver/profile";
@@ -41,9 +43,11 @@ import { AdminShell, AdminDashboardContent } from "./screens/admin/shell";
 import {
   AdminUsersPage,
   AdminDriversPage,
+  AdminDriverDetailPage,
   AdminKycPage,
   AdminVehiclesPage,
   AdminJobsPage,
+  AdminJobDetailPage,
   AdminPricingPage,
   AdminPaymentsPage,
   AdminReportsPage,
@@ -139,6 +143,8 @@ function renderScreen(screen: string) {
       return <CompletedScreen />;
     case "jobs":
       return <JobsScreen />;
+    case "job-detail":
+      return <JobDetailScreen />;
     case "notifications":
       return <NotificationsScreen />;
     case "profile":
@@ -158,6 +164,8 @@ function renderScreen(screen: string) {
       return <DriverDashboardScreen />;
     case "driver-jobs":
       return <DriverJobsScreen />;
+    case "driver-job-detail":
+      return <DriverJobDetailScreen />;
     case "driver-earnings":
       return <DriverEarningsScreen />;
     case "driver-history":
@@ -180,12 +188,16 @@ function renderAdmin(screen: string) {
       return <AdminUsersPage />;
     case "admin-drivers":
       return <AdminDriversPage />;
+    case "admin-driver-detail":
+      return <AdminDriverDetailPage />;
     case "admin-kyc":
       return <AdminKycPage />;
     case "admin-vehicles":
       return <AdminVehiclesPage />;
     case "admin-jobs":
       return <AdminJobsPage />;
+    case "admin-job-detail":
+      return <AdminJobDetailPage />;
     case "admin-pricing":
       return <AdminPricingPage />;
     case "admin-payments":

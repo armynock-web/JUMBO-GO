@@ -233,3 +233,41 @@ Stage Summary:
 - All emojis replaced with consistent Lucide SVG icon library
 - Complies with blueprint Design System rule: "ห้ามใช้ Emoji แทน Icon ใน Production"
 - Complies with blueprint rule: "ใช้ Icon Library เดียวกันทั้งระบบ" (Lucide throughout)
+
+---
+Task ID: gap-fill
+Agent: main
+Task: Fill 4 missing detail pages (U16, D16, A05, A10) — final completeness audit
+
+Work Log:
+- Audited all Screen IDs from blueprint against implementation
+- Found 4 missing detail pages (all /[id] routes):
+  * U16 /jobs/[jobId] — รายละเอียดงาน (User)
+  * D16 /driver/jobs/[jobId] — รายละเอียดงาน (Driver)
+  * A05 /admin/drivers/[id] — รายละเอียดคนขับ (Admin)
+  * A10 /admin/jobs/[id] — รายละเอียดงาน (Admin)
+  Note: A07 /admin/kyc/[id] already handled as detail panel inside admin-kyc page
+- Added 4 new Screen IDs to store (job-detail, driver-job-detail, admin-driver-detail, admin-job-detail)
+- Built U16 JobDetailScreen: job header, route, driver info, status timeline, price breakdown, receipt buttons, re-book CTA
+- Built D16 DriverJobDetailScreen: job header, customer info, route, earning breakdown (commission -10%), status timeline, delivery proof upload, update status + confirm delivery actions
+- Built A05 AdminDriverDetailPage: driver header with KYC/online badges, 4 stat boxes, vehicle info, KYC timeline, recent jobs table, suspend/edit actions
+- Built A10 AdminJobDetailPage: job header, route+actors grid, price breakdown with commission, Audit Log with timestamps+actors, view-proof/suspend/force-close actions
+- Updated AppShell to render all 4 new screens
+- Updated DesktopRail screen inventory: U16, D16, A05, A10 added with correct labels
+- Updated admin sidebar NAV to include รายละเอียดคนขับ + รายละเอียดงาน entries
+- Fixed import path bug in driver/job-detail.tsx (../../status-bar not ../status-bar)
+
+Verification (agent-browser):
+- U16: shows JG-2025-00108 with route/driver/timeline/price/receipt ✓
+- D16: shows job with customer/route/earning breakdown (-฿52 commission)/proof upload/confirm ✓
+- A05: shows driver สมชาย ใจดี with KYC badge, stats (42 jobs/฿38.4k/94%), vehicle, KYC history, recent jobs ✓
+- A10: shows job with route, actors (ลูกค้า/คนขับ), price (฿619), Audit Log with timestamps, admin actions ✓
+- ESLint: 0 errors, 0 warnings
+
+Stage Summary:
+- ALL Screen IDs from blueprint now complete:
+  * User: U01-U19 (19 screens) ✓
+  * Driver: D01-D19 (19 screens, D03-D12 as stepper) ✓
+  * Admin: A01-A15 (15 screens, A07 as panel) ✓
+  * Total: 53 screens
+- No missing items remain

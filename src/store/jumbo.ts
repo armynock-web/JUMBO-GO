@@ -24,6 +24,7 @@ export type ScreenId =
   | "tracking"
   | "completed"
   | "jobs"
+  | "job-detail" // U16 /jobs/[jobId]
   | "notifications"
   | "profile"
   | "support"
@@ -34,21 +35,25 @@ export type ScreenId =
   | "driver-onboarding-status" // D13
   | "driver-dashboard" // D14
   | "driver-jobs" // D15
-  | "driver-earnings" // D16
-  | "driver-history" // D17
-  | "driver-profile" // D18
-  // Admin screens A01-A11
+  | "driver-job-detail" // D16 /driver/jobs/[jobId]
+  | "driver-earnings" // D17
+  | "driver-history" // D18
+  | "driver-profile" // D19
+  // Admin screens A01-A15
   | "admin-login" // A01
   | "admin-dashboard" // A02
   | "admin-users" // A03
   | "admin-drivers" // A04
-  | "admin-kyc" // A05
-  | "admin-vehicles" // A06
-  | "admin-jobs" // A07
-  | "admin-pricing" // A08
-  | "admin-payments" // A09
-  | "admin-reports" // A10
-  | "admin-settings"; // A11
+  | "admin-driver-detail" // A05 /admin/drivers/[id]
+  | "admin-kyc" // A06
+  | "admin-vehicles" // A08
+  | "admin-jobs" // A09
+  | "admin-job-detail" // A10 /admin/jobs/[id]
+  | "admin-pricing" // A11
+  | "admin-payments" // A12
+  | "admin-reports" // A13
+  | "admin-notifications" // A14
+  | "admin-settings"; // A15
 
 export type LocationPoint = {
   address: string;

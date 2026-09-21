@@ -29,6 +29,7 @@ import {
   Clock,
   ShieldAlert,
   AlertTriangle,
+  MapPin,
 } from "lucide-react";
 import { useState } from "react";
 import { motion } from "framer-motion";
@@ -681,6 +682,279 @@ function SummaryPill({
       <p className={`text-[18px] font-extrabold ${dark ? "text-ink" : ""}`}>
         {count}
       </p>
+    </div>
+  );
+}
+
+// === A05: Driver Detail (/admin/drivers/[id]) ===
+export function AdminDriverDetailPage() {
+  const go = useJumbo((s) => s.go);
+  return (
+    <div>
+      <button
+        onClick={() => go("admin-drivers")}
+        className="mb-2 flex items-center gap-1 text-[12px] font-bold text-jumbo"
+      >
+        ← ย้อนกลับ
+      </button>
+
+      {/* driver header */}
+      <div className="mb-3 flex items-center gap-3 rounded-2xl border border-line bg-white p-4">
+        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-jumbo text-[20px] font-bold text-white">
+          สช
+        </div>
+        <div className="flex-1">
+          <p className="text-[16px] font-bold text-ink">สมชาย ใจดี</p>
+          <p className="text-[11px] text-ink-muted">JG-00108 • 081-234-5678</p>
+          <div className="mt-1 flex items-center gap-2 text-[10px]">
+            <span className="rounded-full bg-green-100 px-2 py-0.5 font-bold text-green-700">
+              KYC อนุมัติ
+            </span>
+            <span className="rounded-full bg-jumbo-light px-2 py-0.5 font-bold text-jumbo">
+              ออนไลน์
+            </span>
+            <span className="text-ink-muted">★ 4.8 (320)</span>
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <button className="flex items-center gap-1 rounded-lg border border-jumbo bg-white px-3 py-1.5 text-[11px] font-bold text-jumbo">
+            ระงับ
+          </button>
+          <button className="flex items-center gap-1 rounded-lg bg-jumbo px-3 py-1.5 text-[11px] font-bold text-white">
+            แก้ไข
+          </button>
+        </div>
+      </div>
+
+      {/* stats */}
+      <div className="mb-3 grid grid-cols-2 gap-3 md:grid-cols-4">
+        <StatBox label="งานสำเร็จ" value="42" color="text-green-600" />
+        <StatBox label="รายได้รวม" value="฿38.4k" color="text-jumbo" />
+        <StatBox label="ยกเลิก" value="3" color="text-amber-600" />
+        <StatBox label="อัตรารับ" value="94%" color="text-ink" />
+      </div>
+
+      {/* vehicle */}
+      <div className="mb-3 rounded-2xl border border-line bg-white p-3">
+        <p className="mb-2 text-[13px] font-bold text-ink">รถของ Driver</p>
+        <div className="flex items-center justify-between rounded-lg bg-surface p-2.5">
+          <div>
+            <p className="text-[12px] font-bold text-ink">Isuzu D-Max</p>
+            <p className="text-[10px] text-ink-muted">
+              กระบะตู้ทึบ • ขาว • ขข 1234 กรุงเทพฯ
+            </p>
+          </div>
+          <span className="rounded-full bg-green-100 px-2 py-0.5 text-[9px] font-bold text-green-700">
+            อนุมัติ
+          </span>
+        </div>
+      </div>
+
+      {/* KYC timeline */}
+      <div className="mb-3 rounded-2xl border border-line bg-white p-3">
+        <p className="mb-2 text-[13px] font-bold text-ink">ประวัติ KYC</p>
+        <div className="flex flex-col gap-2">
+          {[
+            { label: "ส่ง KYC", time: "10 ก.ย. 2025 10:42", done: true },
+            { label: "ตรวจสอบ", time: "10 ก.ย. 2025 14:20", done: true },
+            { label: "อนุมัติ", time: "10 ก.ย. 2025 16:15", done: true },
+          ].map((s, i) => (
+            <div key={i} className="flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-green-600" strokeWidth={2.5} />
+              <span className="flex-1 text-[12px] font-semibold text-ink">
+                {s.label}
+              </span>
+              <span className="text-[10px] text-ink-muted">{s.time}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* recent jobs */}
+      <div className="rounded-2xl border border-line bg-white p-3">
+        <div className="mb-2 flex items-center justify-between">
+          <p className="text-[13px] font-bold text-ink">งานล่าสุด (5)</p>
+          <button
+            onClick={() => go("admin-jobs")}
+            className="text-[11px] font-bold text-jumbo"
+          >
+            ดูทั้งหมด
+          </button>
+        </div>
+        <table className="w-full text-left text-[11px]">
+          <thead className="border-b border-line text-ink-muted">
+            <tr>
+              <th className="py-1.5 font-medium">รหัส</th>
+              <th className="px-2 py-1.5 font-medium">เส้นทาง</th>
+              <th className="px-2 py-1.5 font-medium">ยอด</th>
+              <th className="py-1.5 font-medium">สถานะ</th>
+            </tr>
+          </thead>
+          <tbody>
+            {[
+              ["JG-00108", "บ้าน→สนามบิน", "฿619", "กำลังทำ"],
+              ["JG-00105", "ออฟฟิศ→ไอคอน", "฿450", "เสร็จ"],
+              ["JG-00100", "บางนา→สุว.", "฿720", "เสร็จ"],
+              ["JG-00098", "ลาดพร้าว→สยาม", "฿380", "เสร็จ"],
+              ["JG-00094", "เซ็นทรัล→ดอน", "฿1,450", "ยกเลิก"],
+            ].map((r, i) => (
+              <tr key={i} className="border-b border-line/50">
+                <td className="py-1.5 font-bold text-jumbo">{r[0]}</td>
+                <td className="px-2 py-1.5 text-ink">{r[1]}</td>
+                <td className="px-2 py-1.5 font-semibold text-ink">{r[2]}</td>
+                <td className="py-1.5">
+                  <span
+                    className={`rounded-full px-1.5 py-0.5 text-[9px] font-bold ${
+                      r[3] === "เสร็จ"
+                        ? "bg-green-100 text-green-700"
+                        : r[3] === "ยกเลิก"
+                          ? "bg-jumbo-light text-jumbo"
+                          : "bg-amber-100 text-amber-700"
+                    }`}
+                  >
+                    {r[3]}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+// === A10: Job Detail (/admin/jobs/[id]) ===
+export function AdminJobDetailPage() {
+  const go = useJumbo((s) => s.go);
+  return (
+    <div>
+      <button
+        onClick={() => go("admin-jobs")}
+        className="mb-2 flex items-center gap-1 text-[12px] font-bold text-jumbo"
+      >
+        ← ย้อนกลับ
+      </button>
+
+      {/* job header */}
+      <div className="mb-3 rounded-2xl border border-line bg-white p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-[11px] text-ink-muted">เลขที่งาน</p>
+            <p className="text-[16px] font-bold text-jumbo">JG-2025-00108</p>
+          </div>
+          <span className="rounded-full bg-amber-100 px-3 py-1 text-[11px] font-bold text-amber-700">
+            กำลังดำเนินการ
+          </span>
+        </div>
+        <div className="mt-2 flex items-center gap-3 text-[11px] text-ink-muted">
+          <span>21 ก.ย. 2025 09:42</span>
+          <span>•</span>
+          <span>กระบะตู้ทึบ</span>
+          <span>•</span>
+          <span>Driver: สมชาย ใจดี (JG-00108)</span>
+        </div>
+      </div>
+
+      {/* route + actors */}
+      <div className="mb-3 grid grid-cols-1 gap-3 md:grid-cols-2">
+        <div className="rounded-2xl border border-line bg-white p-3">
+          <p className="mb-2 text-[12px] font-bold text-ink">เส้นทาง</p>
+          <div className="flex items-start gap-2">
+            <div className="flex flex-col items-center pt-1">
+              <div className="h-2 w-2 rounded-full bg-green-600" />
+              <div className="my-0.5 h-6 w-0.5 bg-line" />
+              <MapPin className="h-3 w-3 text-jumbo" />
+            </div>
+            <div className="text-[11px]">
+              <p className="font-semibold text-ink">99/9 หมู่บ้านพฤกษาวิลล์</p>
+              <p className="font-semibold text-ink">ท่าอากาศยานสุวรรณภูมิ</p>
+            </div>
+          </div>
+        </div>
+        <div className="rounded-2xl border border-line bg-white p-3">
+          <p className="mb-2 text-[12px] font-bold text-ink">ผู้เกี่ยวข้อง</p>
+          <div className="flex flex-col gap-1.5 text-[11px]">
+            <div className="flex justify-between">
+              <span className="text-ink-muted">ลูกค้า:</span>
+              <span className="font-semibold text-ink">สมชาย ใจดี (USR-1024)</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-ink-muted">คนขับ:</span>
+              <span className="font-semibold text-ink">สมชาย ใจดี (JG-00108)</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-ink-muted">ระยะทาง:</span>
+              <span className="font-semibold text-ink">9 กม.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* price */}
+      <div className="mb-3 rounded-2xl border border-line bg-white p-3">
+        <p className="mb-2 text-[12px] font-bold text-ink">การเงิน</p>
+        <div className="flex flex-col gap-1 text-[11px]">
+          <div className="flex justify-between"><span className="text-ink-muted">ค่าขนส่ง</span><span className="font-semibold text-ink">฿544</span></div>
+          <div className="flex justify-between"><span className="text-ink-muted">ค่าทางด่วน</span><span className="font-semibold text-ink">฿75</span></div>
+          <div className="flex justify-between"><span className="text-ink-muted">ค่าคอมมิชชัน</span><span className="font-semibold text-jumbo">-฿62</span></div>
+          <div className="mt-1 flex justify-between border-t border-dashed border-line pt-1.5">
+            <span className="font-bold text-ink">ยอดลูกค้าจ่าย</span>
+            <span className="font-extrabold text-jumbo">฿619</span>
+          </div>
+        </div>
+      </div>
+
+      {/* status logs (audit) */}
+      <div className="mb-3 rounded-2xl border border-line bg-white p-3">
+        <p className="mb-2 text-[12px] font-bold text-ink">Audit Log (สถานะ)</p>
+        <div className="flex flex-col gap-1.5">
+          {[
+            { s: "รับงานแล้ว", t: "09:42:15", actor: "Driver" },
+            { s: "กำลังเดินทาง", t: "09:43:02", actor: "Driver" },
+            { s: "ใกล้ถึงจุดรับ", t: "09:52:30", actor: "Driver" },
+            { s: "รับของแล้ว", t: "09:55:10", actor: "Driver" },
+            { s: "กำลังขนส่ง", t: "09:56:00", actor: "ระบบ" },
+          ].map((l, i) => (
+            <div key={i} className="flex items-center gap-2 rounded-lg bg-surface p-1.5">
+              <CheckCircle2 className="h-3 w-3 text-green-600" strokeWidth={2.5} />
+              <span className="flex-1 text-[11px] font-semibold text-ink">{l.s}</span>
+              <span className="text-[9px] text-ink-muted">{l.actor}</span>
+              <span className="text-[9px] font-mono text-ink-muted">{l.t}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* actions */}
+      <div className="flex gap-2">
+        <button className="flex flex-1 items-center justify-center gap-1 rounded-lg border border-line bg-white py-2 text-[11px] font-bold text-ink">
+          <Eye className="h-3.5 w-3.5" /> ดูหลักฐาน
+        </button>
+        <button className="flex flex-1 items-center justify-center gap-1 rounded-lg border border-amber-400 bg-amber-50 py-2 text-[11px] font-bold text-amber-700">
+          ระงับงาน
+        </button>
+        <button className="flex flex-1 items-center justify-center gap-1 rounded-lg bg-jumbo py-2 text-[11px] font-bold text-white">
+          บังคับปิดงาน
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function StatBox({
+  label,
+  value,
+  color,
+}: {
+  label: string;
+  value: string;
+  color: string;
+}) {
+  return (
+    <div className="rounded-xl border border-line bg-white p-3 text-center">
+      <p className={`text-[18px] font-extrabold ${color}`}>{value}</p>
+      <p className="text-[10px] text-ink-muted">{label}</p>
     </div>
   );
 }
