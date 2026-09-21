@@ -1,0 +1,2000 @@
+
+ห้ามแก้โค้ด
+
+ตรวจทุก Screen ID:
+- U01 ถึง U19
+- D01 ถึง D19
+- A01 ถึง A15
+
+ให้ตรวจ:
+1. มี Route หรือไม่
+2. มี Page Component หรือไม่
+3. มี Screen Specification หรือไม่
+4. มี Loading State หรือไม่
+5. มี Error State หรือไม่
+6. มี Empty State หรือไม่
+7. มี API เชื่อมหรือไม่
+8. มี Validation หรือไม่
+9. มี Permission หรือไม่
+10. มี Acceptance Criteria หรือไม่
+11. มีข้อความภาษาไทยครบหรือไม่
+12. ใช้ Design System หรือไม่
+
+ห้ามเขียนโค้ด
+ห้ามแก้ไฟล์
+
+รายงานเป็นตาราง:
+| Screen ID | Route | Page | UI | API | Loading | Error | Empty | Validation | Status |
+```
+
+---
+
+# 15. Prompt ห้าม AI แก้ไฟล์เกินขอบเขต
+
+ก่อนเริ่มทุก Phase ให้ใช้ Prompt นี้:
+
+```text
+ก่อนเขียนโค้ด ให้ตรวจสอบขอบเขตไฟล์
+
+FILES ALLOWED TO CREATE:
+- [ระบุไฟล์]
+
+FILES ALLOWED TO MODIFY:
+- [ระบุไฟล์]
+
+FILES NOT ALLOWED TO MODIFY:
+- ทุกไฟล์ที่ไม่ได้อยู่ในสองรายการด้านบน
+
+ถ้าพบว่าต้องแก้ไฟล์นอกขอบเขต:
+1. หยุด
+2. แสดงชื่อไฟล์
+3. อธิบายเหตุผล
+4. ขออนุมัติก่อน
+
+ห้ามแก้ไขไฟล์นอกขอบเขตโดยอัตโนมัติ
+```
+
+---
+
+# 16. Prompt แก้เฉพาะ Bug
+
+```text
+แก้เฉพาะ Bug ต่อไปนี้:
+
+Bug ID: BUG-001
+Screen: U05
+Route: /home
+อาการ:
+[อธิบายอาการ]
+
+ผลลัพธ์ที่คาดหวัง:
+[อธิบาย]
+
+ไฟล์ที่อนุญาตให้แก้:
+- app/(user)/home/page.tsx
+- components/booking/LocationForm.tsx
+
+ห้าม:
+- สร้าง Feature ใหม่
+- เปลี่ยน API
+- เปลี่ยน Database
+- แก้ Screen อื่น
+- Refactor ไฟล์อื่น
+- เปลี่ยน Design System
+
+ก่อนแก้:
+1. วิเคราะห์สาเหตุ
+2. แสดงไฟล์และบรรทัดที่เกี่ยวข้อง
+3. แสดงแผนแก้
+4. รออนุมัติ
+```
+
+---
+
+# 17. Prompt เชื่อม API โดยไม่ทำ UI พัง
+
+```text
+เชื่อม API ให้กับ Screen U05 เท่านั้น
+
+หน้าที่มีอยู่แล้ว:
+- /home
+
+API ที่อนุญาต:
+- GET /api/locations/recent
+- GET /api/vehicle-types
+
+ห้าม:
+- เปลี่ยน Layout
+- เปลี่ยน Text
+- เปลี่ยนสี
+- เปลี่ยน Route
+- สร้างหน้าครั้งใหม่
+- ใช้ Mock Data หลังเชื่อม API
+- แก้ API อื่น
+
+ต้องเพิ่ม:
+- Loading State
+- Error State
+- Empty State
+- Retry
+- Abort Request
+- TypeScript Types
+- Zod Response Validation
+
+ก่อนเขียน:
+แสดง Data Flow:
+UI → Hook → API → Validation → UI
+
+รออนุมัติ
+```
+
+---
+
+# 18. Prompt สั่ง AI อัปเดตสถานะเอกสาร
+
+```text
+อัปเดตสถานะ Screen Inventory เท่านั้น
+
+Screen ที่ทำเสร็จ:
+- U01
+- U02
+- U03
+
+ให้เปลี่ยนสถานะตามผลตรวจจริงเท่านั้น:
+- U01 = DONE หากผ่าน Acceptance Criteria ครบ
+- U02 = TESTING หากยังมี Test ไม่ครบ
+- U03 = IN_PROGRESS หากยังมีข้อผิดพลาด
+
+ห้ามแก้ Source Code
+ห้ามเพิ่ม Screen
+ห้ามลบ Screen
+หลังแก้ให้แสดง Diff ของ docs/SCREEN-INVENTORY.md
+```
+
+---
+
+# 19. รูปแบบคำตอบที่ AI ต้องใช้
+
+กำหนดให้ AI ตอบตามรูปแบบนี้ทุก Phase:
+
+```text
+PHASE: Phase 5
+SCREEN: U05
+ROUTE: /home
+STATUS: PLANNING
+
+DOCUMENTS READ:
+- docs/SCREEN-INVENTORY.md
+- docs/screens/U05-home.md
+- docs/DESIGN-SYSTEM.md
+
+FILES TO CREATE:
+- ...
+
+FILES TO MODIFY:
+- ...
+
+FILES NOT ALLOWED TO MODIFY:
+- ...
+
+COMPONENT TREE:
+- ...
+
+DATA FLOW:
+- ...
+
+API:
+- ...
+
+STATES:
+- Initial
+- Loading
+- Empty
+- Error
+- Success
+
+ACCEPTANCE CRITERIA:
+- [ ] ...
+- [ ] ...
+
+WAITING FOR APPROVAL: YES
+```
+
+หลังทำเสร็จ:
+
+```text
+PHASE: Phase 5
+SCREEN: U05
+STATUS: COMPLETED
+
+FILES CREATED:
+- ...
+
+FILES MODIFIED:
+- ...
+
+FILES NOT MODIFIED:
+- ...
+
+COMMANDS RUN:
+- npm run lint
+- npx tsc --noEmit
+- npm run build
+
+RESULT:
+- Lint: PASS/FAIL
+- TypeScript: PASS/FAIL
+- Build: PASS/FAIL
+
+ACCEPTANCE CRITERIA:
+- [x] ...
+- [ ] ...
+
+REMAINING ISSUES:
+- ...
+
+NEXT RECOMMENDED PHASE:
+- ...
+```
+
+---
+
+# 20. วิธีใช้งานที่ถูกต้อง
+
+ลำดับที่แนะนำ:
+
+```text
+1. ให้ AI อ่านโปรเจกต์
+2. สร้างเอกสาร
+3. ตรวจ Screen Inventory
+4. สร้าง Design System
+5. สร้าง Database
+6. สร้าง Auth
+7. สร้าง U01
+8. ตรวจ U01
+9. สร้าง U02
+10. ตรวจ U02
+11. สร้าง U03
+12. ตรวจ U03
+13. ทำทีละหน้าไปเรื่อย ๆ
+```
+
+อย่าสั่งแบบนี้:
+
+```text
+ทำ U01 ถึง U19 ให้เสร็จ
+```
+
+ให้สั่งแบบนี้:
+
+```text
+ทำเฉพาะ U01
+```
+
+แล้วจึง:
+
+```text
+ตรวจ U01
+```
+
+แล้วจึง:
+
+```text
+ทำเฉพาะ U02
+```
+
+---
+
+## กฎที่สำคัญที่สุด
+
+ให้ AI ทำงานแบบนี้เสมอ:
+
+```text
+อ่านเอกสาร
+↓
+แสดงแผน
+↓
+รออนุมัติ
+↓
+สร้างเฉพาะ Phase
+↓
+ตรวจสอบ
+↓
+อัปเดตสถานะ
+↓
+ไป Phase ถัดไป
+```
+
+หากให้ AI ทำทีละ Phase และบังคับใช้ `Screen ID + Route + Files Allowed + Acceptance Criteria` ปัญหาหน้าหาย หน้าซ้ำ ขั้นตอนมั่ว และ AI แก้ไฟล์เกินขอบเขตจะลดลงมาก โดยให้ใช้ `docs/SCREEN-INVENTORY.md` เป็นรายการควบคุมกลางของทั้งโปรเจกต์.
+
+
+สถานะหลักของคนขับ
+text
+REGISTERED
+  ↓
+PROFILE_INCOMPLETE
+  ↓
+KYC_DRAFT
+  ↓
+KYC_SUBMITTED
+  ↓
+UNDER_REVIEW
+  ├── REJECTED → แก้ไขและส่งใหม่
+  └── APPROVED
+          ↓
+VEHICLE_PENDING
+          ↓
+READY_FOR_ASSIGNMENT
+          ↓
+ONLINE
+          ↓
+BUSY
+          ↓
+OFFLINE
+ฟังก์ชันหลัก
+สมัครด้วยเบอร์โทรศัพท์และ OTP
+
+เข้าสู่ระบบ
+
+กรอกข้อมูลส่วนตัว
+
+ยืนยันตัวตน KYC
+
+อัปโหลดบัตรประชาชน
+
+อัปโหลดใบขับขี่
+
+อัปโหลดรูปถ่ายผู้สมัคร
+
+กรอกข้อมูลรถ
+
+อัปโหลดเอกสารรถ
+
+เพิ่มบัญชีธนาคาร
+
+ตรวจสอบสถานะการอนุมัติ
+
+เปิด/ปิดสถานะพร้อมรับงาน
+
+รับงานและตอบรับงาน
+
+ดูรายละเอียดจุดรับ–ส่ง
+
+นำทางไปยังจุดรับสินค้า
+
+อัปเดตสถานะงาน
+
+อัปโหลดหลักฐานการรับหรือส่งสินค้า
+
+ดูรายได้
+
+ดูประวัติงาน
+
+ติดต่อฝ่ายสนับสนุน
+
+แก้ไขโปรไฟล์และเอกสารหมดอายุ
+
+Supabase Storage รองรับการควบคุมไฟล์ด้วย PostgreSQL RLS และควรจำกัดโฟลเดอร์ให้ผูกกับ user_id โดยตรง ส่วน Service Role Key ต้องเก็บไว้ฝั่งเซิร์ฟเวอร์เท่านั้น ห้ามใส่ใน Client หรือแอปที่เผยแพร่สู่ผู้ใช้ทั่วไป
+
+2. สถาปัตยกรรมระบบ
+text
+Driver App / Mobile Web
+        │
+        │ Supabase Auth
+        ▼
+Next.js App Router
+        │
+        ├── Route Handlers / API
+        ├── Server Actions
+        ├── Middleware
+        ├── Zod Validation
+        └── Supabase Server Client
+                │
+                ├── Supabase Auth
+                ├── PostgreSQL
+                ├── Storage
+                ├── Realtime
+                └── Edge Functions
+Stack แนะนำ
+ส่วนระบบ	เทคโนโลยี
+Frontend	Next.js, TypeScript, Tailwind CSS
+UI	shadcn/ui
+Backend	Next.js Route Handlers
+Database	Supabase PostgreSQL
+Authentication	Supabase Auth
+File Storage	Supabase Storage
+Realtime	Supabase Realtime
+Validation	Zod
+Form	React Hook Form
+State	Zustand หรือ TanStack Query
+แผนที่	Google Maps หรือ Mapbox
+แจ้งเตือน	Firebase Cloud Messaging
+OTP	ผู้ให้บริการ SMS/OTP ของไทย
+รูปภาพ	Browser compression ก่อนอัปโหลด
+Admin	Next.js Admin Dashboard
+Next.js App Router รองรับ Route Handler ในไฟล์ route.ts ภายใต้โฟลเดอร์ app และรองรับ HTTP methods เช่น GET, POST, PUT, PATCH และ DELETE
+
+3. โครงสร้างโปรเจกต์
+text
+jumbo-go/
+├── app/
+│   ├── (public)/
+│   │   ├── page.tsx
+│   │   └── driver/
+│   │       └── register/
+│   │           └── page.tsx
+│   │
+│   ├── (auth)/
+│   │   ├── login/
+│   │   │   └── page.tsx
+│   │   ├── verify-otp/
+│   │   │   └── page.tsx
+│   │   └── callback/
+│   │       └── route.ts
+│   │
+│   ├── driver/
+│   │   ├── layout.tsx
+│   │   ├── page.tsx
+│   │   ├── onboarding/
+│   │   │   ├── page.tsx
+│   │   │   ├── profile/
+│   │   │   │   └── page.tsx
+│   │   │   ├── identity/
+│   │   │   │   └── page.tsx
+│   │   │   ├── license/
+│   │   │   │   └── page.tsx
+│   │   │   ├── vehicle/
+│   │   │   │   └── page.tsx
+│   │   │   ├── bank/
+│   │   │   │   └── page.tsx
+│   │   │   └── submit/
+│   │   │       └── page.tsx
+│   │   │
+│   │   ├── jobs/
+│   │   │   ├── page.tsx
+│   │   │   └── [jobId]/
+│   │   │       └── page.tsx
+│   │   ├── earnings/
+│   │   │   └── page.tsx
+│   │   ├── history/
+│   │   │   └── page.tsx
+│   │   ├── profile/
+│   │   │   └── page.tsx
+│   │   └── support/
+│   │       └── page.tsx
+│   │
+│   └── api/
+│       ├── auth/
+│       │   ├── send-otp/
+│       │   │   └── route.ts
+│       │   └── verify-otp/
+│       │       └── route.ts
+│       ├── driver/
+│       │   ├── profile/
+│       │   │   └── route.ts
+│       │   ├── kyc/
+│       │   │   ├── route.ts
+│       │   │   ├── submit/
+│       │   │   │   └── route.ts
+│       │   │   └── documents/
+│       │   │       └── route.ts
+│       │   ├── vehicles/
+│       │   │   └── route.ts
+│       │   ├── bank-accounts/
+│       │   │   └── route.ts
+│       │   ├── availability/
+│       │   │   └── route.ts
+│       │   ├── jobs/
+│       │   │   ├── route.ts
+│       │   │   └── [jobId]/
+│       │   │       ├── accept/
+│       │       │   └── route.ts
+│       │   │       └── status/
+│       │   │           └── route.ts
+│       │   └── location/
+│       │       └── route.ts
+│       │
+│       └── webhooks/
+│           ├── otp/
+│           ├── payment/
+│           └── notification/
+│
+├── components/
+│   ├── driver/
+│   ├── kyc/
+│   ├── vehicle/
+│   ├── jobs/
+│   ├── maps/
+│   └── ui/
+│
+├── lib/
+│   ├── supabase/
+│   │   ├── browser.ts
+│   │   ├── server.ts
+│   │   └── admin.ts
+│   ├── validations/
+│   ├── permissions/
+│   ├── pricing/
+│   ├── notifications/
+│   └── storage/
+│
+├── hooks/
+├── types/
+├── supabase/
+│   ├── migrations/
+│   ├── seed.sql
+│   └── functions/
+│
+└── middleware.ts
+4. โมดูลระบบฝั่งคนรับงาน
+Module 1: Authentication
+รับผิดชอบ:
+
+สมัครด้วยเบอร์โทรศัพท์
+
+ส่ง OTP
+
+ตรวจสอบ OTP
+
+สร้างบัญชีผู้ใช้
+
+ต่ออายุ Session
+
+Logout
+
+ตรวจสอบสิทธิ์ Driver
+
+ตารางที่เกี่ยวข้อง:
+
+auth.users
+
+profiles
+
+user_roles
+
+otp_attempts
+
+Module 2: Driver Profile
+ข้อมูลหลัก:
+
+ชื่อ–นามสกุล
+
+เบอร์โทรศัพท์
+
+วันเกิด
+
+ที่อยู่
+
+จังหวัด
+
+อำเภอ
+
+ตำบล
+
+รหัสไปรษณีย์
+
+รูปโปรไฟล์
+
+ผู้ติดต่อฉุกเฉิน
+
+สถานะบัญชี
+
+Module 3: KYC
+แบ่งเป็น 5 ขั้นตอน:
+
+ข้อมูลส่วนตัว
+
+บัตรประชาชน
+
+ใบขับขี่
+
+เอกสารรถ
+
+บัญชีธนาคาร
+
+สถานะเอกสาร:
+
+text
+DRAFT
+UPLOADED
+PENDING_REVIEW
+APPROVED
+REJECTED
+EXPIRED
+ทุกครั้งที่เจ้าหน้าที่แก้ไขสถานะ ควรบันทึกลง kyc_review_logs เพื่อให้ตรวจสอบย้อนหลังได้
+
+Module 4: Vehicle
+รองรับประเภทรถจากภาพ:
+
+กระบะ
+
+กระบะตู้ทึบ
+
+กระบะคอก
+
+จัมโบ้
+
+6 ล้อ
+
+ข้อมูลรถ:
+
+ประเภทรถ
+
+ยี่ห้อ
+
+รุ่น
+
+สี
+
+ทะเบียนรถ
+
+จังหวัดทะเบียน
+
+น้ำหนักบรรทุก
+
+ขนาดพื้นที่บรรทุก
+
+รูปรถ
+
+เล่มทะเบียน
+
+พ.ร.บ.
+
+ประกันภัย
+
+Module 5: Driver Availability
+คนขับจะเปิดรับงานได้เมื่อ:
+
+text
+kyc_status = APPROVED
+vehicle_status = APPROVED
+bank_account_status = APPROVED
+account_status = ACTIVE
+สถานะ:
+
+text
+OFFLINE
+ONLINE
+BUSY
+SUSPENDED
+การเปิด Online ควรตรวจสอบเงื่อนไขบน Server ทุกครั้ง ไม่ควรเชื่อค่าจาก Client
+
+Module 6: Job Dispatch
+ระบบหางานให้คนขับตาม:
+
+ประเภทรถ
+
+พื้นที่ปัจจุบัน
+
+ระยะทางจากจุดรับ
+
+น้ำหนักบรรทุก
+
+ช่วงเวลาที่รับงาน
+
+คะแนนคนขับ
+
+ประวัติการยกเลิก
+
+สถานะ Online
+
+ลำดับงาน:
+
+text
+ORDER_CREATED
+  ↓
+SEARCHING_DRIVER
+  ↓
+OFFERED
+  ↓
+ACCEPTED
+  ↓
+DRIVER_GOING_TO_PICKUP
+  ↓
+ARRIVED_PICKUP
+  ↓
+PICKED_UP
+  ↓
+IN_TRANSIT
+  ↓
+ARRIVED_DROPOFF
+  ↓
+DELIVERED
+  ↓
+COMPLETED
+Module 7: Earnings
+ข้อมูลที่ควรแสดง:
+
+รายได้รวม
+
+ค่ารอบ
+
+โบนัส
+
+ค่ารอ
+
+ค่าทางด่วน
+
+ค่าคอมมิชชัน
+
+ยอดหัก
+
+ยอดสุทธิ
+
+รายได้รายวัน
+
+รายได้รายเดือน
+
+สถานะการโอนเงิน
+
+Module 8: Notifications
+ประเภทแจ้งเตือน:
+
+ผลการตรวจ KYC
+
+มีงานใหม่
+
+งานถูกยกเลิก
+
+ลูกค้าแก้ไขจุดส่ง
+
+เอกสารใกล้หมดอายุ
+
+แจ้งยอดรายได้
+
+แจ้งการโอนเงิน
+
+แจ้งเตือนจากแอดมิน
+
+5. โครงสร้างฐานข้อมูล Supabase
+profiles
+sql
+create table public.profiles (
+  id uuid primary key references auth.users(id) on delete cascade,
+  role text not null default 'driver',
+  full_name text,
+  phone text,
+  avatar_url text,
+  date_of_birth date,
+  address text,
+  province text,
+  district text,
+  subdistrict text,
+  postal_code text,
+  emergency_contact_name text,
+  emergency_contact_phone text,
+  account_status text not null default 'ACTIVE',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+driver_profiles
+sql
+create table public.driver_profiles (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null unique references public.profiles(id) on delete cascade,
+  driver_code text unique,
+  kyc_status text not null default 'NOT_STARTED',
+  availability_status text not null default 'OFFLINE',
+  rating numeric(3,2) default 5.00,
+  total_jobs integer not null default 0,
+  completed_jobs integer not null default 0,
+  cancelled_jobs integer not null default 0,
+  current_lat numeric(10,7),
+  current_lng numeric(10,7),
+  last_location_at timestamptz,
+  approved_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+kyc_submissions
+sql
+create table public.kyc_submissions (
+  id uuid primary key default gen_random_uuid(),
+  driver_id uuid not null references public.driver_profiles(id),
+  version integer not null default 1,
+  status text not null default 'DRAFT',
+  submitted_at timestamptz,
+  reviewed_at timestamptz,
+  reviewed_by uuid references public.profiles(id),
+  rejection_reason text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+kyc_documents
+sql
+create table public.kyc_documents (
+  id uuid primary key default gen_random_uuid(),
+  kyc_submission_id uuid not null references public.kyc_submissions(id) on delete cascade,
+  driver_id uuid not null references public.driver_profiles(id),
+  document_type text not null,
+  storage_path text not null,
+  file_name text,
+  mime_type text,
+  file_size integer,
+  document_number text,
+  issued_date date,
+  expiry_date date,
+  status text not null default 'UPLOADED',
+  rejection_reason text,
+  created_at timestamptz not null default now()
+);
+vehicles
+sql
+create table public.vehicles (
+  id uuid primary key default gen_random_uuid(),
+  driver_id uuid not null references public.driver_profiles(id),
+  vehicle_type text not null,
+  brand text,
+  model text,
+  color text,
+  plate_number text not null,
+  plate_province text not null,
+  max_weight_kg integer,
+  cargo_width_cm integer,
+  cargo_length_cm integer,
+  cargo_height_cm integer,
+  status text not null default 'PENDING',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+bank_accounts
+sql
+create table public.bank_accounts (
+  id uuid primary key default gen_random_uuid(),
+  driver_id uuid not null references public.driver_profiles(id),
+  bank_code text not null,
+  account_name text not null,
+  account_number_encrypted text not null,
+  account_number_last4 text not null,
+  status text not null default 'PENDING',
+  created_at timestamptz not null default now()
+);
+jobs
+sql
+create table public.jobs (
+  id uuid primary key default gen_random_uuid(),
+  order_id uuid,
+  driver_id uuid references public.driver_profiles(id),
+  vehicle_id uuid references public.vehicles(id),
+  status text not null default 'SEARCHING_DRIVER',
+  pickup_address text not null,
+  pickup_lat numeric(10,7) not null,
+  pickup_lng numeric(10,7) not null,
+  dropoff_address text not null,
+  dropoff_lat numeric(10,7) not null,
+  dropoff_lng numeric(10,7) not null,
+  distance_km numeric(10,2),
+  base_fare numeric(12,2),
+  driver_earnings numeric(12,2),
+  customer_price numeric(12,2),
+  accepted_at timestamptz,
+  picked_up_at timestamptz,
+  delivered_at timestamptz,
+  completed_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+job_status_logs
+sql
+create table public.job_status_logs (
+  id uuid primary key default gen_random_uuid(),
+  job_id uuid not null references public.jobs(id) on delete cascade,
+  actor_id uuid not null references public.profiles(id),
+  old_status text,
+  new_status text not null,
+  note text,
+  latitude numeric(10,7),
+  longitude numeric(10,7),
+  created_at timestamptz not null default now()
+);
+driver_locations
+sql
+create table public.driver_locations (
+  id bigint generated always as identity primary key,
+  driver_id uuid not null references public.driver_profiles(id),
+  latitude numeric(10,7) not null,
+  longitude numeric(10,7) not null,
+  heading numeric(6,2),
+  speed numeric(8,2),
+  recorded_at timestamptz not null default now()
+);
+6. Storage Buckets
+แนะนำแยก Bucket ดังนี้:
+
+text
+kyc-private
+vehicle-private
+job-proof-private
+avatars-public
+โครงสร้างไฟล์:
+
+text
+kyc-private/
+  {user_id}/
+    identity-front.jpg
+    identity-back.jpg
+    selfie.jpg
+    license-front.jpg
+    license-back.jpg
+
+vehicle-private/
+  {user_id}/
+    registration-book.jpg
+    compulsory-insurance.jpg
+    vehicle-front.jpg
+    vehicle-side.jpg
+
+job-proof-private/
+  {driver_id}/
+    {job_id}/
+      pickup-proof.jpg
+      delivery-proof.jpg
+      signature.jpg
+ไม่ควรทำเอกสาร KYC เป็น Public Bucket เพราะเป็นข้อมูลส่วนบุคคลที่มีความอ่อนไหว ควรใช้ Private Bucket และสร้าง Signed URL อายุสั้นเฉพาะเมื่อผู้มีสิทธิ์ร้องขอ
+
+ตัวอย่าง Policy สำหรับการอัปโหลดไฟล์ของตัวเอง:
+
+sql
+create policy "driver_upload_own_kyc"
+on storage.objects
+for insert
+to authenticated
+with check (
+  bucket_id = 'kyc-private'
+  and (storage.foldername(name))[1] = auth.uid()::text
+);
+ตัวอย่าง Policy สำหรับอ่านไฟล์ของตัวเอง:
+
+sql
+create policy "driver_read_own_kyc"
+on storage.objects
+for select
+to authenticated
+using (
+  bucket_id = 'kyc-private'
+  and (storage.foldername(name))[1] = auth.uid()::text
+);
+7. ขั้นตอน KYC ฝั่งคนรับงาน
+ขั้นที่ 1: สมัครสมาชิก
+หน้าจอ:
+
+text
+สมัครเป็นคนขับ
+เบอร์โทรศัพท์
+ปุ่ม รับรหัส OTP
+API:
+
+text
+POST /api/auth/send-otp
+Request:
+
+json
+{
+  "phone": "0812345678"
+}
+Response:
+
+json
+{
+  "success": true,
+  "expiresIn": 300,
+  "requestId": "otp_request_id"
+}
+ขั้นที่ 2: ยืนยัน OTP
+text
+POST /api/auth/verify-otp
+Request:
+
+json
+{
+  "phone": "0812345678",
+  "otp": "123456",
+  "requestId": "otp_request_id"
+}
+หลังตรวจสอบสำเร็จ:
+
+สร้าง auth.users
+
+สร้าง profiles
+
+สร้าง driver_profiles
+
+สร้าง kyc_submissions
+
+ส่งผู้ใช้ไปหน้า /driver/onboarding
+
+ขั้นที่ 3: กรอกข้อมูลส่วนตัว
+text
+PUT /api/driver/profile
+Request:
+
+json
+{
+  "fullName": "สมชาย ใจดี",
+  "dateOfBirth": "1990-01-01",
+  "address": "99/9 หมู่ 1",
+  "province": "มหาสารคาม",
+  "district": "เมืองมหาสารคาม",
+  "subdistrict": "ตลาด",
+  "postalCode": "44000",
+  "emergencyContactName": "สมหญิง ใจดี",
+  "emergencyContactPhone": "0899999999"
+}
+Validation ด้วย Zod:
+
+ts
+import { z } from "zod";
+
+export const driverProfileSchema = z.object({
+  fullName: z.string().min(3).max(120),
+  dateOfBirth: z.string().date(),
+  address: z.string().min(5),
+  province: z.string().min(2),
+  district: z.string().min(2),
+  subdistrict: z.string().min(2),
+  postalCode: z.string().regex(/^\d{5}$/),
+  emergencyContactName: z.string().min(3),
+  emergencyContactPhone: z.string().regex(/^0\d{9}$/),
+});
+ขั้นที่ 4: อัปโหลดบัตรประชาชน
+เอกสาร:
+
+ด้านหน้า
+
+ด้านหลัง
+
+รูปถ่ายใบหน้า หรือ Selfie
+
+เลขบัตรประชาชน
+
+วันหมดอายุ ถ้ามี
+
+API:
+
+text
+POST /api/driver/kyc/documents
+แบบ Multipart:
+
+text
+documentType=ID_CARD_FRONT
+file=<image>
+Document Type:
+
+text
+ID_CARD_FRONT
+ID_CARD_BACK
+SELFIE
+DRIVER_LICENSE_FRONT
+DRIVER_LICENSE_BACK
+VEHICLE_REGISTRATION
+COMPULSORY_INSURANCE
+VEHICLE_FRONT
+VEHICLE_SIDE
+ควรตรวจสอบ:
+
+MIME Type
+
+ขนาดไฟล์
+
+นามสกุลไฟล์
+
+ขนาดภาพ
+
+ไฟล์ซ้ำ
+
+ผู้ใช้เป็นเจ้าของโฟลเดอร์
+
+ห้ามรับชื่อไฟล์จากผู้ใช้มาใช้ตรง ๆ
+
+ขั้นที่ 5: ใบขับขี่
+ข้อมูล:
+
+json
+{
+  "licenseNumber": "123456789",
+  "licenseType": "THIRD_PRIVATE",
+  "issuedDate": "2024-01-01",
+  "expiryDate": "2029-01-01"
+}
+ระบบควรแจ้งเตือนล่วงหน้า:
+
+text
+เหลือ 30 วัน → แจ้งเตือน
+เหลือ 7 วัน → แจ้งเตือนเร่งด่วน
+หมดอายุ → ระงับรับงาน
+ขั้นที่ 6: ข้อมูลรถ
+ตัวเลือกตามภาพ:
+
+text
+PICKUP
+CLOSED_PICKUP
+CAGE_PICKUP
+JUMBO
+SIX_WHEEL
+ตัวอย่าง:
+
+json
+{
+  "vehicleType": "CLOSED_PICKUP",
+  "brand": "Isuzu",
+  "model": "D-Max",
+  "color": "ขาว",
+  "plateNumber": "กข 1234",
+  "plateProvince": "มหาสารคาม",
+  "maxWeightKg": 1500
+}
+ระบบควรตรวจทะเบียนซ้ำ:
+
+text
+GET /api/driver/vehicles/check-plate?plateNumber=กข1234
+ขั้นที่ 7: บัญชีธนาคาร
+ข้อมูลที่ควรเก็บ:
+
+ธนาคาร
+
+ชื่อบัญชี
+
+เลขบัญชี
+
+เลขบัญชี 4 ตัวท้าย
+
+รูปหน้าสมุดบัญชี หรือหลักฐานบัญชี
+
+ไม่ควรเก็บเลขบัญชีแบบ Plain Text หากไม่จำเป็น ควรเข้ารหัสฝั่ง Server และแสดงให้ผู้ใช้เห็นเพียง:
+
+text
+ธนาคารกสิกรไทย
+ชื่อบัญชี: สมชาย ใจดี
+เลขบัญชี: xxxx-xxxx-1234
+ขั้นที่ 8: ยอมรับข้อกำหนด
+ต้องมี Checkbox:
+
+ยอมรับข้อกำหนดการใช้บริการ
+
+ยินยอมให้ตรวจสอบข้อมูล
+
+ยินยอมให้จัดเก็บเอกสาร KYC
+
+รับทราบนโยบายความเป็นส่วนตัว
+
+ยินยอมให้ใช้ตำแหน่งระหว่างออนไลน์
+
+บันทึก:
+
+sql
+create table public.user_consents (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references public.profiles(id),
+  consent_type text not null,
+  version text not null,
+  accepted_at timestamptz not null default now(),
+  ip_address inet,
+  user_agent text
+);
+ขั้นที่ 9: ส่งตรวจสอบ
+text
+POST /api/driver/kyc/submit
+Server ต้องตรวจสอบว่าข้อมูลครบ:
+
+text
+มีข้อมูล Profile
+มีบัตรประชาชนครบ
+มี Selfie
+มีใบขับขี่ครบ
+มีข้อมูลรถ
+มีเอกสารรถ
+มีบัญชีธนาคาร
+ยอมรับ Consent
+ถ้าครบ:
+
+text
+kyc_submissions.status = UNDER_REVIEW
+driver_profiles.kyc_status = UNDER_REVIEW
+Response:
+
+json
+{
+  "success": true,
+  "status": "UNDER_REVIEW",
+  "message": "ส่งเอกสารเรียบร้อย กรุณารอการตรวจสอบ"
+}
+8. API ทั้งหมดที่ควรมี
+Authentication
+Method	Endpoint	หน้าที่
+POST	/api/auth/send-otp	ขอ OTP
+POST	/api/auth/verify-otp	ยืนยัน OTP
+POST	/api/auth/logout	ออกจากระบบ
+GET	/api/auth/me	ข้อมูลผู้ใช้ปัจจุบัน
+Profile
+Method	Endpoint	หน้าที่
+GET	/api/driver/profile	ดูโปรไฟล์
+PUT	/api/driver/profile	แก้ไขโปรไฟล์
+POST	/api/driver/avatar	อัปโหลดรูปโปรไฟล์
+KYC
+Method	Endpoint	หน้าที่
+GET	/api/driver/kyc	ดูสถานะ KYC
+POST	/api/driver/kyc	สร้างแบบฟอร์ม KYC
+PUT	/api/driver/kyc	บันทึก KYC
+POST	/api/driver/kyc/documents	อัปโหลดเอกสาร
+DELETE	/api/driver/kyc/documents/:id	ลบเอกสาร
+POST	/api/driver/kyc/submit	ส่งตรวจสอบ
+GET	/api/driver/kyc/timeline	ดูประวัติการตรวจ
+Vehicle
+Method	Endpoint	หน้าที่
+GET	/api/driver/vehicles	ดูรถทั้งหมด
+POST	/api/driver/vehicles	เพิ่มรถ
+GET	/api/driver/vehicles/:id	ดูรายละเอียดรถ
+PUT	/api/driver/vehicles/:id	แก้ไขรถ
+DELETE	/api/driver/vehicles/:id	ลบรถ
+POST	/api/driver/vehicles/:id/documents	อัปโหลดเอกสารรถ
+Bank
+Method	Endpoint	หน้าที่
+GET	/api/driver/bank-accounts	ดูบัญชี
+POST	/api/driver/bank-accounts	เพิ่มบัญชี
+PUT	/api/driver/bank-accounts/:id	แก้ไขบัญชี
+DELETE	/api/driver/bank-accounts/:id	ลบบัญชี
+Availability
+Method	Endpoint	หน้าที่
+GET	/api/driver/availability	ดูสถานะ
+POST	/api/driver/availability/online	เปิดรับงาน
+POST	/api/driver/availability/offline	ปิดรับงาน
+POST	/api/driver/location	อัปเดตตำแหน่ง
+Jobs
+Method	Endpoint	หน้าที่
+GET	/api/driver/jobs	ดูงาน
+GET	/api/driver/jobs/:id	รายละเอียดงาน
+POST	/api/driver/jobs/:id/accept	รับงาน
+POST	/api/driver/jobs/:id/reject	ปฏิเสธงาน
+POST	/api/driver/jobs/:id/status	อัปเดตสถานะ
+POST	/api/driver/jobs/:id/proof	อัปโหลดหลักฐาน
+POST	/api/driver/jobs/:id/cancel	ยกเลิกงาน
+Earnings
+Method	Endpoint	หน้าที่
+GET	/api/driver/earnings	รายได้
+GET	/api/driver/earnings/summary	สรุปรายได้
+GET	/api/driver/payouts	ประวัติการโอน
+9. ตัวอย่าง Route Handler
+ts
+// app/api/driver/availability/online/route.ts
+
+import { NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
+
+export async function POST() {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json(
+      { error: "UNAUTHORIZED" },
+      { status: 401 }
+    );
+  }
+
+  const { data: driver } = await supabase
+    .from("driver_profiles")
+    .select("id, kyc_status, availability_status")
+    .eq("user_id", user.id)
+    .single();
+
+  if (!driver) {
+    return NextResponse.json(
+      { error: "DRIVER_NOT_FOUND" },
+      { status: 404 }
+    );
+  }
+
+  if (driver.kyc_status !== "APPROVED") {
+    return NextResponse.json(
+      {
+        error: "KYC_NOT_APPROVED",
+        message: "บัญชียังไม่ผ่านการตรวจสอบ",
+      },
+      { status: 422 }
+    );
+  }
+
+  const { data, error } = await supabase
+    .from("driver_profiles")
+    .update({
+      availability_status: "ONLINE",
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", driver.id)
+    .select()
+    .single();
+
+  if (error) {
+    return NextResponse.json(
+      { error: "UPDATE_FAILED" },
+      { status: 500 }
+    );
+  }
+
+  return NextResponse.json({
+    success: true,
+    driver: data,
+  });
+}
+10. การรับงานแบบปลอดภัย
+การรับงานต้องใช้ Transaction หรือ RPC เพื่อป้องกันคนขับสองคนกดรับงานเดียวกันพร้อมกัน
+
+sql
+create or replace function accept_job(
+  p_job_id uuid,
+  p_driver_id uuid
+)
+returns public.jobs
+language plpgsql
+security definer
+as $$
+declare
+  v_job public.jobs;
+begin
+  select *
+  into v_job
+  from public.jobs
+  where id = p_job_id
+  for update;
+
+  if v_job.id is null then
+    raise exception 'JOB_NOT_FOUND';
+  end if;
+
+  if v_job.status <> 'OFFERED' then
+    raise exception 'JOB_ALREADY_TAKEN';
+  end if;
+
+  update public.jobs
+  set
+    driver_id = p_driver_id,
+    status = 'ACCEPTED',
+    accepted_at = now(),
+    updated_at = now()
+  where id = p_job_id
+  returning * into v_job;
+
+  update public.driver_profiles
+  set availability_status = 'BUSY'
+  where id = p_driver_id;
+
+  return v_job;
+end;
+$$;
+ห้ามให้ Client อัปเดต driver_id และ status โดยตรงเอง เพราะอาจทำให้รับงานซ้ำหรือปลอมสถานะได้
+
+11. หน้าจอฝั่งคนรับงาน
+หน้าสมัคร Driver
+องค์ประกอบ:
+
+text
+โลโก้ JUMBO GO
+หัวข้อ: สมัครเป็นพาร์ตเนอร์คนขับ
+คำอธิบาย:
+- งานต่อเนื่อง
+- รายได้โปร่งใส
+- เลือกเวลาทำงานได้
+- มีทีมงานช่วยเหลือ
+
+ปุ่ม: สมัครคนขับ
+หน้า Onboarding
+ใช้ Stepper:
+
+text
+1. ข้อมูลส่วนตัว
+2. ยืนยันตัวตน
+3. ใบขับขี่
+4. ข้อมูลรถ
+5. บัญชีธนาคาร
+6. ตรวจสอบและส่ง
+หน้า KYC Status
+text
+กำลังตรวจสอบเอกสาร
+
+เอกสารของคุณอยู่ระหว่างตรวจสอบ
+ระยะเวลาโดยประมาณ: 1–2 วันทำการ
+
+[ดูเอกสาร]
+[แก้ไขข้อมูล]
+[ติดต่อเจ้าหน้าที่]
+หน้า Driver Dashboard
+text
+สวัสดี สมชาย ใจดี
+
+สถานะ: ออฟไลน์
+[เปิดรับงาน]
+
+งานวันนี้        รายได้วันนี้
+3 งาน            1,250 บาท
+
+งานที่กำลังดำเนินการ
+รายได้ล่าสุด
+ประกาศจากระบบ
+หน้ารับงาน
+text
+มีงานใหม่
+ระยะทางไปจุดรับ: 4.2 กม.
+ระยะทางรวม: 28.5 กม.
+รายได้โดยประมาณ: 520 บาท
+ประเภทรถ: กระบะตู้ทึบ
+
+[ปฏิเสธ] [รับงาน]
+หน้าเดินทาง
+text
+กำลังไปจุดรับสินค้า
+เหลือ 5 นาทีถึงจุดรับ
+
+[โทรหาลูกค้า]
+[แชต]
+[ถึงจุดรับแล้ว]
+หน้าปิดงาน
+text
+ส่งงานสำเร็จแล้ว
+รายได้รอบนี้: 520 บาท
+
+[ถ่ายรูปหลักฐาน]
+[ยืนยันส่งงาน]
+12. RLS พื้นฐาน
+เปิด RLS:
+
+sql
+alter table public.profiles enable row level security;
+alter table public.driver_profiles enable row level security;
+alter table public.kyc_submissions enable row level security;
+alter table public.kyc_documents enable row level security;
+alter table public.vehicles enable row level security;
+alter table public.jobs enable row level security;
+ผู้ใช้ดูโปรไฟล์ตัวเอง:
+
+sql
+create policy "user_read_own_profile"
+on public.profiles
+for select
+to authenticated
+using (id = auth.uid());
+ผู้ใช้แก้โปรไฟล์ตัวเอง:
+
+sql
+create policy "user_update_own_profile"
+on public.profiles
+for update
+to authenticated
+using (id = auth.uid())
+with check (id = auth.uid());
+ผู้ขับดูข้อมูลตัวเอง:
+
+sql
+create policy "driver_read_own_profile"
+on public.driver_profiles
+for select
+to authenticated
+using (user_id = auth.uid());
+ผู้ขับดู KYC ของตัวเอง:
+
+sql
+create policy "driver_read_own_kyc"
+on public.kyc_submissions
+for select
+to authenticated
+using (
+  driver_id in (
+    select id
+    from public.driver_profiles
+    where user_id = auth.uid()
+  )
+);
+ส่วนเจ้าหน้าที่ Admin ควรใช้ Role และ Policy แยกต่างหาก ไม่ควรเปิดให้ผู้ใช้ทั่วไปอ่านข้อมูล KYC ของผู้อื่น
+
+13. สิทธิ์ของระบบ
+Driver
+อ่านและแก้ไขข้อมูลตนเอง
+
+อัปโหลดเอกสารของตนเอง
+
+ดูงานที่ได้รับมอบหมาย
+
+อัปเดตสถานะงานของตนเอง
+
+ดูรายได้ของตนเอง
+
+เปิด/ปิดรับงาน
+
+ส่งตำแหน่งของตนเอง
+
+Admin
+ตรวจสอบ KYC
+
+อนุมัติหรือปฏิเสธเอกสาร
+
+จัดการคนขับ
+
+จัดการรถ
+
+มอบหมายงาน
+
+ดูตำแหน่งคนขับ
+
+ระงับบัญชี
+
+จัดการการจ่ายเงิน
+
+Customer
+สร้างงาน
+
+ดูสถานะงาน
+
+ดูตำแหน่งคนขับของงานตัวเอง
+
+ติดต่อคนขับผ่านระบบ
+
+14. ลำดับการพัฒนา MVP
+Phase 1: สมัครและ KYC
+Supabase Auth
+
+สมัคร OTP
+
+Profile
+
+อัปโหลดเอกสาร
+
+KYC Status
+
+Admin ตรวจสอบ KYC
+
+Phase 2: รถและพร้อมรับงาน
+เพิ่มรถ
+
+ตรวจเอกสารรถ
+
+เพิ่มบัญชีธนาคาร
+
+เปิด/ปิด Online
+
+อัปเดต Location
+
+Phase 3: ระบบงาน
+สร้างงาน
+
+จ่ายงานให้คนขับ
+
+รับงาน
+
+สถานะงาน
+
+หลักฐานรับ–ส่ง
+
+ประวัติงาน
+
+Phase 4: รายได้
+คำนวณค่ารอบ
+
+ค่าคอมมิชชัน
+
+สรุปรายได้
+
+รอบจ่ายเงิน
+
+รายการโอนเงิน
+
+Phase 5: Production
+Push Notification
+
+Realtime
+
+Monitoring
+
+Audit Log
+
+Rate Limit
+
+ระบบตรวจเอกสารอัตโนมัติ
+
+ระบบป้องกัน GPS ปลอม
+
+ระบบ Fraud Detection
+
+15. กฎสำคัญก่อนขึ้น Production
+ห้ามใช้ SUPABASE_SERVICE_ROLE_KEY ใน Client
+
+เอกสาร KYC ต้องอยู่ใน Private Bucket
+
+ทุก API ต้องตรวจ auth.getUser()
+
+ห้ามเชื่อ user_id จาก Request Body
+
+รับ user_id จาก Session เท่านั้น
+
+การรับงานต้องเป็น Atomic Transaction
+
+จำกัดจำนวนครั้งการส่ง OTP
+
+จำกัดขนาดไฟล์และ MIME Type
+
+สร้าง Audit Log ทุกการเปลี่ยนสถานะ
+
+ทำ Signed URL สำหรับเอกสารแบบหมดอายุ
+
+ซ่อนเลขบัตรประชาชนและเลขบัญชีบางส่วน
+
+เข้ารหัสข้อมูลที่มีความเสี่ยงสูง
+
+ให้ผู้ใช้ลบหรือขอแก้ไขข้อมูลตามนโยบายความเป็นส่วนตัว
+
+ทดสอบ RLS ด้วยผู้ใช้หลาย Role
+
+ตรวจสอบเอกสารหมดอายุด้วย Scheduled Job
+
+แนวทางนี้เหมาะสำหรับทำ MVP ด้วย Next.js และ Supabase โดยเริ่มจาก สมัคร → KYC → รถ → บัญชีธนาคาร → อนุมัติ → เปิดรับงาน → รับงานแรก ก่อน แล้วค่อยเพิ่มระบบชำระเงิน แผนที่ Realtime และระบบจัดสรรงานอัตโนมัติภายหลัง.
+
+
+
+JUMBO_GO_พิมพ์เขียวระบบและการออกแบบหน้าจอ
+เอกสาร PDF
+จัดทำเอกสาร PDF ให้เรียบร้อยแล้วครับ ภายในรวบรวม:
+
+Flow หน้าจอตามภาพตั้งแต่ Splash ถึงส่งงานสำเร็จ
+
+หน้าผู้ใช้และหน้าคนรับงาน
+
+Design System สี ฟอนต์ และการคุมข้อความภาษาไทย
+
+โครงสร้างโปรเจกต์ Next.js
+
+Zod Schema สำหรับ KYC และ Vehicles
+
+Database Schema สำหรับ Drivers, Vehicles และ KYC
+
+Supabase Database RLS
+
+Supabase Storage RLS สำหรับเอกสาร KYC
+
+ตัวอย่าง Browser Client และ Server Client
+
+Next.js Middleware ป้องกันเส้นทาง Driver
+
+ระบบ Online / Offline
+
+Realtime, Presence และ Heartbeat
+
+API เพิ่มรถ
+
+รายการ API ที่ควรมี
+
+Checklist การพัฒนา
+
+ลำดับการทำงานตั้งแต่สมัครจนพร้อมรับงาน
+
+ข้อควรระวังด้านความปลอดภัย
+
+ไฟล์เอกสารพร้อมใช้งานและดาวน์โหลดได้จากไฟล์แนบด้านบนครับ.
+
+ช่วยทำสัญญาจ้างงานให้หน่อยตกลงกันไว้กับผู้ว่าจ้างว่าค่าใช้จ่ายที่เป็นของผู้ว่าจ้างโดยตรงที่เกี่ยวกับการสร้างเว็บแอปพลิเคชั่นตามสเต็ปดังกล่าวก็คือให้ผู้ว่าจ้างโอนชำระตามจริงส่วนค่าจ้างจะไปรับตอนที่ส่งมอบระบบระบบรายละเอียดหน้าผู้ใช้งานของฝั่งผู้ใช้งานคุยกันที่ 10,000 หน้าแอดมินคุยกันที่ 10,000 หลังจากคุณทำเอกสารเสร็จแล้วถ้าคุณมีคำแนะนำเพิ่มเติมหรือส่วนไหนที่ผมควรจะเรียนรู้แล้วก็ป้องกันแม่ตัวเองเสียเปรียบหรือว่าสิ่งที่กำลังทำอยู่มันเสียเปรียบไหมก็ช่วยบอกด้วยแล้วกัน
+
+
+ร่างสัญญาจ้างพัฒนาเว็บแอปพลิเคชัน JUMBO GO
+เอกสาร PDF
+จัดทำ ร่างสัญญาจ้างพัฒนาเว็บแอปพลิเคชัน JUMBO GO ให้เรียบร้อยแล้วครับ โดยมีเนื้อหาครบถ้วนเกี่ยวกับ:
+
+ค่าใช้จ่ายภายนอกที่ผู้ว่าจ้างชำระตามจริง
+
+ค่าพัฒนาฝั่งผู้ใช้งาน 10,000 บาท
+
+ค่าพัฒนาฝั่งแอดมิน 10,000 บาท
+
+ค่าจ้างรวมเบื้องต้น 20,000 บาท
+
+เงื่อนไขชำระเงินเมื่อส่งมอบระบบ
+
+ขอบเขตงานฝั่งผู้ใช้ ฝั่งแอดมิน และฝั่ง Driver
+
+การส่งมอบและตรวจรับงาน
+
+ระยะเวลาตรวจรับ
+
+การแก้ไข Bug และการเปลี่ยน Requirement
+
+ลิขสิทธิ์ Source Code และบัญชีบริการต่าง ๆ
+
+ค่า Domain, Hosting, Supabase, Map API, OTP และ Payment Gateway
+
+การรักษาความลับและข้อมูลส่วนบุคคล
+
+เงื่อนไขยกเลิกสัญญา
+
+ความรับผิดและเหตุสุดวิสัย
+
+ภาคผนวกขอบเขตงาน
+
+ภาคผนวกเกณฑ์ตรวจรับ
+
+ภาคผนวกรายการค่าใช้จ่ายภายนอก
+
+คำแนะนำสำคัญ
+ข้อตกลงเดิมที่ให้ผู้ว่าจ้างจ่ายค่าจ้างทั้งหมดหลังส่งมอบงาน ทำให้ผู้รับจ้างเสียเปรียบค่อนข้างมาก เพราะผู้รับจ้างต้องใช้เวลาพัฒนาเต็มโครงการก่อนจึงจะได้รับเงิน แนะนำให้เจรจาเป็น:
+
+30% เมื่อเริ่มงาน
+
+40% เมื่อส่ง Demo หลัก
+
+30% เมื่อส่งมอบระบบจริง
+
+หากผู้ว่าจ้างไม่ยอมแบ่งงวด อย่างน้อยควรกำหนดให้ชัดเจนว่า:
+
+“ส่งมอบระบบ” หมายถึงอะไร
+
+ผู้ว่าจ้างมีเวลาตรวจรับกี่วัน
+
+ถ้าไม่ตอบกลับภายในกำหนดให้ถือว่ารับมอบ
+
+แก้ไขฟรีได้กี่รอบ
+
+Feature ใหม่คิดเงินเพิ่มอย่างไร
+
+Source Code ส่งมอบเมื่อชำระเงินครบเท่านั้น
+
+บัญชี Domain, Hosting และ Supabase ต้องเป็นของผู้ว่าจ้าง
+
+ผู้ว่าจ้างต้องรับผิดชอบค่าใช้บริการภายนอกทั้งหมด
+
+เอกสารฉบับนี้เป็น แบบร่างสำหรับนำไปเจรจา ไม่ควรลงนามโดยไม่ตรวจสอบรายละเอียดกับทนายความ โดยเฉพาะเรื่องภาษี หัก ณ ที่จ่าย ลิขสิทธิ์ และ PDPA ซึ่งอาจแตกต่างตามสถานะบุคคลหรือนิติบุคคลของคู่สัญญา หลักการจ้างทำของไทยผูกกับผลงานและการส่งมอบ ส่วนหน้าที่ของผู้ประมวลผลข้อมูลส่วนบุคคลควรระบุให้ชัดเจนเมื่อผู้พัฒนาเข้าถึงข้อมูลลูกค้าหรือเอกสาร KYC
+
+ผมต้องการไดอะแกรมในการ เป็นยูสเซอร์โฟร์ แล้วก็ให้เอไอมันสร้างหน้าได้เป๊ะ เป๊ะให้ครบตามที่เราต้องการมันสร้างหน้าไม่ครบสักที แล้วทำไปทำมามั่วซั่วและขั้นตอนไปหมด
+
+ได้ครับ ปัญหาที่ AI สร้างหน้าไม่ครบและทำ Flow มั่ว มักเกิดจากการสั่งงานแบบ “ทำแอป JUMBO GO ให้หน่อย” ซึ่งกว้างเกินไป AI จะเดาเองว่าอะไรสำคัญก่อนหลัง
+
+วิธีแก้คือ ต้องมีเอกสารควบคุม 4 ชั้น:
+
+text
+1. User Flow Diagram
+2. Screen Inventory
+3. Screen Specification
+4. AI Implementation Rules
+แล้วสั่ง AI ให้สร้างทีละชุด โดย ห้ามสร้างข้ามหน้า ห้ามตัดหน้า ห้ามสมมติเอง และต้องตรวจ Checklist ทุกครั้ง
+
+ด้านล่างคือ User Flow ฉบับเป็นระบบสำหรับ JUMBO GO พร้อม Prompt ที่นำไปใช้กับ AI Coding Agent ได้
+
+1. กติกาหลักก่อนให้ AI สร้าง
+ให้ถือกติกานี้เป็นกฎสูงสุดของโปรเจกต์:
+
+text
+ห้ามตัดหน้าใด ๆ ออก
+ห้ามรวมหลายหน้าเป็นหน้าเดียว
+ห้ามเปลี่ยนลำดับ User Flow
+ห้ามตั้งชื่อหน้าหรือ Route ใหม่เอง
+ห้ามสร้าง Feature ที่ไม่มีในเอกสาร
+ห้ามใช้ข้อความภาษาอังกฤษใน UI หากมีข้อความไทยกำหนดไว้แล้ว
+ห้ามเปลี่ยนโทนสีหลัก
+ห้ามเขียนโค้ดทั้งระบบในครั้งเดียว
+ต้องทำทีละ Phase
+ต้องแสดงรายการไฟล์ที่จะสร้างก่อนเขียนโค้ด
+ต้องตรวจว่าไฟล์เดิมมีอยู่แล้วหรือไม่
+ต้องไม่เขียนทับไฟล์โดยไม่แจ้ง
+หากข้อมูลไม่พอ ให้หยุดและถาม ไม่ให้เดา
+Next.js ใช้โครงสร้างแบบ File-system Routing โดย Folder กำหนดเส้นทาง และ page.tsx เป็นหน้าของ Route ส่วน layout.tsx, loading.tsx, error.tsx ใช้ทำโครงสร้างร่วม สถานะโหลด และ Error Boundary ได้
+
+2. ภาพรวมระบบทั้งหมด
+2.1 Actor ในระบบ
+text
+ผู้ใช้งาน
+  ├── สมัครสมาชิก
+  ├── เรียกรถ
+  ├── ติดตามงาน
+  ├── ชำระเงิน
+  └── ดูประวัติ
+
+คนรับงาน / Driver
+  ├── สมัคร Driver
+  ├── ยืนยันตัวตน KYC
+  ├── เพิ่มรถ
+  ├── เปิดรับงาน
+  ├── รับงาน
+  ├── อัปเดตสถานะ
+  └── ดูรายได้
+
+ผู้ดูแลระบบ / Admin
+  ├── ตรวจ KYC
+  ├── อนุมัติ Driver
+  ├── จัดการรถ
+  ├── จัดการงาน
+  ├── ดูผู้ใช้งาน
+  ├── ตั้งค่าราคา
+  └── ตรวจสอบปัญหา
+2.2 แผนผังระบบระดับใหญ่
+
+
+
+3. User Flow ฝั่งผู้ใช้งาน
+นี่คือ Flow หลักที่ต้องสร้างตามภาพ โดยห้ามสลับลำดับ
+
+
+
+
+3.1 รายการหน้าฝั่งผู้ใช้งาน
+ID	Route	ชื่อหน้า	สถานะ
+U01	/	Splash	ต้องสร้าง
+U02	/login	เข้าสู่ระบบ	ต้องสร้าง
+U03	/register	สมัครสมาชิก	ต้องสร้าง
+U04	/verify-otp	ยืนยัน OTP	ต้องสร้าง
+U05	/home	หน้าหลัก	ต้องสร้าง
+U06	/booking/pickup	จุดรับสินค้า	ต้องสร้าง
+U07	/booking/dropoff	จุดส่งสินค้า	ต้องสร้าง
+U08	/booking/vehicle-type	เลือกประเภทรถ	ต้องสร้าง
+U09	/booking/summary	สรุปราคา	ต้องสร้าง
+U10	/booking/confirm	ยืนยันเรียกรถ	ต้องสร้าง
+U11	/booking/searching	กำลังค้นหาคนขับ	ต้องสร้าง
+U12	/booking/driver-found	คนขับรับงานแล้ว	ต้องสร้าง
+U13	/booking/tracking	ติดตามรถ	ต้องสร้าง
+U14	/booking/completed	ส่งงานสำเร็จ	ต้องสร้าง
+U15	/jobs	ประวัติงาน	ต้องสร้าง
+U16	/jobs/[jobId]	รายละเอียดงาน	ต้องสร้าง
+U17	/profile	โปรไฟล์	ต้องสร้าง
+U18	/notifications	การแจ้งเตือน	ต้องสร้าง
+U19	/support	ศูนย์ช่วยเหลือ	ต้องสร้าง
+4. รายละเอียดแต่ละหน้าฝั่งผู้ใช้งาน
+U01 — Splash
+จุดประสงค์
+ตรวจ Session และส่งผู้ใช้ไปหน้าที่ถูกต้อง
+
+UI
+text
+โลโก้ JUMBO GO
+เรียกรถขนของ ราคาคนไทย
+เร็ว • ปลอดภัย • ไว้ใจได้
+ขนได้ทุกที่ ไปได้ไกลกว่า ไปกับคนไทย
+Logic
+text
+ไม่มี Session → /login
+มี Session และ Role=user → /home
+มี Session และ Role=driver แต่ KYC ยังไม่ผ่าน → /driver/onboarding
+มี Session และ Role=driver และผ่านแล้ว → /driver
+มี Session และ Role=admin → /admin
+ห้าม AI ทำ
+ห้ามทำ Splash เป็นหน้า Home
+
+ห้ามใส่ปุ่มที่ไม่มีใน Flow
+
+ห้ามเปลี่ยนเป็นภาษาอังกฤษ
+
+ห้ามพา User ทุกคนไป /home โดยไม่ตรวจ Role
+
+U02 — เข้าสู่ระบบ
+UI
+text
+เข้าสู่ระบบ
+เบอร์โทรศัพท์
+รหัสผ่าน
+จำฉันไว้
+ลืมรหัสผ่าน?
+เข้าสู่ระบบ
+ดำเนินการต่อด้วย Google
+ดำเนินการต่อด้วย Apple
+ยังไม่มีบัญชี? สมัครสมาชิก
+Action
+text
+กดเข้าสู่ระบบสำเร็จ → ตรวจ Role → ไปหน้าที่ถูกต้อง
+กดสมัครสมาชิก → /register
+กดลืมรหัสผ่าน → /forgot-password
+U03 — สมัครสมาชิก
+UI
+text
+สมัครสมาชิก
+ชื่อ–นามสกุล
+เบอร์โทรศัพท์
+รหัสผ่าน
+ยืนยันรหัสผ่าน
+ยอมรับข้อกำหนดการใช้บริการ
+สมัครสมาชิก
+Validation
+text
+ชื่อ–นามสกุลต้องไม่ว่าง
+เบอร์โทรศัพท์ต้องถูกต้อง
+รหัสผ่านต้องมีความยาวตามกำหนด
+รหัสผ่านสองช่องต้องตรงกัน
+ต้องยอมรับข้อกำหนด
+Action
+text
+สมัครสำเร็จ → /verify-otp
+U04 — ยืนยัน OTP
+UI
+text
+ยืนยันเบอร์โทรศัพท์
+กรอกรหัส OTP 6 หลัก
+ส่งรหัสอีกครั้ง
+ยืนยัน
+State
+text
+กำลังส่ง OTP
+กรอก OTP ไม่ครบ
+OTP ไม่ถูกต้อง
+OTP หมดอายุ
+ยืนยันสำเร็จ
+Action
+text
+ยืนยันสำเร็จ → /home
+U05 — หน้าหลัก
+UI
+text
+☰  JUMBO GO  🔔
+
+ขนของง่าย
+ไม่ไกลกว่า
+ไปกับคนไทย
+
+รับของที่ไหน?
+ตำแหน่งปัจจุบัน
+
+ส่งที่ไหน?
+ปลายทาง
+
+เลือกประเภทรถ
+
+กระบะ
+ตู้ทึบ
+คอก
+จัมโบ้
+6 ล้อ
+
+ดูราคาและเรียกรถ
+Action
+text
+กดรับของ → /booking/pickup
+กดส่งของ → /booking/dropoff
+กดเลือกรถ → /booking/vehicle-type
+กดดูราคา → ตรวจข้อมูลให้ครบ → /booking/summary
+U06 — จุดรับสินค้า
+UI
+text
+รับของที่ไหน?
+ค้นหาสถานที่
+ใช้ตำแหน่งปัจจุบัน
+ปักหมุดบนแผนที่
+ยืนยันจุดรับ
+Data
+ts
+type LocationPoint = {
+  address: string;
+  latitude: number;
+  longitude: number;
+  placeId?: string;
+  note?: string;
+};
+U07 — จุดส่งสินค้า
+UI
+text
+ส่งที่ไหน?
+ค้นหาสถานที่
+ใช้ตำแหน่งปัจจุบัน
+ปักหมุดบนแผนที่
+ยืนยันจุดส่ง
+Validation
+text
+จุดส่งต้องไม่เหมือนจุดรับ
+ต้องมี Address
+ต้องมี Latitude
+ต้องมี Longitude
+U08 — เลือกประเภทรถ
+text
+เลือกประเภทรถ
+
+กระบะ
+บรรทุกได้ประมาณ 1 ตัน
+
+กระบะตู้ทึบ
+บรรทุกได้ประมาณ 1.5 ตัน
+
+กระบะคอก
+บรรทุกได้ประมาณ 1.5 ตัน
+
+จัมโบ้
+บรรทุกได้ประมาณ 3–5 ตัน
+
+6 ล้อ
+บรรทุกได้ประมาณ 5–10 ตัน
+Data ที่ต้องเก็บ
+ts
+type VehicleType =
+  | "PICKUP"
+  | "CLOSED_PICKUP"

@@ -1,0 +1,1502 @@
+  1500→# 6. Prompt Phase 4: Authentication
+  1501→
+  1502→```text
+  1503→เริ่ม Phase 4: Authentication
+  1504→
+  1505→เป้าหมาย:
+  1506→ทำระบบ Login, Register และ OTP เท่านั้น
+  1507→
+  1508→อ่าน:
+  1509→- AGENTS.md
+  1510→- docs/SCREEN-INVENTORY.md
+  1511→- docs/screens/U02-login.md
+  1512→- docs/screens/U03-register.md
+  1513→- docs/screens/U04-verify-otp.md
+  1514→- docs/API-CONTRACT.md
+  1515→
+  1516→ทำเฉพาะ:
+  1517→- /login
+  1518→- /register
+  1519→- /verify-otp
+  1520→
+  1521→สร้างหรือแก้ไฟล์ที่จำเป็นเท่านั้น:
+  1522→
+  1523→SCREENS
+  1524→- app/(auth)/login/page.tsx
+  1525→- app/(auth)/register/page.tsx
+  1526→- app/(auth)/verify-otp/page.tsx
+  1527→
+  1528→COMPONENTS
+  1529→- components/auth/LoginForm.tsx
+  1530→- components/auth/RegisterForm.tsx
+  1531→- components/auth/OtpForm.tsx
+  1532→
+  1533→API
+  1534→- app/api/auth/send-otp/route.ts
+  1535→- app/api/auth/verify-otp/route.ts
+  1536→- app/api/auth/logout/route.ts
+  1537→
+  1538→VALIDATION
+  1539→- lib/validations/auth.schema.ts
+  1540→
+  1541→กฎ:
+  1542→1. ห้ามสร้าง Home
+  1543→2. ห้ามสร้าง Booking
+  1544→3. ห้ามสร้าง Driver
+  1545→4. ห้ามสร้าง Admin
+  1546→5. ห้ามใช้ Mock Login
+  1547→6. ต้องมี Loading/Error/Success State
+  1548→7. Error ทุกข้อความเป็นภาษาไทย
+  1549→8. ต้องตรวจ Session
+  1550→9. ต้องป้องกัน Submit ซ้ำ
+  1551→10. ต้องรองรับ Mobile
+  1552→
+  1553→ก่อนเขียน:
+  1554→แสดง Component Tree และ API Flow
+  1555→รออนุมัติ
+  1556→```
+  1557→
+  1558→---
+  1559→
+  1560→# 7. Prompt Phase 5: User Home
+  1561→
+  1562→```text
+  1563→เริ่ม Phase 5: User Home
+  1564→
+  1565→ทำเฉพาะ Screen U05
+  1566→Route: /home
+  1567→
+  1568→อ่าน:
+  1569→- docs/screens/U05-home.md
+  1570→- docs/DESIGN-SYSTEM.md
+  1571→- docs/API-CONTRACT.md
+  1572→- docs/SCREEN-INVENTORY.md
+  1573→
+  1574→ต้องสร้าง:
+  1575→- app/(user)/home/page.tsx
+  1576→- components/booking/LocationForm.tsx
+  1577→- components/booking/VehicleTypeSelector.tsx
+  1578→- components/booking/PromotionBanner.tsx
+  1579→- components/layout/AppHeader.tsx
+  1580→
+  1581→ต้องมี UI:
+  1582→1. Header สีแดง
+  1583→2. โลโก้ JUMBO GO
+  1584→3. ปุ่มเมนู
+  1585→4. ปุ่มแจ้งเตือน
+  1586→5. Banner
+  1587→6. ช่องจุดรับ
+  1588→7. ช่องจุดส่ง
+  1589→8. รายการประเภทรถ
+  1590→9. ปุ่มดูราคาและเรียกรถ
+  1591→10. Bottom Navigation
+  1592→
+  1593→ต้องมี State:
+  1594→- Initial
+  1595→- Loading
+  1596→- Empty
+  1597→- Error
+  1598→- Location Permission Denied
+  1599→- Ready
+  1600→
+  1601→กฎ:
+  1602→- ห้ามทำหน้าสรุปราคา
+  1603→- ห้ามสร้าง API ราคา
+  1604→- ห้ามสร้าง Tracking
+  1605→- ห้ามเพิ่มปุ่มที่ไม่ได้ระบุ
+  1606→- ห้ามแก้ Screen อื่น
+  1607→
+  1608→ก่อนเขียน:
+  1609→แสดงรายการไฟล์ที่จะแก้
+  1610→รออนุมัติ
+  1611→```
+  1612→
+  1613→---
+  1614→
+  1615→# 8. Prompt Phase 6: Booking Flow
+  1616→
+  1617→```text
+  1618→เริ่ม Phase 6: User Booking Flow
+  1619→
+  1620→ทำเฉพาะหน้าต่อไปนี้:
+  1621→- U06 Pickup
+  1622→- U07 Dropoff
+  1623→- U08 Vehicle Type
+  1624→- U09 Summary
+  1625→- U10 Confirm
+  1626→
+  1627→ห้ามทำ:
+  1628→- Searching
+  1629→- Driver Found
+  1630→- Tracking
+  1631→- Completed
+  1632→- Driver
+  1633→- Admin
+  1634→
+  1635→อ่าน:
+  1636→- docs/USER-FLOWS.md
+  1637→- docs/SCREEN-INVENTORY.md
+  1638→- docs/API-CONTRACT.md
+  1639→- docs/DESIGN-SYSTEM.md
+  1640→
+  1641→ต้องสร้าง:
+  1642→- app/(user)/booking/pickup/page.tsx
+  1643→- app/(user)/booking/dropoff/page.tsx
+  1644→- app/(user)/booking/vehicle-type/page.tsx
+  1645→- app/(user)/booking/summary/page.tsx
+  1646→- app/(user)/booking/confirm/page.tsx
+  1647→- components/booking/LocationPicker.tsx
+  1648→- components/booking/VehicleTypeCard.tsx
+  1649→- components/booking/PriceBreakdown.tsx
+  1650→- components/booking/BookingReview.tsx
+  1651→- lib/validations/booking.schema.ts
+  1652→
+  1653→กฎ:
+  1654→1. ต้องเก็บข้อมูลระหว่าง Step
+  1655→2. ห้ามทำข้อมูลหายเมื่อย้อนกลับ
+  1656→3. จุดรับและจุดส่งต้องมี Latitude/Longitude
+  1657→4. ต้องตรวจว่าจุดรับและจุดส่งไม่เหมือนกัน
+  1658→5. ราคาต้องระบุว่าเป็นราคาโดยประมาณ
+  1659→6. ห้าม Hard-code ราคาใน UI
+  1660→7. ทุกหน้าแสดง Step Indicator
+  1661→8. ทุกหน้าใช้ภาษาไทย
+  1662→9. ทุกหน้ามี Back Action
+  1663→10. ห้ามข้ามขั้นตอน
+  1664→
+  1665→ก่อนเขียน:
+  1666→แสดง Data Model ชั่วคราวของ Booking
+  1667→แสดง Navigation Map
+  1668→รออนุมัติ
+  1669→```
+  1670→
+  1671→---
+  1672→
+  1673→# 9. Prompt Phase 7: Searching และ Driver Tracking
+  1674→
+  1675→```text
+  1676→เริ่ม Phase 7: Job Searching and Tracking
+  1677→
+  1678→ทำเฉพาะ:
+  1679→- U11 Searching
+  1680→- U12 Driver Found
+  1681→- U13 Tracking
+  1682→- U14 Completed
+  1683→
+  1684→อ่าน:
+  1685→- docs/USER-FLOWS.md
+  1686→- docs/API-CONTRACT.md
+  1687→- docs/SCREEN-INVENTORY.md
+  1688→- docs/DATABASE-SCHEMA.md
+  1689→
+  1690→ต้องสร้าง:
+  1691→- app/(user)/booking/searching/page.tsx
+  1692→- app/(user)/booking/driver-found/page.tsx
+  1693→- app/(user)/booking/tracking/page.tsx
+  1694→- app/(user)/booking/completed/page.tsx
+  1695→- components/jobs/JobStatusTimeline.tsx
+  1696→- components/jobs/DriverInfoCard.tsx
+  1697→- components/jobs/CancelJobModal.tsx
+  1698→- components/maps/TrackingMap.tsx
+  1699→- hooks/useJobRealtime.ts
+  1700→- hooks/useDriverLocation.ts
+  1701→
+  1702→ต้องเชื่อม:
+  1703→- Job Status
+  1704→- Driver Profile
+  1705→- Driver Location
+  1706→- ETA
+  1707→- Cancellation
+  1708→
+  1709→ต้องมีสถานะ:
+  1710→- SEARCHING_DRIVER
+  1711→- OFFERED
+  1712→- ACCEPTED
+  1713→- DRIVER_GOING_TO_PICKUP
+  1714→- ARRIVED_PICKUP
+  1715→- PICKED_UP
+  1716→- IN_TRANSIT
+  1717→- ARRIVED_DROPOFF
+  1718→- DELIVERED
+  1719→- COMPLETED
+  1720→- CANCELLED
+  1721→- NO_DRIVER_FOUND
+  1722→
+  1723→กฎ:
+  1724→1. ห้ามแสดงข้อมูล Driver ถ้ายังไม่รับงาน
+  1725→2. ห้ามแสดง Tracking ถ้ายังไม่มี Driver
+  1726→3. การยกเลิกต้องมี Confirmation Modal
+  1727→4. Realtime ต้อง Unsubscribe เมื่อออกจากหน้า
+  1728→5. ต้องมี Fallback หาก Realtime หลุด
+  1729→6. ต้องมี Loading และ Connection Error
+  1730→7. ห้ามใช้ตำแหน่งปลอมใน Production
+  1731→8. ห้ามทำหน้า Driver หรือ Admin ใน Phase นี้
+  1732→
+  1733→ก่อนเขียน:
+  1734→แสดง State Machine
+  1735→แสดง Realtime Event Flow
+  1736→รออนุมัติ
+  1737→```
+  1738→
+  1739→---
+  1740→
+  1741→# 10. Prompt Phase 8: Driver Onboarding และ KYC
+  1742→
+  1743→```text
+  1744→เริ่ม Phase 8: Driver Onboarding and KYC
+  1745→
+  1746→ทำเฉพาะ Driver Onboarding:
+  1747→- D01 สมัคร Driver
+  1748→- D03 Profile
+  1749→- D04 Identity
+  1750→- D05 Selfie
+  1751→- D06 License
+  1752→- D07 Vehicle
+  1753→- D08 Vehicle Documents
+  1754→- D09 Bank
+  1755→- D10 Consent
+  1756→- D11 Review
+  1757→- D12 Submit
+  1758→- D13 Status
+  1759→
+  1760→อ่าน:
+  1761→- docs/USER-FLOWS.md
+  1762→- docs/SCREEN-INVENTORY.md
+  1763→- docs/DATABASE-SCHEMA.md
+  1764→- docs/API-CONTRACT.md
+  1765→- docs/DESIGN-SYSTEM.md
+  1766→
+  1767→ต้องสร้าง:
+  1768→- app/(driver)/driver/register/page.tsx
+  1769→- app/(driver)/driver/onboarding/profile/page.tsx
+  1770→- app/(driver)/driver/onboarding/identity/page.tsx
+  1771→- app/(driver)/driver/onboarding/selfie/page.tsx
+  1772→- app/(driver)/driver/onboarding/license/page.tsx
+  1773→- app/(driver)/driver/onboarding/vehicle/page.tsx
+  1774→- app/(driver)/driver/onboarding/vehicle-documents/page.tsx
+  1775→- app/(driver)/driver/onboarding/bank/page.tsx
+  1776→- app/(driver)/driver/onboarding/consent/page.tsx
+  1777→- app/(driver)/driver/onboarding/review/page.tsx
+  1778→- app/(driver)/driver/onboarding/submit/page.tsx
+  1779→- app/(driver)/driver/onboarding/status/page.tsx
+  1780→
+  1781→ต้องมี:
+  1782→1. Stepper 1–10
+  1783→2. Save Draft
+  1784→3. Resume Onboarding
+  1785→4. Upload File
+  1786→5. File Type Validation
+  1787→6. File Size Validation
+  1788→7. Preview File
+  1789→8. Delete File
+  1790→9. KYC Status
+  1791→10. Rejection Reason
+  1792→11. Submit Confirmation
+  1793→12. Consent Log
+  1794→
+  1795→กฎความปลอดภัย:
+  1796→- เอกสาร KYC ต้องเป็น Private Bucket
+  1797→- Path ต้องขึ้นต้นด้วย user_id
+  1798→- ห้ามเปิด Public URL
+  1799→- ใช้ Signed URL
+  1800→- ห้ามเก็บเลขบัตรประชาชนแบบ Plain Text ถ้าไม่จำเป็น
+  1801→- ห้ามใช้ Service Role ใน Client
+  1802→- ทุก Document ต้องตรวจ Ownership
+  1803→- ทุก API ต้องตรวจ Session
+  1804→
+  1805→ก่อนเขียน:
+  1806→แสดง File Upload Flow
+  1807→แสดง KYC State Machine
+  1808→แสดง Storage Path
+  1809→แสดง RLS Requirements
+  1810→รออนุมัติ
+  1811→```
+  1812→
+  1813→---
+  1814→
+  1815→# 11. Prompt Phase 9: Driver Dashboard และรับงาน
+  1816→
+  1817→```text
+  1818→เริ่ม Phase 9: Driver Dashboard and Jobs
+  1819→
+  1820→ทำเฉพาะ:
+  1821→- D14 Driver Dashboard
+  1822→- D15 Driver Jobs
+  1823→- D16 Job Detail
+  1824→- D17 Driver Earnings
+  1825→- D18 Driver History
+  1826→- D19 Driver Profile
+  1827→
+  1828→ต้องมี:
+  1829→1. สถานะ Offline
+  1830→2. ปุ่มเปิดรับงาน
+  1831→3. สถานะ Online
+  1832→4. สถานะ Busy
+  1833→5. งานใหม่
+  1834→6. รับงาน
+  1835→7. ปฏิเสธงาน
+  1836→8. อัปเดตสถานะ
+  1837→9. อัปโหลดหลักฐาน
+  1838→10. รายได้
+  1839→11. ประวัติงาน
+  1840→12. โปรไฟล์
+  1841→
+  1842→กฎ:
+  1843→- Driver เปิด Online ได้เมื่อ KYC Approved
+  1844→- ต้องมีรถ Approved อย่างน้อยหนึ่งคัน
+  1845→- ต้องมี Account Active
+  1846→- การรับงานต้องใช้ Transaction หรือ RPC
+  1847→- ป้องกัน Driver สองคนรับงานเดียวกัน
+  1848→- ตำแหน่งต้องส่งตามช่วงเวลาที่กำหนด
+  1849→- เมื่อ Offline ต้องหยุดรับงานใหม่
+  1850→- ห้ามแก้สถานะงานโดยไม่ตรวจสิทธิ์
+  1851→
+  1852→ก่อนเขียน:
+  1853→แสดง Job State Machine
+  1854→แสดง Permission Matrix
+  1855→แสดง API ที่ใช้
+  1856→รออนุมัติ
+  1857→```
+  1858→
+  1859→---
+  1860→
+  1861→# 12. Prompt Phase 10: Admin
+  1862→
+  1863→```text
+  1864→เริ่ม Phase 10: Admin Dashboard
+  1865→
+  1866→ทำเฉพาะหน้า Admin:
+  1867→- A01 Admin Login
+  1868→- A02 Dashboard
+  1869→- A03 Users
+  1870→- A04 Drivers
+  1871→- A05 Driver Detail
+  1872→- A06 KYC Review
+  1873→- A07 KYC Detail
+  1874→- A08 Vehicles
+  1875→- A09 Jobs
+  1876→- A10 Job Detail
+  1877→- A11 Pricing
+  1878→- A12 Payments
+  1879→- A13 Reports
+  1880→- A14 Notifications
+  1881→- A15 Settings
+  1882→
+  1883→ต้องมี:
+  1884→1. Admin Role Guard
+  1885→2. Dashboard Summary
+  1886→3. User Search
+  1887→4. Driver Search
+  1888→5. KYC Review
+  1889→6. Approve
+  1890→7. Reject พร้อมเหตุผล
+  1891→8. Vehicle Review
+  1892→9. Job Management
+  1893→10. Pricing Management
+  1894→11. Reports
+  1895→12. Audit Log
+  1896→
+  1897→กฎ:
+  1898→- ห้ามให้ User เข้าหน้า Admin
+  1899→- ทุก Action ต้องบันทึก Audit Log
+  1900→- การอนุมัติ KYC ต้องระบุผู้อนุมัติ
+  1901→- การปฏิเสธต้องมีเหตุผล
+  1902→- ห้ามลบข้อมูลถาวรโดยไม่มี Confirmation
+  1903→- เอกสาร KYC ต้องแสดงผ่าน Signed URL
+  1904→- จำกัดสิทธิ์ Admin ตาม Role
+  1905→- ทุกตารางต้องมี Loading, Empty, Error State
+  1906→
+  1907→ก่อนเขียน:
+  1908→แสดง Permission Matrix
+  1909→แสดง Admin Route Guard
+  1910→แสดงรายการ Mutation
+  1911→รออนุมัติ
+  1912→```
+  1913→
+  1914→---
+  1915→
+  1916→# 13. Prompt Phase 11: Testing
+  1917→
+  1918→```text
+  1919→เริ่ม Phase 11: Testing and Quality Assurance
+  1920→
+  1921→ห้ามเพิ่ม Feature
+  1922→ห้ามเปลี่ยน UI
+  1923→ห้าม Refactor ใหญ่
+  1924→
+  1925→ตรวจสอบทั้งหมด:
+  1926→
+  1927→## Static Check
+  1928→
+  1929→- npm run lint
+  1930→- npx tsc --noEmit
+  1931→- npm run build
+  1932→
+  1933→## Route Check
+  1934→
+  1935→ตรวจทุก Route จาก:
+  1936→- docs/SCREEN-INVENTORY.md
+  1937→
+  1938→ตรวจ:
+  1939→- Route มีอยู่จริง
+  1940→- Route เปิดได้
+  1941→- Route ไม่ชนกัน
+  1942→- Route ที่ต้อง Login ถูกป้องกัน
+  1943→- Route Admin ถูกป้องกัน
+  1944→- Route Driver ถูกป้องกัน
+  1945→
+  1946→## UI Check
+  1947→
+  1948→ทุก Screen:
+  1949→- Mobile 375px
+  1950→- Mobile 390px
+  1951→- Mobile 414px
+  1952→- Desktop 1280px
+  1953→
+  1954→ตรวจ:
+  1955→- ข้อความล้น
+  1956→- ปุ่มตกบรรทัด
+  1957→- Header ล้น
+  1958→- Card ล้น
+  1959→- Modal ล้น
+  1960→- Form อ่านง่าย
+  1961→- Keyboard ใช้งานได้
+  1962→
+  1963→## Flow Check
+  1964→
+  1965→ตรวจ:
+  1966→- Register → OTP → Home
+  1967→- Home → Pickup → Dropoff → Vehicle → Summary
+  1968→- Summary → Confirm → Searching
+  1969→- Searching → Driver Found → Tracking
+  1970→- Tracking → Completed
+  1971→- Driver Register → KYC → Approved → Online
+  1972→- Admin Login → KYC Review → Approve
+  1973→
+  1974→## Security Check
+  1975→
+  1976→- RLS
+  1977→- Storage RLS
+  1978→- Session
+  1979→- Role
+  1980→- Ownership
+  1981→- Service Role Key
+  1982→- Signed URL
+  1983→- Input Validation
+  1984→
+  1985→ให้รายงานเป็นตาราง:
+  1986→| Test | Result | Evidence | Problem | Fix |
+  1987→```
+  1988→
+  1989→---
+  1990→
+  1991→# 14. Prompt Phase 12: ตรวจความครบของหน้า
+  1992→
+  1993→```text
+  1994→ทำ Screen Completeness Audit
+  1995→
+  1996→อ่าน:
+  1997→- docs/SCREEN-INVENTORY.md
+  1998→- docs/USER-FLOWS.md
+  1999→- docs/ACCEPTANCE-CRITERIA.md
+  2000→
+  2001→ห้ามแก้โค้ด
+  2002→
+  2003→ตรวจทุก Screen ID:
+  2004→- U01 ถึง U19
+  2005→- D01 ถึง D19
+  2006→- A01 ถึง A15
+  2007→
+  2008→ให้ตรวจ:
+  2009→1. มี Route หรือไม่
+  2010→2. มี Page Component หรือไม่
+  2011→3. มี Screen Specification หรือไม่
+  2012→4. มี Loading State หรือไม่
+  2013→5. มี Error State หรือไม่
+  2014→6. มี Empty State หรือไม่
+  2015→7. มี API เชื่อมหรือไม่
+  2016→8. มี Validation หรือไม่
+  2017→9. มี Permission หรือไม่
+  2018→10. มี Acceptance Criteria หรือไม่
+  2019→11. มีข้อความภาษาไทยครบหรือไม่
+  2020→12. ใช้ Design System หรือไม่
+  2021→
+  2022→ห้ามเขียนโค้ด
+  2023→ห้ามแก้ไฟล์
+  2024→
+  2025→รายงานเป็นตาราง:
+  2026→| Screen ID | Route | Page | UI | API | Loading | Error | Empty | Validation | Status |
+  2027→```
+  2028→
+  2029→---
+  2030→
+  2031→# 15. Prompt ห้าม AI แก้ไฟล์เกินขอบเขต
+  2032→
+  2033→ก่อนเริ่มทุก Phase ให้ใช้ Prompt นี้:
+  2034→
+  2035→```text
+  2036→ก่อนเขียนโค้ด ให้ตรวจสอบขอบเขตไฟล์
+  2037→
+  2038→FILES ALLOWED TO CREATE:
+  2039→- [ระบุไฟล์]
+  2040→
+  2041→FILES ALLOWED TO MODIFY:
+  2042→- [ระบุไฟล์]
+  2043→
+  2044→FILES NOT ALLOWED TO MODIFY:
+  2045→- ทุกไฟล์ที่ไม่ได้อยู่ในสองรายการด้านบน
+  2046→
+  2047→ถ้าพบว่าต้องแก้ไฟล์นอกขอบเขต:
+  2048→1. หยุด
+  2049→2. แสดงชื่อไฟล์
+  2050→3. อธิบายเหตุผล
+  2051→4. ขออนุมัติก่อน
+  2052→
+  2053→ห้ามแก้ไขไฟล์นอกขอบเขตโดยอัตโนมัติ
+  2054→```
+  2055→
+  2056→---
+  2057→
+  2058→# 16. Prompt แก้เฉพาะ Bug
+  2059→
+  2060→```text
+  2061→แก้เฉพาะ Bug ต่อไปนี้:
+  2062→
+  2063→Bug ID: BUG-001
+  2064→Screen: U05
+  2065→Route: /home
+  2066→อาการ:
+  2067→[อธิบายอาการ]
+  2068→
+  2069→ผลลัพธ์ที่คาดหวัง:
+  2070→[อธิบาย]
+  2071→
+  2072→ไฟล์ที่อนุญาตให้แก้:
+  2073→- app/(user)/home/page.tsx
+  2074→- components/booking/LocationForm.tsx
+  2075→
+  2076→ห้าม:
+  2077→- สร้าง Feature ใหม่
+  2078→- เปลี่ยน API
+  2079→- เปลี่ยน Database
+  2080→- แก้ Screen อื่น
+  2081→- Refactor ไฟล์อื่น
+  2082→- เปลี่ยน Design System
+  2083→
+  2084→ก่อนแก้:
+  2085→1. วิเคราะห์สาเหตุ
+  2086→2. แสดงไฟล์และบรรทัดที่เกี่ยวข้อง
+  2087→3. แสดงแผนแก้
+  2088→4. รออนุมัติ
+  2089→```
+  2090→
+  2091→---
+  2092→
+  2093→# 17. Prompt เชื่อม API โดยไม่ทำ UI พัง
+  2094→
+  2095→```text
+  2096→เชื่อม API ให้กับ Screen U05 เท่านั้น
+  2097→
+  2098→หน้าที่มีอยู่แล้ว:
+  2099→- /home
+  2100→
+  2101→API ที่อนุญาต:
+  2102→- GET /api/locations/recent
+  2103→- GET /api/vehicle-types
+  2104→
+  2105→ห้าม:
+  2106→- เปลี่ยน Layout
+  2107→- เปลี่ยน Text
+  2108→- เปลี่ยนสี
+  2109→- เปลี่ยน Route
+  2110→- สร้างหน้าครั้งใหม่
+  2111→- ใช้ Mock Data หลังเชื่อม API
+  2112→- แก้ API อื่น
+  2113→
+  2114→ต้องเพิ่ม:
+  2115→- Loading State
+  2116→- Error State
+  2117→- Empty State
+  2118→- Retry
+  2119→- Abort Request
+  2120→- TypeScript Types
+  2121→- Zod Response Validation
+  2122→
+  2123→ก่อนเขียน:
+  2124→แสดง Data Flow:
+  2125→UI → Hook → API → Validation → UI
+  2126→
+  2127→รออนุมัติ
+  2128→```
+  2129→
+  2130→---
+  2131→
+  2132→# 18. Prompt สั่ง AI อัปเดตสถานะเอกสาร
+  2133→
+  2134→```text
+  2135→อัปเดตสถานะ Screen Inventory เท่านั้น
+  2136→
+  2137→Screen ที่ทำเสร็จ:
+  2138→- U01
+  2139→- U02
+  2140→- U03
+  2141→
+  2142→ให้เปลี่ยนสถานะตามผลตรวจจริงเท่านั้น:
+  2143→- U01 = DONE หากผ่าน Acceptance Criteria ครบ
+  2144→- U02 = TESTING หากยังมี Test ไม่ครบ
+  2145→- U03 = IN_PROGRESS หากยังมีข้อผิดพลาด
+  2146→
+  2147→ห้ามแก้ Source Code
+  2148→ห้ามเพิ่ม Screen
+  2149→ห้ามลบ Screen
+  2150→หลังแก้ให้แสดง Diff ของ docs/SCREEN-INVENTORY.md
+  2151→```
+  2152→
+  2153→---
+  2154→
+  2155→# 19. รูปแบบคำตอบที่ AI ต้องใช้
+  2156→
+  2157→กำหนดให้ AI ตอบตามรูปแบบนี้ทุก Phase:
+  2158→
+  2159→```text
+  2160→PHASE: Phase 5
+  2161→SCREEN: U05
+  2162→ROUTE: /home
+  2163→STATUS: PLANNING
+  2164→
+  2165→DOCUMENTS READ:
+  2166→- docs/SCREEN-INVENTORY.md
+  2167→- docs/screens/U05-home.md
+  2168→- docs/DESIGN-SYSTEM.md
+  2169→
+  2170→FILES TO CREATE:
+  2171→- ...
+  2172→
+  2173→FILES TO MODIFY:
+  2174→- ...
+  2175→
+  2176→FILES NOT ALLOWED TO MODIFY:
+  2177→- ...
+  2178→
+  2179→COMPONENT TREE:
+  2180→- ...
+  2181→
+  2182→DATA FLOW:
+  2183→- ...
+  2184→
+  2185→API:
+  2186→- ...
+  2187→
+  2188→STATES:
+  2189→- Initial
+  2190→- Loading
+  2191→- Empty
+  2192→- Error
+  2193→- Success
+  2194→
+  2195→ACCEPTANCE CRITERIA:
+  2196→- [ ] ...
+  2197→- [ ] ...
+  2198→
+  2199→WAITING FOR APPROVAL: YES
+  2200→```
+  2201→
+  2202→หลังทำเสร็จ:
+  2203→
+  2204→```text
+  2205→PHASE: Phase 5
+  2206→SCREEN: U05
+  2207→STATUS: COMPLETED
+  2208→
+  2209→FILES CREATED:
+  2210→- ...
+  2211→
+  2212→FILES MODIFIED:
+  2213→- ...
+  2214→
+  2215→FILES NOT MODIFIED:
+  2216→- ...
+  2217→
+  2218→COMMANDS RUN:
+  2219→- npm run lint
+  2220→- npx tsc --noEmit
+  2221→- npm run build
+  2222→
+  2223→RESULT:
+  2224→- Lint: PASS/FAIL
+  2225→- TypeScript: PASS/FAIL
+  2226→- Build: PASS/FAIL
+  2227→
+  2228→ACCEPTANCE CRITERIA:
+  2229→- [x] ...
+  2230→- [ ] ...
+  2231→
+  2232→REMAINING ISSUES:
+  2233→- ...
+  2234→
+  2235→NEXT RECOMMENDED PHASE:
+  2236→- ...
+  2237→```
+  2238→
+  2239→---
+  2240→
+  2241→# 20. วิธีใช้งานที่ถูกต้อง
+  2242→
+  2243→ลำดับที่แนะนำ:
+  2244→
+  2245→```text
+  2246→1. ให้ AI อ่านโปรเจกต์
+  2247→2. สร้างเอกสาร
+  2248→3. ตรวจ Screen Inventory
+  2249→4. สร้าง Design System
+  2250→5. สร้าง Database
+  2251→6. สร้าง Auth
+  2252→7. สร้าง U01
+  2253→8. ตรวจ U01
+  2254→9. สร้าง U02
+  2255→10. ตรวจ U02
+  2256→11. สร้าง U03
+  2257→12. ตรวจ U03
+  2258→13. ทำทีละหน้าไปเรื่อย ๆ
+  2259→```
+  2260→
+  2261→อย่าสั่งแบบนี้:
+  2262→
+  2263→```text
+  2264→ทำ U01 ถึง U19 ให้เสร็จ
+  2265→```
+  2266→
+  2267→ให้สั่งแบบนี้:
+  2268→
+  2269→```text
+  2270→ทำเฉพาะ U01
+  2271→```
+  2272→
+  2273→แล้วจึง:
+  2274→
+  2275→```text
+  2276→ตรวจ U01
+  2277→```
+  2278→
+  2279→แล้วจึง:
+  2280→
+  2281→```text
+  2282→ทำเฉพาะ U02
+  2283→```
+  2284→
+  2285→---
+  2286→
+  2287→## กฎที่สำคัญที่สุด
+  2288→
+  2289→ให้ AI ทำงานแบบนี้เสมอ:
+  2290→
+  2291→```text
+  2292→อ่านเอกสาร
+  2293→↓
+  2294→แสดงแผน
+  2295→↓
+  2296→รออนุมัติ
+  2297→↓
+  2298→สร้างเฉพาะ Phase
+  2299→↓
+  2300→ตรวจสอบ
+  2301→↓
+  2302→อัปเดตสถานะ
+  2303→↓
+  2304→ไป Phase ถัดไป
+  2305→```
+  2306→
+  2307→หากให้ AI ทำทีละ Phase และบังคับใช้ `Screen ID + Route + Files Allowed + Acceptance Criteria` ปัญหาหน้าหาย หน้าซ้ำ ขั้นตอนมั่ว และ AI แก้ไฟล์เกินขอบเขตจะลดลงมาก โดยให้ใช้ `docs/SCREEN-INVENTORY.md` เป็นรายการควบคุมกลางของทั้งโปรเจกต์.
+  2308→
+  2309→
+  2310→สถานะหลักของคนขับ
+  2311→text
+  2312→REGISTERED
+  2313→  ↓
+  2314→PROFILE_INCOMPLETE
+  2315→  ↓
+  2316→KYC_DRAFT
+  2317→  ↓
+  2318→KYC_SUBMITTED
+  2319→  ↓
+  2320→UNDER_REVIEW
+  2321→  ├── REJECTED → แก้ไขและส่งใหม่
+  2322→  └── APPROVED
+  2323→          ↓
+  2324→VEHICLE_PENDING
+  2325→          ↓
+  2326→READY_FOR_ASSIGNMENT
+  2327→          ↓
+  2328→ONLINE
+  2329→          ↓
+  2330→BUSY
+  2331→          ↓
+  2332→OFFLINE
+  2333→ฟังก์ชันหลัก
+  2334→สมัครด้วยเบอร์โทรศัพท์และ OTP
+  2335→
+  2336→เข้าสู่ระบบ
+  2337→
+  2338→กรอกข้อมูลส่วนตัว
+  2339→
+  2340→ยืนยันตัวตน KYC
+  2341→
+  2342→อัปโหลดบัตรประชาชน
+  2343→
+  2344→อัปโหลดใบขับขี่
+  2345→
+  2346→อัปโหลดรูปถ่ายผู้สมัคร
+  2347→
+  2348→กรอกข้อมูลรถ
+  2349→
+  2350→อัปโหลดเอกสารรถ
+  2351→
+  2352→เพิ่มบัญชีธนาคาร
+  2353→
+  2354→ตรวจสอบสถานะการอนุมัติ
+  2355→
+  2356→เปิด/ปิดสถานะพร้อมรับงาน
+  2357→
+  2358→รับงานและตอบรับงาน
+  2359→
+  2360→ดูรายละเอียดจุดรับ–ส่ง
+  2361→
+  2362→นำทางไปยังจุดรับสินค้า
+  2363→
+  2364→อัปเดตสถานะงาน
+  2365→
+  2366→อัปโหลดหลักฐานการรับหรือส่งสินค้า
+  2367→
+  2368→ดูรายได้
+  2369→
+  2370→ดูประวัติงาน
+  2371→
+  2372→ติดต่อฝ่ายสนับสนุน
+  2373→
+  2374→แก้ไขโปรไฟล์และเอกสารหมดอายุ
+  2375→
+  2376→Supabase Storage รองรับการควบคุมไฟล์ด้วย PostgreSQL RLS และควรจำกัดโฟลเดอร์ให้ผูกกับ user_id โดยตรง ส่วน Service Role Key ต้องเก็บไว้ฝั่งเซิร์ฟเวอร์เท่านั้น ห้ามใส่ใน Client หรือแอปที่เผยแพร่สู่ผู้ใช้ทั่วไป
+  2377→
+  2378→2. สถาปัตยกรรมระบบ
+  2379→text
+  2380→Driver App / Mobile Web
+  2381→        │
+  2382→        │ Supabase Auth
+  2383→        ▼
+  2384→Next.js App Router
+  2385→        │
+  2386→        ├── Route Handlers / API
+  2387→        ├── Server Actions
+  2388→        ├── Middleware
+  2389→        ├── Zod Validation
+  2390→        └── Supabase Server Client
+  2391→                │
+  2392→                ├── Supabase Auth
+  2393→                ├── PostgreSQL
+  2394→                ├── Storage
+  2395→                ├── Realtime
+  2396→                └── Edge Functions
+  2397→Stack แนะนำ
+  2398→ส่วนระบบ        เทคโนโลยี
+  2399→Frontend        Next.js, TypeScript, Tailwind CSS
+  2400→UI      shadcn/ui
+  2401→Backend Next.js Route Handlers
+  2402→Database        Supabase PostgreSQL
+  2403→Authentication  Supabase Auth
+  2404→File Storage    Supabase Storage
+  2405→Realtime        Supabase Realtime
+  2406→Validation      Zod
+  2407→Form    React Hook Form
+  2408→State   Zustand หรือ TanStack Query
+  2409→แผนที่  Google Maps หรือ Mapbox
+  2410→แจ้งเตือน       Firebase Cloud Messaging
+  2411→OTP     ผู้ให้บริการ SMS/OTP ของไทย
+  2412→รูปภาพ  Browser compression ก่อนอัปโหลด
+  2413→Admin   Next.js Admin Dashboard
+  2414→Next.js App Router รองรับ Route Handler ในไฟล์ route.ts ภายใต้โฟลเดอร์ app และรองรับ HTTP methods เช่น GET, POST, PUT, PATCH และ DELETE
+  2415→
+  2416→3. โครงสร้างโปรเจกต์
+  2417→text
+  2418→jumbo-go/
+  2419→├── app/
+  2420→│   ├── (public)/
+  2421→│   │   ├── page.tsx
+  2422→│   │   └── driver/
+  2423→│   │       └── register/
+  2424→│   │           └── page.tsx
+  2425→│   │
+  2426→│   ├── (auth)/
+  2427→│   │   ├── login/
+  2428→│   │   │   └── page.tsx
+  2429→│   │   ├── verify-otp/
+  2430→│   │   │   └── page.tsx
+  2431→│   │   └── callback/
+  2432→│   │       └── route.ts
+  2433→│   │
+  2434→│   ├── driver/
+  2435→│   │   ├── layout.tsx
+  2436→│   │   ├── page.tsx
+  2437→│   │   ├── onboarding/
+  2438→│   │   │   ├── page.tsx
+  2439→│   │   │   ├── profile/
+  2440→│   │   │   │   └── page.tsx
+  2441→│   │   │   ├── identity/
+  2442→│   │   │   │   └── page.tsx
+  2443→│   │   │   ├── license/
+  2444→│   │   │   │   └── page.tsx
+  2445→│   │   │   ├── vehicle/
+  2446→│   │   │   │   └── page.tsx
+  2447→│   │   │   ├── bank/
+  2448→│   │   │   │   └── page.tsx
+  2449→│   │   │   └── submit/
+  2450→│   │   │       └── page.tsx
+  2451→│   │   │
+  2452→│   │   ├── jobs/
+  2453→│   │   │   ├── page.tsx
+  2454→│   │   │   └── [jobId]/
+  2455→│   │   │       └── page.tsx
+  2456→│   │   ├── earnings/
+  2457→│   │   │   └── page.tsx
+  2458→│   │   ├── history/
+  2459→│   │   │   └── page.tsx
+  2460→│   │   ├── profile/
+  2461→│   │   │   └── page.tsx
+  2462→│   │   └── support/
+  2463→│   │       └── page.tsx
+  2464→│   │
+  2465→│   └── api/
+  2466→│       ├── auth/
+  2467→│       │   ├── send-otp/
+  2468→│       │   │   └── route.ts
+  2469→│       │   └── verify-otp/
+  2470→│       │       └── route.ts
+  2471→│       ├── driver/
+  2472→│       │   ├── profile/
+  2473→│       │   │   └── route.ts
+  2474→│       │   ├── kyc/
+  2475→│       │   │   ├── route.ts
+  2476→│       │   │   ├── submit/
+  2477→│       │   │   │   └── route.ts
+  2478→│       │   │   └── documents/
+  2479→│       │   │       └── route.ts
+  2480→│       │   ├── vehicles/
+  2481→│       │   │   └── route.ts
+  2482→│       │   ├── bank-accounts/
+  2483→│       │   │   └── route.ts
+  2484→│       │   ├── availability/
+  2485→│       │   │   └── route.ts
+  2486→│       │   ├── jobs/
+  2487→│       │   │   ├── route.ts
+  2488→│       │   │   └── [jobId]/
+  2489→│       │   │       ├── accept/
+  2490→│       │       │   └── route.ts
+  2491→│       │   │       └── status/
+  2492→│       │   │           └── route.ts
+  2493→│       │   └── location/
+  2494→│       │       └── route.ts
+  2495→│       │
+  2496→│       └── webhooks/
+  2497→│           ├── otp/
+  2498→│           ├── payment/
+  2499→│           └── notification/
+  2500→│
+  2501→├── components/
+  2502→│   ├── driver/
+  2503→│   ├── kyc/
+  2504→│   ├── vehicle/
+  2505→│   ├── jobs/
+  2506→│   ├── maps/
+  2507→│   └── ui/
+  2508→│
+  2509→├── lib/
+  2510→│   ├── supabase/
+  2511→│   │   ├── browser.ts
+  2512→│   │   ├── server.ts
+  2513→│   │   └── admin.ts
+  2514→│   ├── validations/
+  2515→│   ├── permissions/
+  2516→│   ├── pricing/
+  2517→│   ├── notifications/
+  2518→│   └── storage/
+  2519→│
+  2520→├── hooks/
+  2521→├── types/
+  2522→├── supabase/
+  2523→│   ├── migrations/
+  2524→│   ├── seed.sql
+  2525→│   └── functions/
+  2526→│
+  2527→└── middleware.ts
+  2528→4. โมดูลระบบฝั่งคนรับงาน
+  2529→Module 1: Authentication
+  2530→รับผิดชอบ:
+  2531→
+  2532→สมัครด้วยเบอร์โทรศัพท์
+  2533→
+  2534→ส่ง OTP
+  2535→
+  2536→ตรวจสอบ OTP
+  2537→
+  2538→สร้างบัญชีผู้ใช้
+  2539→
+  2540→ต่ออายุ Session
+  2541→
+  2542→Logout
+  2543→
+  2544→ตรวจสอบสิทธิ์ Driver
+  2545→
+  2546→ตารางที่เกี่ยวข้อง:
+  2547→
+  2548→auth.users
+  2549→
+  2550→profiles
+  2551→
+  2552→user_roles
+  2553→
+  2554→otp_attempts
+  2555→
+  2556→Module 2: Driver Profile
+  2557→ข้อมูลหลัก:
+  2558→
+  2559→ชื่อ–นามสกุล
+  2560→
+  2561→เบอร์โทรศัพท์
+  2562→
+  2563→วันเกิด
+  2564→
+  2565→ที่อยู่
+  2566→
+  2567→จังหวัด
+  2568→
+  2569→อำเภอ
+  2570→
+  2571→ตำบล
+  2572→
+  2573→รหัสไปรษณีย์
+  2574→
+  2575→รูปโปรไฟล์
+  2576→
+  2577→ผู้ติดต่อฉุกเฉิน
+  2578→
+  2579→สถานะบัญชี
+  2580→
+  2581→Module 3: KYC
+  2582→แบ่งเป็น 5 ขั้นตอน:
+  2583→
+  2584→ข้อมูลส่วนตัว
+  2585→
+  2586→บัตรประชาชน
+  2587→
+  2588→ใบขับขี่
+  2589→
+  2590→เอกสารรถ
+  2591→
+  2592→บัญชีธนาคาร
+  2593→
+  2594→สถานะเอกสาร:
+  2595→
+  2596→text
+  2597→DRAFT
+  2598→UPLOADED
+  2599→PENDING_REVIEW
+  2600→APPROVED
+  2601→REJECTED
+  2602→EXPIRED
+  2603→ทุกครั้งที่เจ้าหน้าที่แก้ไขสถานะ ควรบันทึกลง kyc_review_logs เพื่อให้ตรวจสอบย้อนหลังได้
+  2604→
+  2605→Module 4: Vehicle
+  2606→รองรับประเภทรถจากภาพ:
+  2607→
+  2608→กระบะ
+  2609→
+  2610→กระบะตู้ทึบ
+  2611→
+  2612→กระบะคอก
+  2613→
+  2614→จัมโบ้
+  2615→
+  2616→6 ล้อ
+  2617→
+  2618→ข้อมูลรถ:
+  2619→
+  2620→ประเภทรถ
+  2621→
+  2622→ยี่ห้อ
+  2623→
+  2624→รุ่น
+  2625→
+  2626→สี
+  2627→
+  2628→ทะเบียนรถ
+  2629→
+  2630→จังหวัดทะเบียน
+  2631→
+  2632→น้ำหนักบรรทุก
+  2633→
+  2634→ขนาดพื้นที่บรรทุก
+  2635→
+  2636→รูปรถ
+  2637→
+  2638→เล่มทะเบียน
+  2639→
+  2640→พ.ร.บ.
+  2641→
+  2642→ประกันภัย
+  2643→
+  2644→Module 5: Driver Availability
+  2645→คนขับจะเปิดรับงานได้เมื่อ:
+  2646→
+  2647→text
+  2648→kyc_status = APPROVED
+  2649→vehicle_status = APPROVED
+  2650→bank_account_status = APPROVED
+  2651→account_status = ACTIVE
+  2652→สถานะ:
+  2653→
+  2654→text
+  2655→OFFLINE
+  2656→ONLINE
+  2657→BUSY
+  2658→SUSPENDED
+  2659→การเปิด Online ควรตรวจสอบเงื่อนไขบน Server ทุกครั้ง ไม่ควรเชื่อค่าจาก Client
+  2660→
+  2661→Module 6: Job Dispatch
+  2662→ระบบหางานให้คนขับตาม:
+  2663→
+  2664→ประเภทรถ
+  2665→
+  2666→พื้นที่ปัจจุบัน
+  2667→
+  2668→ระยะทางจากจุดรับ
+  2669→
+  2670→น้ำหนักบรรทุก
+  2671→
+  2672→ช่วงเวลาที่รับงาน
+  2673→
+  2674→คะแนนคนขับ
+  2675→
+  2676→ประวัติการยกเลิก
+  2677→
+  2678→สถานะ Online
+  2679→
+  2680→ลำดับงาน:
+  2681→
+  2682→text
+  2683→ORDER_CREATED
+  2684→  ↓
+  2685→SEARCHING_DRIVER
+  2686→  ↓
+  2687→OFFERED
+  2688→  ↓
+  2689→ACCEPTED
+  2690→  ↓
+  2691→DRIVER_GOING_TO_PICKUP
+  2692→  ↓
+  2693→ARRIVED_PICKUP
+  2694→  ↓
+  2695→PICKED_UP
+  2696→  ↓
+  2697→IN_TRANSIT
+  2698→  ↓
+  2699→ARRIVED_DROPOFF
+  2700→  ↓
+  2701→DELIVERED
+  2702→  ↓
+  2703→COMPLETED
+  2704→Module 7: Earnings
+  2705→ข้อมูลที่ควรแสดง:
+  2706→
+  2707→รายได้รวม
+  2708→
+  2709→ค่ารอบ
+  2710→
+  2711→โบนัส
+  2712→
+  2713→ค่ารอ
+  2714→
+  2715→ค่าทางด่วน
+  2716→
+  2717→ค่าคอมมิชชัน
+  2718→
+  2719→ยอดหัก
+  2720→
+  2721→ยอดสุทธิ
+  2722→
+  2723→รายได้รายวัน
+  2724→
+  2725→รายได้รายเดือน
+  2726→
+  2727→สถานะการโอนเงิน
+  2728→
+  2729→Module 8: Notifications
+  2730→ประเภทแจ้งเตือน:
+  2731→
+  2732→ผลการตรวจ KYC
+  2733→
+  2734→มีงานใหม่
+  2735→
+  2736→งานถูกยกเลิก
+  2737→
+  2738→ลูกค้าแก้ไขจุดส่ง
+  2739→
+  2740→เอกสารใกล้หมดอายุ
+  2741→
+  2742→แจ้งยอดรายได้
+  2743→
+  2744→แจ้งการโอนเงิน
+  2745→
+  2746→แจ้งเตือนจากแอดมิน
+  2747→
+  2748→5. โครงสร้างฐานข้อมูล Supabase
+  2749→profiles
+  2750→sql
+  2751→create table public.profiles (
+  2752→  id uuid primary key references auth.users(id) on delete cascade,
+  2753→  role text not null default 'driver',
+  2754→  full_name text,
+  2755→  phone text,
+  2756→  avatar_url text,
+  2757→  date_of_birth date,
+  2758→  address text,
+  2759→  province text,
+  2760→  district text,
+  2761→  subdistrict text,
+  2762→  postal_code text,
+  2763→  emergency_contact_name text,
+  2764→  emergency_contact_phone text,
+  2765→  account_status text not null default 'ACTIVE',
+  2766→  created_at timestamptz not null default now(),
+  2767→  updated_at timestamptz not null default now()
+  2768→);
+  2769→driver_profiles
+  2770→sql
+  2771→create table public.driver_profiles (
+  2772→  id uuid primary key default gen_random_uuid(),
+  2773→  user_id uuid not null unique references public.profiles(id) on delete cascade,
+  2774→  driver_code text unique,
+  2775→  kyc_status text not null default 'NOT_STARTED',
+  2776→  availability_status text not null default 'OFFLINE',
+  2777→  rating numeric(3,2) default 5.00,
+  2778→  total_jobs integer not null default 0,
+  2779→  completed_jobs integer not null default 0,
+  2780→  cancelled_jobs integer not null default 0,
+  2781→  current_lat numeric(10,7),
+  2782→  current_lng numeric(10,7),
+  2783→  last_location_at timestamptz,
+  2784→  approved_at timestamptz,
+  2785→  created_at timestamptz not null default now(),
+  2786→  updated_at timestamptz not null default now()
+  2787→);
+  2788→kyc_submissions
+  2789→sql
+  2790→create table public.kyc_submissions (
+  2791→  id uuid primary key default gen_random_uuid(),
+  2792→  driver_id uuid not null references public.driver_profiles(id),
+  2793→  version integer not null default 1,
+  2794→  status text not null default 'DRAFT',
+  2795→  submitted_at timestamptz,
+  2796→  reviewed_at timestamptz,
+  2797→  reviewed_by uuid references public.profiles(id),
+  2798→  rejection_reason text,
+  2799→  created_at timestamptz not null default now(),
+  2800→  updated_at timestamptz not null default now()
+  2801→);
+  2802→kyc_documents
+  2803→sql
+  2804→create table public.kyc_documents (
+  2805→  id uuid primary key default gen_random_uuid(),
+  2806→  kyc_submission_id uuid not null references public.kyc_submissions(id) on delete cascade,
+  2807→  driver_id uuid not null references public.driver_profiles(id),
+  2808→  document_type text not null,
+  2809→  storage_path text not null,
+  2810→  file_name text,
+  2811→  mime_type text,
+  2812→  file_size integer,
+  2813→  document_number text,
+  2814→  issued_date date,
+  2815→  expiry_date date,
+  2816→  status text not null default 'UPLOADED',
+  2817→  rejection_reason text,
+  2818→  created_at timestamptz not null default now()
+  2819→);
+  2820→vehicles
+  2821→sql
+  2822→create table public.vehicles (
+  2823→  id uuid primary key default gen_random_uuid(),
+  2824→  driver_id uuid not null references public.driver_profiles(id),
+  2825→  vehicle_type text not null,
+  2826→  brand text,
+  2827→  model text,
+  2828→  color text,
+  2829→  plate_number text not null,
+  2830→  plate_province text not null,
+  2831→  max_weight_kg integer,
+  2832→  cargo_width_cm integer,
+  2833→  cargo_length_cm integer,
+  2834→  cargo_height_cm integer,
+  2835→  status text not null default 'PENDING',
+  2836→  created_at timestamptz not null default now(),
+  2837→  updated_at timestamptz not null default now()
+  2838→);
+  2839→bank_accounts
+  2840→sql
+  2841→create table public.bank_accounts (
+  2842→  id uuid primary key default gen_random_uuid(),
+  2843→  driver_id uuid not null references public.driver_profiles(id),
+  2844→  bank_code text not null,
+  2845→  account_name text not null,
+  2846→  account_number_encrypted text not null,
+  2847→  account_number_last4 text not null,
+  2848→  status text not null default 'PENDING',
+  2849→  created_at timestamptz not null default now()
+  2850→);
+  2851→jobs
+  2852→sql
+  2853→create table public.jobs (
+  2854→  id uuid primary key default gen_random_uuid(),
+  2855→  order_id uuid,
+  2856→  driver_id uuid references public.driver_profiles(id),
+  2857→  vehicle_id uuid references public.vehicles(id),
+  2858→  status text not null default 'SEARCHING_DRIVER',
+  2859→  pickup_address text not null,
+  2860→  pickup_lat numeric(10,7) not null,
+  2861→  pickup_lng numeric(10,7) not null,
+  2862→  dropoff_address text not null,
+  2863→  dropoff_lat numeric(10,7) not null,
+  2864→  dropoff_lng numeric(10,7) not null,
+  2865→  distance_km numeric(10,2),
+  2866→  base_fare numeric(12,2),
+  2867→  driver_earnings numeric(12,2),
+  2868→  customer_price numeric(12,2),
+  2869→  accepted_at timestamptz,
+  2870→  picked_up_at timestamptz,
+  2871→  delivered_at timestamptz,
+  2872→  completed_at timestamptz,
+  2873→  created_at timestamptz not null default now(),
+  2874→  updated_at timestamptz not null default now()
+  2875→);
+  2876→job_status_logs
+  2877→sql
+  2878→create table public.job_status_logs (
+  2879→  id uuid primary key default gen_random_uuid(),
+  2880→  job_id uuid not null references public.jobs(id) on delete cascade,
+  2881→  actor_id uuid not null references public.profiles(id),
+  2882→  old_status text,
+  2883→  new_status text not null,
+  2884→  note text,
+  2885→  latitude numeric(10,7),
+  2886→  longitude numeric(10,7),
+  2887→  created_at timestamptz not null default now()
+  2888→);
+  2889→driver_locations
+  2890→sql
+  2891→create table public.driver_locations (
+  2892→  id bigint generated always as identity primary key,
+  2893→  driver_id uuid not null references public.driver_profiles(id),
+  2894→  latitude numeric(10,7) not null,
+  2895→  longitude numeric(10,7) not null,
+  2896→  heading numeric(6,2),
+  2897→  speed numeric(8,2),
+  2898→  recorded_at timestamptz not null default now()
+  2899→);
+  2900→6. Storage Buckets
+  2901→แนะนำแยก Bucket ดังนี้:
+  2902→
+  2903→text
+  2904→kyc-private
+  2905→vehicle-private
+  2906→job-proof-private
+  2907→avatars-public
+  2908→โครงสร้างไฟล์:
+  2909→
+  2910→text
+  2911→kyc-private/
+  2912→  {user_id}/
+  2913→    identity-front.jpg
+  2914→    identity-back.jpg
+  2915→    selfie.jpg
+  2916→    license-front.jpg
+  2917→    license-back.jpg
+  2918→
+  2919→vehicle-private/
+  2920→  {user_id}/
+  2921→    registration-book.jpg
+  2922→    compulsory-insurance.jpg
+  2923→    vehicle-front.jpg
+  2924→    vehicle-side.jpg
+  2925→
+  2926→job-proof-private/
+  2927→  {driver_id}/
+  2928→    {job_id}/
+  2929→      pickup-proof.jpg
+  2930→      delivery-proof.jpg
+  2931→      signature.jpg
+  2932→ไม่ควรทำเอกสาร KYC เป็น Public Bucket เพราะเป็นข้อมูลส่วนบุคคลที่มีความอ่อนไหว ควรใช้ Private Bucket และสร้าง Signed URL อายุสั้นเฉพาะเมื่อผู้มีสิทธิ์ร้องขอ
+  2933→
+  2934→ตัวอย่าง Policy สำหรับการอัปโหลดไฟล์ของตัวเอง:
+  2935→
+  2936→sql
+  2937→create policy "driver_upload_own_kyc"
+  2938→on storage.objects
+  2939→for insert
+  2940→to authenticated
+  2941→with check (
+  2942→  bucket_id = 'kyc-private'
+  2943→  and (storage.foldername(name))[1] = auth.uid()::text
+  2944→);
+  2945→ตัวอย่าง Policy สำหรับอ่านไฟล์ของตัวเอง:
+  2946→
+  2947→sql
+  2948→create policy "driver_read_own_kyc"
+  2949→on storage.objects
+  2950→for select
+  2951→to authenticated
+  2952→using (
+  2953→  bucket_id = 'kyc-private'
+  2954→  and (storage.foldername(name))[1] = auth.uid()::text
+  2955→);
+  2956→7. ขั้นตอน KYC ฝั่งคนรับงาน
+  2957→ขั้นที่ 1: สมัครสมาชิก
+  2958→หน้าจอ:
+  2959→
+  2960→text
+  2961→สมัครเป็นคนขับ
+  2962→เบอร์โทรศัพท์
+  2963→ปุ่ม รับรหัส OTP
+  2964→API:
+  2965→
+  2966→text
+  2967→POST /api/auth/send-otp
+  2968→Request:
+  2969→
+  2970→json
+  2971→{
+  2972→  "phone": "0812345678"
+  2973→}
+  2974→Response:
+  2975→
+  2976→json
+  2977→{
+  2978→  "success": true,
+  2979→  "expiresIn": 300,
+  2980→  "requestId": "otp_request_id"
+  2981→}
+  2982→ขั้นที่ 2: ยืนยัน OTP
+  2983→text
+  2984→POST /api/auth/verify-otp
+  2985→Request:
+  2986→
+  2987→json
+  2988→{
+  2989→  "phone": "0812345678",
+  2990→  "otp": "123456",
+  2991→  "requestId": "otp_request_id"
+  2992→}
+  2993→หลังตรวจสอบสำเร็จ:
+  2994→
+  2995→สร้าง auth.users
+  2996→
+  2997→สร้าง profiles
+  2998→
+  2999→สร้าง driver_profiles
+
+[showing lines 1500-2999 of 11581; use offset=3000 with limit to continue reading]
