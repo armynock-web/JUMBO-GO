@@ -73,3 +73,54 @@ Stage Summary:
 - Realtime tracking timeline auto-advances through 6 job statuses
 - Mobile + desktop both responsive
 - Browser verification passed (DOM-level confirmation + visual screenshots)
+
+---
+Task ID: 11-18
+Agent: main
+Task: Build complete Driver + Admin sides per full blueprint
+
+Work Log:
+- Extended store with 'mode' (user/driver/admin) + new Screen IDs for D01-D18 (Driver) and A01-A11 (Admin)
+- Built Driver screens (18 screens total):
+  * D01 driver-register: hero + benefits + 10-step preview + requirements + CTA
+  * D02 driver-login: phone/password/login
+  * D03-D12 driver-onboarding: 10-step KYC stepper (profile/identity/selfie/license/vehicle/vehicle-docs/bank/consent/review/submit) with upload cards, form fields, step indicator, draft save
+  * D13 driver-onboarding-status: under_review state + timeline + docs list + actions
+  * D14 driver-dashboard: header + online toggle + stats (งานวันนี้/รายได้) + ongoing + earnings + announcements + driver bottom nav
+  * D15 driver-jobs: new jobs cards with accept/reject + active jobs
+  * D16 driver-earnings: hero total + tabs (today/week/month) + breakdown + pending + transfer history
+  * D17 driver-history: filterable list (all/done/cancel) with ratings
+  * D18 driver-profile: KYC badge + vehicle + finance + settings + logout
+- Built Admin screens (11 screens total):
+  * A01 admin-login: email/password + audit log notice
+  * A02-A11 admin-shell with sidebar (desktop) + mobile drawer
+  * A02 dashboard: 4 summary cards + 3 today stats + recent KYC table + jobs-by-status bars
+  * A03 users, A04 drivers, A06 vehicles, A07 jobs: table-based pages with status badges
+  * A05 KYC review: list + detail panel with all 10 docs + approve/reject with reason
+  * A08 pricing: editable sliders per vehicle type
+  * A09 payments: stats + transfer history
+  * A10 reports: stats + 7-day bar chart + top drivers
+  * A11 settings: menu list
+- Added Role Switcher (User/Driver/Admin) to:
+  * Desktop rail (top of right column)
+  * Mobile floating bottom-center pill
+- Updated AppShell to handle Admin shell (sidebar) vs mobile shell
+- Updated DesktopRail to show screen inventory per mode (User/Driver/Admin)
+- Fixed relative import paths (../../) for driver/admin subfolders
+- Restored PhoneFrame export that was accidentally removed
+
+Verification:
+- ESLint: 0 errors, 0 warnings
+- Dev server: GET / 200, no module-not-found errors
+- agent-browser verified:
+  * Driver mode: D01 register renders, D03-D12 stepper works (10 steps), D14 dashboard + online toggle works (toggle changes "ออฟไลน์" -> "ออนไลน์ (พร้อมรับงาน)")
+  * Admin mode: A01 login -> A02 dashboard with sidebar nav (11 items) -> A05 KYC review -> open detail -> approve -> "อนุมัติ KYC แล้ว" success
+  * Role switcher: all 3 modes accessible from both desktop rail and mobile floating pill
+
+Stage Summary:
+- Complete system now covers all 3 actors per blueprint:
+  * User (U01-U18): 19 screens
+  * Driver (D01-D18): 18 screens
+  * Admin (A01-A11): 11 screens
+- Total: 48 screens across 3 roles, all Thai UI, all using JUMBO brand colors
+- Single-page showcase on / route with phone frame + role switcher + screen inventory rail

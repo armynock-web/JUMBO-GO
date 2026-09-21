@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { AppShell } from "@/components/jumbo/app-shell";
 import { PhoneFrame, DesktopRail } from "@/components/jumbo/phone-frame";
 import { JumboLogo } from "@/components/jumbo/logo";
-import { useJumbo, type ScreenId } from "@/store/jumbo";
+import { useJumbo, type ScreenId, type Mode } from "@/store/jumbo";
 import { BRAND, VEHICLES } from "@/lib/brand";
 import { VehicleIcon } from "@/components/jumbo/vehicle-icon";
 import {
@@ -23,7 +23,9 @@ import {
 
 export default function Page() {
   const screen = useJumbo((s) => s.screen);
+  const mode = useJumbo((s) => s.mode);
   const go = useJumbo((s) => s.go);
+  const setMode = useJumbo((s) => s.setMode);
   const [isDesktop, setIsDesktop] = useState(false);
 
   useEffect(() => {
@@ -160,7 +162,12 @@ export default function Page() {
 
         {/* Right: rail */}
         <section className="col-span-4 flex flex-col pt-8">
-          <DesktopRail current={screen} onPick={(s) => go(s as ScreenId)} />
+          <DesktopRail
+            current={screen}
+            mode={mode}
+            onPick={(s) => go(s as ScreenId)}
+            onMode={(m) => setMode(m as Mode)}
+          />
         </section>
       </main>
 
@@ -221,10 +228,30 @@ export default function Page() {
   );
 }
 
-// Mobile view - render the app full screen
+// Mobile view - render the app full screen with role switcher overlay
 function MobileApp() {
+  const mode = useJumbo((s) => s.mode);
+  const setMode = useJumbo((s) => s.setMode);
   return (
     <div className="fixed inset-0 w-full overflow-hidden bg-white">
+      {/* floating role switcher */}
+      <div className="fixed bottom-3 left-1/2 z-50 flex -translate-x-1/2 items-center gap-1 rounded-full border border-line bg-white/95 p-1 shadow-lg backdrop-blur">
+        {[
+          { m: "user" as const, label: "User" },
+          { m: "driver" as const, label: "Driver" },
+          { m: "admin" as const, label: "Admin" },
+        ].map((r) => (
+          <button
+            key={r.m}
+            onClick={() => setMode(r.m)}
+            className={`rounded-full px-3 py-1 text-[11px] font-bold transition ${
+              mode === r.m ? "bg-jumbo text-white" : "text-ink-muted"
+            }`}
+          >
+            {r.label}
+          </button>
+        ))}
+      </div>
       <AppShell />
     </div>
   );

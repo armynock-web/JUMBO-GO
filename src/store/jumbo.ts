@@ -3,8 +3,11 @@
 import { create } from "zustand";
 import type { VehicleType } from "@/lib/brand";
 
-// All screen IDs in the JUMBO GO blueprint that we expose in the showcase
+export type Mode = "user" | "driver" | "admin";
+
+// All screen IDs across the 3 actors in the JUMBO GO blueprint
 export type ScreenId =
+  // User screens U01-U18
   | "splash"
   | "onboarding"
   | "login"
@@ -23,7 +26,29 @@ export type ScreenId =
   | "jobs"
   | "notifications"
   | "profile"
-  | "support";
+  | "support"
+  // Driver screens D01-D18
+  | "driver-register"
+  | "driver-login"
+  | "driver-onboarding" // stepper shell (D03-D12)
+  | "driver-onboarding-status" // D13
+  | "driver-dashboard" // D14
+  | "driver-jobs" // D15
+  | "driver-earnings" // D16
+  | "driver-history" // D17
+  | "driver-profile" // D18
+  // Admin screens A01-A11
+  | "admin-login" // A01
+  | "admin-dashboard" // A02
+  | "admin-users" // A03
+  | "admin-drivers" // A04
+  | "admin-kyc" // A05
+  | "admin-vehicles" // A06
+  | "admin-jobs" // A07
+  | "admin-pricing" // A08
+  | "admin-payments" // A09
+  | "admin-reports" // A10
+  | "admin-settings"; // A11
 
 export type LocationPoint = {
   address: string;
@@ -45,18 +70,19 @@ export type BookingDraft = {
 };
 
 type JumboState = {
-  // navigation
+  mode: Mode;
   screen: ScreenId;
   history: ScreenId[];
-  // booking
   draft: BookingDraft;
-  // fake auth
   isAuthenticated: boolean;
-  // driver searching progress (0-100)
   searchProgress: number;
-  // tracking timeline step (index into JOB_TIMELINE)
   trackingStep: number;
+  // driver onboarding step (1-10)
+  kycStep: number;
+  kycSubmitted: boolean;
+  driverOnline: boolean;
   // actions
+  setMode: (m: Mode) => void;
   go: (s: ScreenId) => void;
   back: () => void;
   resetFlow: () => void;
@@ -66,6 +92,9 @@ type JumboState = {
   setPrice: (km: number, price: number) => void;
   setSearchProgress: (n: number) => void;
   setTrackingStep: (n: number) => void;
+  setKycStep: (n: number) => void;
+  submitKyc: () => void;
+  toggleDriverOnline: () => void;
   login: () => void;
   logout: () => void;
 };
@@ -81,17 +110,37 @@ const initialDraft: BookingDraft = {
 };
 
 export const useJumbo = create<JumboState>((set) => ({
+  mode: "user",
   screen: "splash",
   history: [],
   draft: initialDraft,
   isAuthenticated: false,
   searchProgress: 0,
   trackingStep: 0,
+  kycStep: 1,
+  kycSubmitted: false,
+  driverOnline: false,
+
+  setMode: (m) =>
+    set({
+      mode: m,
+      screen:
+        m === "user"
+          ? "splash"
+          : m === "driver"
+            ? "driver-register"
+            : "admin-login",
+      history: [],
+      draft: { ...initialDraft },
+      kycStep: 1,
+      kycSubmitted: false,
+      driverOnline: false,
+    }),
 
   go: (s) =>
     set((st) => ({
       screen: s,
-      history: [...st.history, st.screen].slice(-12),
+      history: [...st.history, st.screen].slice(-16),
     })),
   back: () =>
     set((st) => {
@@ -111,6 +160,9 @@ export const useJumbo = create<JumboState>((set) => ({
     })),
   setSearchProgress: (n) => set({ searchProgress: n }),
   setTrackingStep: (n) => set({ trackingStep: n }),
+  setKycStep: (n) => set({ kycStep: Math.max(1, Math.min(10, n)) }),
+  submitKyc: () => set({ kycSubmitted: true }),
+  toggleDriverOnline: () => set((st) => ({ driverOnline: !st.driverOnline })),
 
   login: () => set({ isAuthenticated: true }),
   logout: () =>
@@ -119,5 +171,8 @@ export const useJumbo = create<JumboState>((set) => ({
       screen: "splash",
       history: [],
       draft: { ...initialDraft },
+      kycStep: 1,
+      kycSubmitted: false,
+      driverOnline: false,
     }),
 }));

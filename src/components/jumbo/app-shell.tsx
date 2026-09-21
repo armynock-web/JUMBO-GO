@@ -24,19 +24,62 @@ import { SupportScreen } from "./screens/support";
 import { BottomNav } from "./bottom-nav";
 import { AnimatePresence, motion } from "framer-motion";
 
-const SCREENS_WITH_BOTTOM_NAV = ["home", "jobs", "notifications", "profile"] as const;
+// Driver screens
+import { DriverRegisterScreen } from "./screens/driver/register";
+import { DriverLoginScreen } from "./screens/driver/login";
+import { DriverOnboardingScreen } from "./screens/driver/onboarding";
+import { DriverOnboardingStatusScreen } from "./screens/driver/status";
+import { DriverDashboardScreen } from "./screens/driver/dashboard";
+import { DriverJobsScreen } from "./screens/driver/jobs";
+import { DriverEarningsScreen } from "./screens/driver/earnings";
+import { DriverHistoryScreen } from "./screens/driver/history";
+import { DriverProfileScreen } from "./screens/driver/profile";
+
+// Admin screens
+import { AdminLoginScreen } from "./screens/admin/login";
+import { AdminShell, AdminDashboardContent } from "./screens/admin/shell";
+import {
+  AdminUsersPage,
+  AdminDriversPage,
+  AdminKycPage,
+  AdminVehiclesPage,
+  AdminJobsPage,
+  AdminPricingPage,
+  AdminPaymentsPage,
+  AdminReportsPage,
+  AdminSettingsPage,
+} from "./screens/admin/pages";
+
+const USER_BOTTOM_NAV_SCREENS = ["home", "jobs", "notifications", "profile"] as const;
 
 export function AppShell() {
   const screen = useJumbo((s) => s.screen);
-  const showBottomNav = (
-    SCREENS_WITH_BOTTOM_NAV as readonly string[]
-  ).includes(screen);
+  const mode = useJumbo((s) => s.mode);
+  const isUserBottomNav =
+    mode === "user" &&
+    (USER_BOTTOM_NAV_SCREENS as readonly string[]).includes(screen);
 
   // Scroll to top whenever screen changes
   useEffect(() => {
     const el = document.getElementById("jumbo-scroll");
     if (el) el.scrollTo({ top: 0, behavior: "auto" });
   }, [screen]);
+
+  // Admin uses its own shell (with sidebar)
+  if (mode === "admin" && screen !== "admin-login") {
+    return (
+      <AdminShell>
+        <motion.div
+          key={screen}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          {renderAdmin(screen)}
+        </motion.div>
+      </AdminShell>
+    );
+  }
 
   return (
     <div
@@ -56,7 +99,7 @@ export function AppShell() {
         </motion.div>
       </AnimatePresence>
 
-      {showBottomNav && <BottomNav />}
+      {isUserBottomNav && <BottomNav />}
     </div>
   );
 }
@@ -101,7 +144,59 @@ function renderScreen(screen: string) {
       return <ProfileScreen />;
     case "support":
       return <SupportScreen />;
+    // Driver
+    case "driver-register":
+      return <DriverRegisterScreen />;
+    case "driver-login":
+      return <DriverLoginScreen />;
+    case "driver-onboarding":
+      return <DriverOnboardingScreen />;
+    case "driver-onboarding-status":
+      return <DriverOnboardingStatusScreen />;
+    case "driver-dashboard":
+      return <DriverDashboardScreen />;
+    case "driver-jobs":
+      return <DriverJobsScreen />;
+    case "driver-earnings":
+      return <DriverEarningsScreen />;
+    case "driver-history":
+      return <DriverHistoryScreen />;
+    case "driver-profile":
+      return <DriverProfileScreen />;
+    // Admin login
+    case "admin-login":
+      return <AdminLoginScreen />;
     default:
       return <HomeScreen />;
+  }
+}
+
+function renderAdmin(screen: string) {
+  switch (screen) {
+    case "admin-dashboard":
+      return <AdminDashboardContent />;
+    case "admin-users":
+      return <AdminUsersPage />;
+    case "admin-drivers":
+      return <AdminDriversPage />;
+    case "admin-kyc":
+      return <AdminKycPage />;
+    case "admin-vehicles":
+      return <AdminVehiclesPage />;
+    case "admin-jobs":
+      return <AdminJobsPage />;
+    case "admin-pricing":
+      return <AdminPricingPage />;
+    case "admin-payments":
+      return <AdminPaymentsPage />;
+    case "admin-reports":
+      return <AdminReportsPage />;
+    case "admin-notifications":
+      // Admin notifications = same notifications list with sidebar
+      return <NotificationsScreen />;
+    case "admin-settings":
+      return <AdminSettingsPage />;
+    default:
+      return <AdminDashboardContent />;
   }
 }
