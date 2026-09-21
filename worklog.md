@@ -169,3 +169,36 @@ Stage Summary:
   * คนขับ: 9/9 types (7 user-specified + 2 from blueprint Module 8: kyc_result, doc_expiring) ✓
   * แอดมิน: 5/5 types ✓
 - ESLint: 0 errors, 0 warnings
+
+---
+Task ID: map-fix
+Agent: main
+Task: Fix tracking map truck marker (was not moving due to SVG attribute bug)
+
+Work Log:
+- Bug found: motion.g used animate={{ cx, cy }} but <g> elements don't have cx/cy attributes (only <circle> does). Truck was stuck at (0,0).
+- Fix: Changed to animate={{ x, y }} which framer-motion maps to CSS transform: translate() on the <g> element.
+- Added ROUTE_POINTS array: 6 waypoints along the bezier curve, one per timeline step
+  * step 0 ACCEPTED: (40,40) at pickup
+  * step 1 GOING_TO_PICKUP: (90,65) approaching
+  * step 2 ARRIVED_PICKUP: (40,40) at pickup
+  * step 3 PICKED_UP: (100,80) just left
+  * step 4 IN_TRANSIT: (180,130) mid-route
+  * step 5 DELIVERED: (260,180) at dropoff
+- Added ROUTE_PROGRESS array (0%, 5%, 0%, 25%, 60%, 100%) for progress bar
+- Added green "traveled" path overlay that grows as truck progresses (pathLength=100 + strokeDasharray trick)
+- Added progress bar at bottom of map (รับ → % → ส่ง)
+- ETA text now context-aware: "ถึงจุดรับ" (steps 0-2) vs "ถึงจุดส่ง" (steps 3-4) vs "ส่งของถึงจุดหมายแล้ว" (step 5)
+- Distance display adapts: "ระยะไปรับ" (4.2 กม.) vs "ระยะไปส่ง" (10.5 กม.)
+
+Verification (agent-browser + JS eval):
+- Fresh reload → click U13 Tracking → step 0: truck transform = translateX(40px) translateY(40px) ✓ (at pickup)
+- Wait 5s → step 1 (mid-animation): truck transform = translateX(88.3px) translateY(64.2px) ✓ (moving toward 90,65 target)
+- Confirms truck smoothly animates along route as timeline advances every 3.5s
+- ESLint: 0 errors, 0 warnings
+
+Stage Summary:
+- Truck marker now actually moves on the tracking map
+- Movement is tied to timeline step (not random/independent)
+- Green traveled-path + progress bar provide visual feedback of journey progress
+- ETA and distance text adapt to whether truck is going to pickup or dropoff

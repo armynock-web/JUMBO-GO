@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useJumbo } from "@/store/jumbo";
 import { StatusBar } from "../status-bar";
 import { JOB_TIMELINE, DRIVER_DEMO } from "@/lib/brand";
@@ -15,6 +15,21 @@ import {
   Clock,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+
+// Route waypoints on the SVG (pickup → mid → dropoff)
+// The truck follows a quadratic bezier M40,40 Q150,90 260,180
+// We sample positions along this curve per timeline step.
+const ROUTE_POINTS = [
+  { x: 40, y: 40 }, // pickup (step 0: ACCEPTED — at pickup start)
+  { x: 90, y: 65 }, // step 1: DRIVER_GOING_TO_PICKUP — approaching
+  { x: 40, y: 40 }, // step 2: ARRIVED_PICKUP — at pickup
+  { x: 100, y: 80 }, // step 3: PICKED_UP — just left pickup
+  { x: 180, y: 130 }, // step 4: IN_TRANSIT — mid-route
+  { x: 260, y: 180 }, // step 5: DELIVERED — at dropoff
+];
+
+// progress % along route (0 = at pickup, 100 = at dropoff)
+const ROUTE_PROGRESS = [0, 5, 0, 25, 60, 100];
 
 export function TrackingScreen() {
   const go = useJumbo((s) => s.go);
@@ -40,6 +55,12 @@ export function TrackingScreen() {
   }, [trackingStep, eta, go, setTrackingStep]);
 
   const current = JOB_TIMELINE[trackingStep];
+
+  // Truck position + progress, tied to timeline step
+  const target = ROUTE_POINTS[Math.min(trackingStep, ROUTE_POINTS.length - 1)];
+  const truckProgress = ROUTE_PROGRESS[Math.min(trackingStep, ROUTE_PROGRESS.length - 1)];
+
+  const truckPos = useMemo(() => ({ x: target.x, y: target.y }), [target]);
 
   return (
     <div className="relative flex h-full flex-col bg-surface">
@@ -71,39 +92,44 @@ export function TrackingScreen() {
           <path d="M0 150 L300 160" stroke="#fff" strokeWidth="8" />
           <path d="M80 0 L100 220" stroke="#fff" strokeWidth="8" />
           <path d="M220 0 L200 220" stroke="#fff" strokeWidth="6" />
-          {/* route */}
+          {/* route path (pickup → dropoff) */}
           <path
             d="M40 40 Q150 90 260 180"
             stroke="#ED1C24"
             strokeWidth="3.5"
             fill="none"
             strokeDasharray="6 4"
-            id="route"
           />
-          {/* pickup */}
+          {/* traveled portion (green) — grows as timeline advances */}
+          <path
+            d="M40 40 Q150 90 260 180"
+            stroke="#16A34A"
+            strokeWidth="3.5"
+            fill="none"
+            pathLength={100}
+            strokeDasharray={`${truckProgress} ${100 - truckProgress}`}
+            style={{ transition: "stroke-dasharray 1.2s ease" }}
+          />
+          {/* pickup pin */}
           <g transform="translate(40 40)">
-            <circle r="6" fill="#16A34A" />
-            <circle r="2" fill="#fff" />
+            <circle r="7" fill="#16A34A" />
+            <circle r="2.5" fill="#fff" />
           </g>
-          {/* dropoff */}
+          {/* dropoff pin */}
           <g transform="translate(260 180)">
             <path d="M0 -10 L7 -2 L0 8 L-7 -2 Z" fill="#ED1C24" />
+            <circle r="2" fill="#fff" cx="0" cy="-2" />
           </g>
-          {/* moving truck */}
+          {/* moving truck — smoothly animates to new position when trackingStep changes */}
           <motion.g
-            animate={{
-              cx: [40, 150, 260],
-              cy: [40, 90, 180],
-            }}
-            transition={{
-              duration: 8,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
+            animate={{ x: truckPos.x, y: truckPos.y }}
+            transition={{ duration: 1.8, ease: "easeInOut" }}
+            initial={false}
           >
-            <circle r="14" fill="#ED1C2433" />
-            <circle r="10" fill="#ED1C24" />
-            <text x="0" y="4" textAnchor="middle" fontSize="12">
+            {/* pulse halo */}
+            <circle r="18" fill="#ED1C2422" className="animate-jumbo-pulse" />
+            <circle r="12" fill="#ED1C24" />
+            <text x="0" y="4" textAnchor="middle" fontSize="13">
               🚚
             </text>
           </motion.g>
@@ -125,22 +151,46 @@ export function TrackingScreen() {
                 {current.label}
               </p>
               <p className="text-[13px] font-bold text-ink">
-                อีก {eta} นาทีถึงจุดรับ
+                {trackingStep < 3
+                  ? `อีก ${eta} นาทีถึงจุดรับ`
+                  : trackingStep < 5
+                    ? `อีก ${eta} นาทีถึงจุดส่ง`
+                    : "ส่งของถึงจุดหมายแล้ว"}
               </p>
             </div>
           </div>
           <div className="text-right">
-            <p className="text-[10px] text-ink-muted">ระยะทาง</p>
+            <p className="text-[10px] text-ink-muted">
+              {trackingStep < 3 ? "ระยะไปรับ" : "ระยะไปส่ง"}
+            </p>
             <p className="text-[13px] font-bold text-ink">
-              {d.distanceKm} กม.
+              {trackingStep < 3
+                ? `${d.distanceKm} กม.`
+                : `${(d.distanceKm * 2.5).toFixed(1)} กม.`}
             </p>
           </div>
         </motion.div>
 
-        {/* connection status */}
-        <div className="absolute bottom-3 left-3 flex items-center gap-1.5 rounded-full bg-white/95 px-2 py-1 text-[10px] font-semibold text-green-600 shadow">
-          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-green-500" />
-          Realtime ซิงค์สด
+        {/* progress bar overlay */}
+        <div className="absolute bottom-3 left-3 right-3 flex items-center gap-2">
+          <span className="flex items-center gap-1 rounded-full bg-white/95 px-2 py-1 text-[9px] font-bold text-green-600 shadow">
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-green-500" />
+            Realtime ซิงค์สด
+          </span>
+          <div className="flex-1">
+            <div className="mb-0.5 flex items-center justify-between text-[9px] text-ink-muted">
+              <span>รับ</span>
+              <span>{Math.round(truckProgress)}%</span>
+              <span>ส่ง</span>
+            </div>
+            <div className="h-1.5 overflow-hidden rounded-full bg-white/60">
+              <motion.div
+                className="h-full bg-gradient-to-r from-green-500 to-jumbo"
+                animate={{ width: `${truckProgress}%` }}
+                transition={{ duration: 1, ease: "easeOut" }}
+              />
+            </div>
+          </div>
         </div>
       </div>
 
