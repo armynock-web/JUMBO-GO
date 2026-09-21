@@ -39,12 +39,22 @@ export function DriverDashboardScreen() {
               </span>
             </div>
           </div>
-          <button
-            onClick={() => go("driver-profile")}
-            className="flex h-12 w-12 items-center justify-center rounded-full bg-white/15 text-2xl"
-          >
-            👤
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => go("notifications")}
+              className="relative flex h-10 w-10 items-center justify-center rounded-full bg-white/15"
+              aria-label="การแจ้งเตือน"
+            >
+              <Bell className="h-5 w-5" />
+              <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-white ring-2 ring-jumbo" />
+            </button>
+            <button
+              onClick={() => go("driver-profile")}
+              className="flex h-12 w-12 items-center justify-center rounded-full bg-white/15 text-2xl"
+            >
+              👤
+            </button>
+          </div>
         </div>
 
         {/* online toggle */}

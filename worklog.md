@@ -124,3 +124,48 @@ Stage Summary:
   * Admin (A01-A11): 11 screens
 - Total: 48 screens across 3 roles, all Thai UI, all using JUMBO brand colors
 - Single-page showcase on / route with phone frame + role switcher + screen inventory rail
+
+---
+Task ID: n1-n3
+Agent: main
+Task: Build comprehensive 3-role notification system
+
+Work Log:
+- Created src/lib/notifications.ts with full notification data model:
+  * 22 notification categories across 3 roles
+  * Customer (10): driver_accepted, driver_going_to_pickup, arrived_pickup, picked_up, in_transit, arrived_dropoff, job_completed, driver_cancelled, payment_due, action_required
+  * Driver (9): new_job_nearby, job_details, customer_cancelled, job_modified, accept_deadline_warning, earnings, kyc_result, doc_expiring, system_announcement
+  * Admin (5): abnormal_cancellation, complaint, stale_job, payment_issue, admin_action_required
+  * Each notification has: id, role, category, title, body, time, unread, priority (low/normal/high/urgent), jobId, amount, action button
+  * CATEGORY_GROUPS for filter chips per role
+  * CATEGORY_META with color + icon per category
+  * PRIORITY_META with label + color per priority
+- Rewrote NotificationsScreen (mobile, role-aware):
+  * Reads mode from store, shows customer/driver/admin notifications
+  * Summary bar (unread count + total count)
+  * Filter chips by category group (สถานะงาน/ปัญหา/การเงิน for customer; งาน/เงิน/ระบบ for driver)
+  * Sorts: unread first, then by priority (urgent > high > normal > low)
+  * Mark-as-read (per-item + "อ่านทั้งหมด")
+  * Action buttons link to relevant screens (e.g. ติดตามรถ -> tracking, รับงาน -> driver-jobs)
+  * Priority badges, jobId, amount display
+  * Back button shown for driver/admin modes (user mode uses bottom nav)
+- Added AdminNotificationsPage (desktop, sidebar-compatible):
+  * Summary cards: ด่วน/สำคัญ/ยังไม่อ่าน/ทั้งหมด counts
+  * Sorted by priority
+  * Action buttons link to admin sub-pages
+- Added bell icon to Driver Dashboard header (links to notifications)
+- Added "notifications" to driver rail screen inventory
+- Removed old NOTIFICATIONS mock from brand.ts (superseded)
+
+Verification (agent-browser):
+- User mode notifications: 10 items, 3 unread, all 10 categories present, filter chips work (ทั้งหมด/สถานะงาน/ปัญหา/การเงิน)
+- Driver mode: bell icon on dashboard -> notifications (9 items, 3 unread), filter works (เงิน/รายได้ shows 3 items: ผล KYC, เอกสารใกล้หมดอายุ, แจ้งยอดรายได้)
+- "อ่านทั้งหมด" marks all read (unread count -> 0)
+- Admin mode: notifications page inside sidebar shell (5 items, 3 unread, summary cards, action buttons)
+
+Stage Summary:
+- Notification system now covers ALL types specified by user for all 3 roles:
+  * ลูกค้า: 10/10 types ✓
+  * คนขับ: 9/9 types (7 user-specified + 2 from blueprint Module 8: kyc_result, doc_expiring) ✓
+  * แอดมิน: 5/5 types ✓
+- ESLint: 0 errors, 0 warnings

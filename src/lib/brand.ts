@@ -204,37 +204,7 @@ export const JOB_TIMELINE = [
   { key: "DELIVERED", label: "ส่งของสำเร็จ", desc: "ส่งของถึงจุดหมายเรียบร้อย" },
 ];
 
-// Notifications
-export const NOTIFICATIONS = [
-  {
-    type: "job",
-    title: "ส่งงานสำเร็จ",
-    body: "งานเลขที่ JG-2025-00108 ส่งมอบเรียบร้อย รายได้ 520 บาท",
-    time: "2 นาทีที่แล้ว",
-    unread: true,
-  },
-  {
-    type: "promo",
-    title: "โปรโมชั่น! ส่งของสุดคุ้ม",
-    body: "ลด 15% สำหรับการเรียกรถกระบะวันนี้ ใช้รหัส JUMBO15",
-    time: "1 ชม.ที่แล้ว",
-    unread: true,
-  },
-  {
-    type: "system",
-    title: "ยินดีต้อนรับสู่ JUMBO GO",
-    body: "บัญชีของคุณพร้อมใช้งานแล้ว เริ่มเรียกรถกันเลย!",
-    time: "เมื่อวาน",
-    unread: false,
-  },
-  {
-    type: "job",
-    title: "คนขับกำลังมา",
-    body: "สมชาย ใจดี กำลังไปรับของ อีก 12 นาที",
-    time: "เมื่อวาน",
-    unread: false,
-  },
-];
+// Notifications moved to src/lib/notifications.ts (comprehensive 3-role system)
 
 export const JOB_HISTORY = [
   {

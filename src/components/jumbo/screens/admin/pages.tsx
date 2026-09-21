@@ -24,9 +24,30 @@ import {
   Plus,
   Edit,
   Trash2,
+  AlertOctagon,
+  MessageSquareWarning,
+  Clock,
+  ShieldAlert,
+  AlertTriangle,
 } from "lucide-react";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import {
+  ADMIN_NOTIFICATIONS,
+  CATEGORY_META,
+  PRIORITY_META,
+  type NotificationCategory,
+} from "@/lib/notifications";
+
+const ICON_MAP_ADMIN: Record<string, React.ElementType> = {
+  AlertOctagon,
+  MessageSquareWarning,
+  Clock,
+  Wallet,
+  ShieldAlert,
+  AlertTriangle,
+  Bell,
+};
 
 // === A03: Users ===
 export function AdminUsersPage() {
@@ -486,6 +507,180 @@ export function AdminSettingsPage() {
           <Trash2 className="h-3.5 w-3.5" /> ล้างแคชระบบ
         </button>
       </div>
+    </div>
+  );
+}
+
+// === A14: Notifications (Admin-specific, desktop-friendly) ===
+export function AdminNotificationsPage() {
+  const go = useJumbo((s) => s.go);
+  const [readIds, setReadIds] = useState<Set<string>>(new Set());
+
+  const markRead = (id: string) =>
+    setReadIds((prev) => new Set([...prev, id]));
+
+  const markAllRead = () =>
+    setReadIds(new Set(ADMIN_NOTIFICATIONS.map((n) => n.id)));
+
+  const sorted = [...ADMIN_NOTIFICATIONS].sort((a, b) => {
+    const aRead = readIds.has(a.id) || !a.unread;
+    const bRead = readIds.has(b.id) || !b.unread;
+    if (aRead !== bRead) return aRead ? 1 : -1;
+    const order: Record<string, number> = {
+      urgent: 0,
+      high: 1,
+      normal: 2,
+      low: 3,
+    };
+    return order[a.priority] - order[b.priority];
+  });
+
+  return (
+    <div>
+      <PageHeader
+        title="การแจ้งเตือนระบบ"
+        count={`${ADMIN_NOTIFICATIONS.filter((n) => n.unread && !readIds.has(n.id)).length} ใหม่`}
+        subtitle="เหตุการณ์ที่ต้องให้แอดมินเข้าไปจัดการ"
+      />
+
+      {/* summary cards */}
+      <div className="mb-3 grid grid-cols-2 gap-3 md:grid-cols-4">
+        <SummaryPill
+          label="ด่วน"
+          count={
+            ADMIN_NOTIFICATIONS.filter(
+              (n) => n.priority === "urgent" && n.unread && !readIds.has(n.id),
+            ).length
+          }
+          color="bg-jumbo"
+        />
+        <SummaryPill
+          label="สำคัญ"
+          count={
+            ADMIN_NOTIFICATIONS.filter(
+              (n) => n.priority === "high" && n.unread && !readIds.has(n.id),
+            ).length
+          }
+          color="bg-amber-500"
+        />
+        <SummaryPill
+          label="ยังไม่อ่าน"
+          count={
+            ADMIN_NOTIFICATIONS.filter(
+              (n) => n.unread && !readIds.has(n.id),
+            ).length
+          }
+          color="bg-blue-500"
+        />
+        <SummaryPill
+          label="ทั้งหมด"
+          count={ADMIN_NOTIFICATIONS.length}
+          color="bg-surface text-ink"
+          dark
+        />
+      </div>
+
+      <div className="mb-2 flex items-center justify-between">
+        <p className="text-[12px] font-bold text-ink-muted">เรียงตามลำดับความสำคัญ</p>
+        <button
+          onClick={markAllRead}
+          className="flex items-center gap-1 text-[11px] font-bold text-jumbo"
+        >
+          <CheckCircle2 className="h-3.5 w-3.5" /> อ่านทั้งหมด
+        </button>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        {sorted.map((n) => {
+          const isRead = readIds.has(n.id) || !n.unread;
+          const meta = CATEGORY_META[n.category as NotificationCategory];
+          const prio = PRIORITY_META[n.priority];
+          const Icon = ICON_MAP_ADMIN[meta.icon] ?? Bell;
+          return (
+            <motion.div
+              key={n.id}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={`flex items-start gap-3 rounded-2xl border p-3 ${
+                isRead
+                  ? "border-line bg-white"
+                  : n.priority === "urgent"
+                    ? "border-jumbo bg-jumbo-light"
+                    : "border-amber-200 bg-amber-50"
+              }`}
+            >
+              <span
+                className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full ${meta.bg} text-white`}
+              >
+                <Icon className="h-4 w-4" strokeWidth={2.5} />
+              </span>
+              <div className="flex-1">
+                <div className="flex items-start justify-between gap-2">
+                  <p className="text-[13px] font-bold text-ink">{n.title}</p>
+                  {!isRead && (
+                    <span className="mt-1 h-2 w-2 flex-shrink-0 rounded-full bg-jumbo" />
+                  )}
+                </div>
+                <p className="mt-0.5 text-[12px] leading-relaxed text-ink-muted">
+                  {n.body}
+                </p>
+                <div className="mt-1.5 flex items-center gap-2 text-[10px]">
+                  <span
+                    className={`rounded-full px-2 py-0.5 font-bold ${prio.bg} ${prio.color}`}
+                  >
+                    {prio.label}
+                  </span>
+                  {n.jobId && (
+                    <span className="font-mono text-ink-muted">{n.jobId}</span>
+                  )}
+                  {n.amount !== undefined && (
+                    <span className="font-bold text-jumbo">
+                      ฿{n.amount.toLocaleString()}
+                    </span>
+                  )}
+                  <span className="text-ink-muted">{n.time}</span>
+                </div>
+              </div>
+              {n.action && (
+                <button
+                  onClick={() => {
+                    markRead(n.id);
+                    if (n.action?.target)
+                      go(n.action.target as never);
+                  }}
+                  className="flex flex-shrink-0 items-center gap-1 self-center rounded-lg bg-jumbo px-3 py-1.5 text-[11px] font-bold text-white"
+                >
+                  {n.action.label}
+                  <ChevronRight className="h-3 w-3" />
+                </button>
+              )}
+            </motion.div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function SummaryPill({
+  label,
+  count,
+  color,
+  dark,
+}: {
+  label: string;
+  count: number;
+  color: string;
+  dark?: boolean;
+}) {
+  return (
+    <div className={`rounded-xl p-3 ${dark ? "border border-line bg-white" : `${color} text-white`}`}>
+      <p className={`text-[10px] ${dark ? "text-ink-muted" : "opacity-90"}`}>
+        {label}
+      </p>
+      <p className={`text-[18px] font-extrabold ${dark ? "text-ink" : ""}`}>
+        {count}
+      </p>
     </div>
   );
 }

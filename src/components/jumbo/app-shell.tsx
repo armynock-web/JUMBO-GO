@@ -48,6 +48,7 @@ import {
   AdminPaymentsPage,
   AdminReportsPage,
   AdminSettingsPage,
+  AdminNotificationsPage,
 } from "./screens/admin/pages";
 
 const USER_BOTTOM_NAV_SCREENS = ["home", "jobs", "notifications", "profile"] as const;
@@ -192,8 +193,7 @@ function renderAdmin(screen: string) {
     case "admin-reports":
       return <AdminReportsPage />;
     case "admin-notifications":
-      // Admin notifications = same notifications list with sidebar
-      return <NotificationsScreen />;
+      return <AdminNotificationsPage />;
     case "admin-settings":
       return <AdminSettingsPage />;
     default:
