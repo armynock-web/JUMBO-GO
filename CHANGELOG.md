@@ -13,18 +13,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Development standards and workflow documentation (AGENTS.md)
 - GitHub repository "JUMBO-GO" created and initialized
 - Initial commit with documentation files pushed to main branch
+- Supabase integration (@supabase/supabase-js, @supabase/ssr)
+- Supabase database schema (8 tables: users, vehicles, drivers, bookings, booking_locations, payments, reviews, notifications)
+- Supabase RLS policies for security
+- Supabase client utilities (client-side, server-side, admin)
+- Auth utilities (sign up, sign in, sign out, verification code)
+- Verification code system (แทน OTP)
+- Google OAuth integration
+- Seed data script for initial database population
+- Documentation (SCREEN-INVENTORY, DESIGN-SYSTEM, DATABASE-SCHEMA, AI prompts)
 
 ### Changed
-- N/A
+- Migrated from Prisma + SQLite to Supabase PostgreSQL
+- Changed OTP system to verification code system (ในระบบเอง)
+- Removed DATABASE_URL from .env (เนื่องจากใช้ Supabase แล้ว)
 
 ### Deprecated
-- N/A
+- Prisma database (ใช้ Supabase แทน)
+- OTP SMS system (ใช้ verification code แทน)
 
 ### Removed
-- N/A
+- DATABASE_URL from .env (เนื่องจากใช้ Supabase แล้ว)
 
 ### Fixed
-- N/A
+- Added dotenv config to seed script for environment variables loading
 
 ### Security
-- N/A
+- Added Google OAuth secrets to .env
+- Configured RLS policies for all database tables
+- Added environment variables for Supabase and Google OAuth
