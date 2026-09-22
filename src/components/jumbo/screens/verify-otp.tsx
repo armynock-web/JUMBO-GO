@@ -5,8 +5,8 @@ import { useJumbo } from "@/store/jumbo";
 import { StatusBar } from "../status-bar";
 import { ChevronLeft, RefreshCw, Smartphone } from "lucide-react";
 import { motion } from "framer-motion";
-import { verifyCode, resendVerificationCode } from "@/lib/auth/verification";
-import { getCurrentUser } from "@/lib/auth/client";
+import { verifyCode, resendVerificationCode } from "../../../lib/auth/verification";
+import { getCurrentUser } from "../../../lib/auth/client";
 
 export function VerifyOtpScreen() {
   const go = useJumbo((s) => s.go);

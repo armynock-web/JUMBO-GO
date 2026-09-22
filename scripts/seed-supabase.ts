@@ -31,7 +31,7 @@ async function seedDatabase() {
       const { data: newUser, error: createError } = await supabase.auth.admin.createUser({
         email: 'test@example.com',
         password: 'password123',
-        email_confirmed_at: new Date().toISOString(),
+        email_confirm: true,
         user_metadata: {
           first_name: 'ทดสอบ',
           last_name: 'ระบบ',
@@ -123,7 +123,7 @@ async function seedDatabase() {
       const { data: driverUser, error: driverUserError } = await supabase.auth.admin.createUser({
         email: 'driver@example.com',
         password: 'password123',
-        email_confirmed_at: new Date().toISOString(),
+        email_confirm: true,
         user_metadata: {
           first_name: 'สมชาย',
           last_name: 'ใจดี',
