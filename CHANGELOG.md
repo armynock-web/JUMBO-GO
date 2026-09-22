@@ -22,6 +22,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Google OAuth integration
 - Seed data script for initial database population
 - Documentation (SCREEN-INVENTORY, DESIGN-SYSTEM, DATABASE-SCHEMA, AI prompts)
+- API routes (bookings, drivers)
+- Supabase Realtime enabled (bookings, drivers, notifications)
+- Supabase Storage policies (avatars, kyc-documents)
 
 ### Changed
 - Migrated from Prisma + SQLite to Supabase PostgreSQL

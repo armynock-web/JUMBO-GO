@@ -1,8 +1,11 @@
 # Version History
 
-## Current Version: 0.3.0
+## Current Version: 0.4.0
 
-### Version 0.3.0 (Current)
+### Version 0.4.0 (Current)
+- Supabase Realtime enabled (bookings, drivers, notifications)
+- Supabase Storage policies (avatars, kyc-documents)
+- API routes (bookings, drivers)
 - Supabase integration (@supabase/supabase-js, @supabase/ssr)
 - Supabase database schema (8 tables with RLS policies)
 - Supabase auth utilities (sign up, sign in, sign out, verification code)
@@ -17,6 +20,12 @@
 - Tailwind CSS 4
 - Shadcn UI components
 - Development standards established
+
+### Version 0.3.0
+- Supabase integration
+- Verification code system
+- Google OAuth integration
+- Auth utilities
 
 ### Version 0.2.1
 - Initial project structure
