@@ -30,7 +30,17 @@ export async function requireAuth() {
 export async function requireRole(role: 'user' | 'driver' | 'admin') {
   const user = await requireAuth()
   
-  // TODO: Implement role checking after adding role column to users table
-  // For now, just return the user
+  // Get user role from database
+  const supabase = await createClient()
+  const { data: profile } = await supabase
+    .from('users')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+
+  if (!profile || profile.role !== role) {
+    throw new Error('Forbidden: Insufficient permissions')
+  }
+
   return user
 }
