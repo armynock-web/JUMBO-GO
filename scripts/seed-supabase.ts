@@ -6,6 +6,7 @@
  * npx tsx scripts/seed-supabase.ts
  */
 
+import 'dotenv/config'
 import { createAdminClient } from '../lib/supabase/admin'
 
 const supabase = createAdminClient()
