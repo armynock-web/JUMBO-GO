@@ -5,6 +5,8 @@ import { useJumbo } from "@/store/jumbo";
 import { StatusBar } from "../status-bar";
 import { ChevronLeft, RefreshCw, Smartphone } from "lucide-react";
 import { motion } from "framer-motion";
+import { verifyCode, resendVerificationCode } from "@/lib/auth/verification";
+import { getCurrentUser } from "@/lib/auth/client";
 
 export function VerifyOtpScreen() {
   const go = useJumbo((s) => s.go);
@@ -14,18 +16,48 @@ export function VerifyOtpScreen() {
   const [seconds, setSeconds] = useState(60);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [verificationCode, setVerificationCode] = useState<string | null>(null);
   const refs = useRef<(HTMLInputElement | null)[]>([]);
 
-  const verify = useCallback(() => {
+  // โหลดรหัสยืนยันเมื่อ component mount
+  useEffect(() => {
+    const loadVerificationCode = async () => {
+      const user = await getCurrentUser();
+      if (user) {
+        const code = await resendVerificationCode(user.id);
+        setVerificationCode(code);
+      }
+    };
+    loadVerificationCode();
+  }, []);
+
+  const verify = useCallback(async () => {
     setError(null);
     setLoading(true);
-    setTimeout(() => {
+
+    try {
+      const user = await getCurrentUser();
+      if (!user) {
+        setError("ไม่พบข้อมูลผู้ใช้ กรุณาเข้าสู่ระบบใหม่");
+        setLoading(false);
+        return;
+      }
+
+      const code = digits.join("");
+      const isValid = await verifyCode(user.id, code);
+
+      if (isValid) {
+        login();
+        go("home");
+      } else {
+        setError("รหัสยืนยันไม่ถูกต้อง กรุณาลองใหม่");
+      }
+    } catch (err) {
+      setError("เกิดข้อผิดพลาด กรุณาลองใหม่");
+    } finally {
       setLoading(false);
-      // Always accept (demo)
-      login();
-      go("home");
-    }, 700);
-  }, [login, go]);
+    }
+  }, [digits, login, go]);
 
   useEffect(() => {
     if (seconds <= 0) return;
@@ -51,10 +83,20 @@ export function VerifyOtpScreen() {
     }
   };
 
-  const resend = () => {
+  const resend = async () => {
     setSeconds(60);
     setDigits(["", "", "", "", "", ""]);
     refs.current[0]?.focus();
+
+    try {
+      const user = await getCurrentUser();
+      if (user) {
+        const code = await resendVerificationCode(user.id);
+        setVerificationCode(code);
+      }
+    } catch (err) {
+      setError("เกิดข้อผิดพลาดในการส่งรหัสใหม่");
+    }
   };
 
   const phone = "081-234-5678";
@@ -87,12 +129,16 @@ export function VerifyOtpScreen() {
 
         <div className="text-center">
           <h1 className="text-[22px] font-extrabold text-ink">
-            ยืนยันเบอร์โทรศัพท์
+            ยืนยันตัวตน
           </h1>
           <p className="mt-1 text-[13px] text-ink-muted">
-            กรอกรหัส OTP 6 หลักที่ส่งไปยัง
+            กรอกรหัสยืนยัน 6 หลัก
           </p>
-          <p className="mt-0.5 text-[14px] font-bold text-ink">{phone}</p>
+          {verificationCode && (
+            <p className="mt-0.5 text-[14px] font-bold text-jumbo">
+              รหัสของคุณ: {verificationCode}
+            </p>
+          )}
         </div>
 
         {/* OTP boxes */}
@@ -156,8 +202,7 @@ export function VerifyOtpScreen() {
         </button>
 
         <p className="text-center text-[11px] text-ink-muted">
-          เพื่อความรวดเร็ว ลองกรอกหมายเลข <span className="font-bold text-ink">123456</span>{" "}
-          หรือกรอกครบ 6 หลักเพื่อยืนยันอัตโนมัติ
+          รหัสยืนยันจะแสดงด้านบน (สำหรับการทดสอบ)
         </p>
         <button
           onClick={() => {
