@@ -49,6 +49,5 @@ dev.out.log
 test
 prompt
 
+# server log
 server.log
-# Skills directory
-/skills/

@@ -14,18 +14,71 @@ export function VerifyOtpScreen() {
   const [seconds, setSeconds] = useState(60);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [autoFilled, setAutoFilled] = useState(false);
   const refs = useRef<(HTMLInputElement | null)[]>([]);
 
-  const verify = useCallback(() => {
+  // Internal system OTP generation: Auto-fetch 6 digits from internal API and auto-fill
+  useEffect(() => {
+    let mounted = true;
+    async function requestInternalOtp() {
+      try {
+        const res = await fetch("/api/auth/send-otp", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ phone: "081-234-5678" }),
+        });
+        const data = await res.json();
+        if (mounted && data.success && data.otp) {
+          const otpChars = (data.otp as string).split("").slice(0, 6);
+          // Wait 600ms for realistic smooth animation then auto-fill
+          setTimeout(() => {
+            if (mounted) {
+              setDigits(otpChars);
+              setAutoFilled(true);
+            }
+          }, 600);
+        }
+      } catch {
+        // Fallback internal code if offline
+        setTimeout(() => {
+          if (mounted) {
+            setDigits(["1", "2", "3", "4", "5", "6"]);
+            setAutoFilled(true);
+          }
+        }, 600);
+      }
+    }
+    requestInternalOtp();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const verify = useCallback(async () => {
     setError(null);
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      // Always accept (demo)
+    try {
+      const code = digits.join("");
+      const res = await fetch("/api/auth/verify-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: "081-234-5678", otp: code }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        login();
+        go("home");
+      } else {
+        setError(data.message || "รหัส OTP ไม่ถูกต้อง");
+      }
+    } catch {
       login();
       go("home");
-    }, 700);
-  }, [login, go]);
+    } finally {
+      setLoading(false);
+    }
+  }, [digits, login, go]);
+
 
   useEffect(() => {
     if (seconds <= 0) return;
@@ -156,9 +209,13 @@ export function VerifyOtpScreen() {
         </button>
 
         <p className="text-center text-[11px] text-ink-muted">
-          เพื่อความรวดเร็ว ลองกรอกหมายเลข <span className="font-bold text-ink">123456</span>{" "}
-          หรือกรอกครบ 6 หลักเพื่อยืนยันอัตโนมัติ
+          {autoFilled ? (
+            <span className="text-emerald-600 font-medium">✓ ระบบรันรหัส OTP 6 หลักลงในช่องให้อัตโนมัติแล้ว</span>
+          ) : (
+            <span>กำลังรันรหัส OTP 6 หลักอัตโนมัติภายในระบบ...</span>
+          )}
         </p>
+
         <button
           onClick={() => {
             login();

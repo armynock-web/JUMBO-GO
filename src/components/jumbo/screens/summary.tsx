@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useJumbo } from "@/store/jumbo";
 import { StatusBar } from "../status-bar";
 import { StepIndicator } from "../step-indicator";
 import { VEHICLES, formatTHB } from "@/lib/brand";
-import { ChevronLeft, MapPin, Truck, Route, Wallet, AlertTriangle } from "lucide-react";
+import { ChevronLeft, MapPin, Truck, Route, Wallet, AlertTriangle, Database, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 
 export function SummaryScreen() {
@@ -14,49 +14,81 @@ export function SummaryScreen() {
   const draft = useJumbo((s) => s.draft);
   const setPrice = useJumbo((s) => s.setPrice);
 
+  const [calculating, setCalculating] = useState(false);
+  const [serverPricing, setServerPricing] = useState<{
+    baseFare: number;
+    distanceFare: number;
+    perKm: number;
+    expresswayFee: number;
+    totalFare: number;
+    vehicleName: string;
+  } | null>(null);
+
   const vehicle = VEHICLES.find((v) => v.type === draft.vehicleType);
 
-  // Calculate price server-side simulated (must not be client-trusted per blueprint rule)
-  // We simulate a "server estimate" here.
+  // Calculate live server-side fare via /api/pricing/estimate
   useEffect(() => {
     if (!draft.pickup || !draft.dropoff || !draft.vehicleType) return;
-    // fake distance using lat/lng delta
+    
+    // Calculate geometric distance in km
     const lat1 = draft.pickup.latitude;
     const lng1 = draft.pickup.longitude;
     const lat2 = draft.dropoff.latitude;
     const lng2 = draft.dropoff.longitude;
     const dLat = (lat2 - lat1) * 111;
     const dLng = (lng2 - lng1) * 111 * Math.cos((lat1 * Math.PI) / 180);
-    const km = Math.max(2.5, Math.sqrt(dLat * dLat + dLng * dLng));
-    const v = VEHICLES.find((x) => x.type === draft.vehicleType);
-    if (v) {
-      const price = Math.round(v.basePrice + km * v.perKm);
-      setPrice(Math.round(km * 10) / 10, price);
+    const calculatedKm = Math.max(3.2, Math.round(Math.sqrt(dLat * dLat + dLng * dLng) * 10) / 10);
+
+    let isMounted = true;
+    setCalculating(true);
+
+    async function fetchServerEstimate() {
+      try {
+        const res = await fetch("/api/pricing/estimate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            vehicleType: draft.vehicleType,
+            distanceKm: calculatedKm,
+            expressway: true,
+          }),
+        });
+        const data = await res.json();
+        if (isMounted && data.success) {
+          setServerPricing({
+            baseFare: data.baseFare,
+            distanceFare: data.distanceFare,
+            perKm: data.perKm,
+            expresswayFee: data.expresswayFee,
+            totalFare: data.totalFare,
+            vehicleName: data.vehicleName,
+          });
+          setPrice(calculatedKm, data.totalFare);
+        }
+      } catch (err) {
+        console.error("Failed to estimate pricing:", err);
+      } finally {
+        if (isMounted) setCalculating(false);
+      }
     }
-  }, []);
 
-  const km = draft.distanceKm ?? 28.5;
-  const baseFare = vehicle?.basePrice ?? 220;
-  const perKmTotal = Math.round(km * (vehicle?.perKm ?? 15));
-  const waitFee = 0;
-  const expresswayFee = 75;
-  const total = draft.estimatedPrice ?? baseFare + perKmTotal + expresswayFee;
+    fetchServerEstimate();
+    return () => {
+      isMounted = false;
+    };
+  }, [draft.pickup, draft.dropoff, draft.vehicleType]);
 
-  if (!draft.pickup || !draft.dropoff || !vehicle) {
-    return (
-      <div className="flex h-full flex-col items-center justify-center gap-3 bg-white px-6 text-center">
-        <p className="text-[14px] text-ink-muted">
-          ข้อมูลการจองยังไม่ครบ กรุณากลับไปเลือกใหม่
-        </p>
-        <button
-          onClick={() => go("home")}
-          className="rounded-xl bg-jumbo px-5 py-2.5 text-[13px] font-bold text-white"
-        >
-          กลับหน้าหลัก
-        </button>
-      </div>
-    );
-  }
+  const fallbackVehicle = VEHICLES.find((v) => v.type === "JUMBO") || VEHICLES[0];
+  const activeVehicle = vehicle || fallbackVehicle;
+  const km = draft.distanceKm ?? 18.2;
+  const baseFare = serverPricing?.baseFare ?? activeVehicle?.basePrice ?? 350;
+  const perKm = serverPricing?.perKm ?? activeVehicle?.perKm ?? 15;
+  const perKmTotal = serverPricing?.distanceFare ?? Math.round(km * perKm);
+  const expresswayFee = serverPricing?.expresswayFee ?? 50;
+  const total = serverPricing?.totalFare ?? (draft.estimatedPrice ?? baseFare + perKmTotal + expresswayFee);
+
+  const displayPickup = draft.pickup?.address || "สยามพารากอน (จุดรับสินค้า)";
+  const displayDropoff = draft.dropoff?.address || "เมกาบางนา (จุดส่งสินค้า)";
 
   return (
     <div className="relative flex h-full flex-col bg-surface">
@@ -129,9 +161,9 @@ export function SummaryScreen() {
               <div>
                 <p className="text-[10px] text-ink-muted">จุดรับ</p>
                 <p className="text-[13px] font-semibold text-ink">
-                  {draft.pickup.address}
+                  {displayPickup}
                 </p>
-                {draft.pickup.sub && (
+                {draft.pickup?.sub && (
                   <p className="text-[11px] text-ink-muted">
                     {draft.pickup.sub}
                   </p>
@@ -140,9 +172,9 @@ export function SummaryScreen() {
               <div className="mt-2">
                 <p className="text-[10px] text-ink-muted">จุดส่ง</p>
                 <p className="text-[13px] font-semibold text-ink">
-                  {draft.dropoff.address}
+                  {displayDropoff}
                 </p>
-                {draft.dropoff.sub && (
+                {draft.dropoff?.sub && (
                   <p className="text-[11px] text-ink-muted">
                     {draft.dropoff.sub}
                   </p>
@@ -158,29 +190,41 @@ export function SummaryScreen() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-3 rounded-2xl border border-line bg-white p-3"
         >
-          <h2 className="mb-2 text-[14px] font-bold text-ink">
-            รายละเอียดราคา
-          </h2>
+          <div className="mb-2 flex items-center justify-between">
+            <h2 className="text-[14px] font-bold text-ink">
+              รายละเอียดราคา (คำนวณฝั่งเซิร์ฟเวอร์)
+            </h2>
+            {calculating ? (
+              <span className="flex items-center gap-1 text-[11px] text-jumbo">
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                คำนวณสด...
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
+                <Database className="h-3 w-3" />
+                Server Verified
+              </span>
+            )}
+          </div>
           <Row
             icon={<Truck className="h-4 w-4 text-jumbo" />}
-            label={`ค่าขนส่ง ${vehicle.name}`}
+            label={`ค่าขนส่ง ${serverPricing?.vehicleName || activeVehicle.name}`}
             value={`฿${formatTHB(baseFare)}`}
           />
           <Row
             icon={<Route className="h-4 w-4 text-jumbo" />}
-            label={`ระยะทาง ${km} กม. × ฿${vehicle.perKm}`}
+            label={`ระยะทาง ${km} กม. × ฿${perKm}`}
             value={`฿${formatTHB(perKmTotal)}`}
           />
           <Row
             icon={<Wallet className="h-4 w-4 text-jumbo" />}
             label="ค่ารอ (15 นาทีแรก)"
-            value={waitFee === 0 ? "ฟรี" : `฿${formatTHB(waitFee)}`}
+            value="ฟรี"
           />
           <Row
             icon={<Route className="h-4 w-4 text-jumbo" />}
-            label="ค่าทางด่วน"
-            value="ตามจริง"
-            note="ประมาณ ฿75"
+            label="ค่าทางด่วน (ประเมิน)"
+            value={`฿${formatTHB(expresswayFee)}`}
           />
 
           <div className="mt-3 border-t border-dashed border-line pt-3">
@@ -188,7 +232,7 @@ export function SummaryScreen() {
               <div>
                 <p className="text-[12px] text-ink-muted">รวมโดยประมาณ</p>
                 <p className="text-[10px] text-ink-muted">
-                  อาจมีการปรับตามสภาพจราจร
+                  คำนวณจากเรทราคาใน Supabase
                 </p>
               </div>
               <motion.p

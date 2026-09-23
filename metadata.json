@@ -1,0 +1,7 @@
+{
+  "name": "Remix Remix JUMBO-GO",
+  "description": "Imported from GitHub: armynock-web/JUMBO-GO",
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
