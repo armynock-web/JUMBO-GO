@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-09-24
+
+### Added
+- **Phase 1: Customer Booking Flow เชื่อมต่อ Live Database (T-012)**
+  - `src/app/api/bookings/route.ts`: POST endpoint สร้าง Booking จริงใน Supabase
+  - `src/app/api/vehicle-types/route.ts`: ดึงประเภทรถจาก `vehicle_types` table
+  - `screens/vehicle-type.tsx`: ดึงข้อมูลจริงจาก `/api/vehicle-types` พร้อม Live DB badge
+  - `screens/summary.tsx`: คำนวณราคาจาก vehicle_type จริง (base_price + perKm × km)
+  - `screens/confirm.tsx`: POST ไปยัง `/api/bookings` บันทึกลง Supabase จริง
+  - `screens/searching.tsx`: แสดง Job Number จริงจาก Supabase response
+  - `screens/jobs.tsx`: ดึงและแสดงประวัติงานจริงจาก Supabase พร้อม Live DB badge
+- **Full API Layer (32 endpoints):** Auth, Bookings, Driver, Admin, Pricing, Notifications
+- **Realtime GPS Subscription** ผ่าน Supabase Realtime WebSockets
+- **ARM-AI Engineering Standard (ARM-AES) v1.0** documentation
+
+### Fixed
+- `scripts/live-supabase-sync.ts`: แก้ TypeScript tuple type error ใน `new Map()`
+- `scripts/seed-and-test.ts`: แก้ union type mismatch ใน notifications upsert
+- `src/lib/supabase/repository.ts`: ลบ `@ts-expect-error` ที่ไม่จำเป็น 3 จุด
+
+### Verified
+- `npx tsc --noEmit`: ✅ exit code 0 (0 errors)
+- `npx next build`: ✅ exit code 0 (26 routes, 32 API endpoints compiled)
+- Live Supabase 14 tables: ✅ ทุกตารางเชื่อมต่อจริง
+
 ## [0.3.0] - 2026-09-23
 
 ### Added
