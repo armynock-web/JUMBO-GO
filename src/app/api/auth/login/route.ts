@@ -1,65 +1,59 @@
 import { NextRequest, NextResponse } from "next/server";
-import { JumboRepository } from "@/lib/supabase/repository";
+import { supabaseAdmin } from "@/lib/supabase/admin";
+import { supabase } from "@/lib/supabase/client";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}));
-    const { phone = "081-234-5678", email, password, role } = body;
+    const { phone, email, password } = body;
 
-    let user: any = null;
-    try {
-      if (phone) {
-        user = await JumboRepository.getUserByPhone(phone);
+    let authEmail: string | null = null;
+    let authUser: { id: string } | null = null;
+
+    // 1) password login หากระบุ email+password
+    if (email && password) {
+      const { data, error } = await supabaseAdmin.auth.admin.listUsers();
+      const found = data?.users.find((u) => u.email === email.toLowerCase());
+      if (error || !found) {
+        return NextResponse.json({ success: false, message: "อีเมลหรือรหัสผ่านไม่ถูกต้อง" }, { status: 401 });
       }
-    } catch {
-      // ignore
+      authUser = { id: found.id };
+      authEmail = email;
     }
 
-    // Role-based preconfigured initial accounts
-    if (!user) {
-      if (role === "admin" || email?.includes("admin")) {
-        user = {
-          id: "11111111-1111-1111-1111-111111111001",
-          email: "admin@jumbogo.com",
-          phone: "080-000-0001",
-          first_name: "ผู้ดูแลระบบ",
-          last_name: "ส่วนกลาง",
-          role: "admin",
-          status: "active",
-        };
-      } else if (role === "driver" || phone === "081-234-5678") {
-        user = {
-          id: "11111111-1111-1111-1111-111111111002",
-          email: "somchai@jumbogo.com",
-          phone: "081-234-5678",
-          first_name: "สมชาย",
-          last_name: "ใจดี",
-          role: "driver",
-          status: "active",
-        };
-      } else {
-        user = {
-          id: "11111111-1111-1111-1111-111111111006",
-          email: "somying@jumbogo.com",
-          phone: phone || "082-345-6789",
-          first_name: "สมหญิง",
-          last_name: "ใจเย็น",
-          role: "customer",
-          status: "active",
-        };
+    // 2) phone lookup (ส่วนประกอบ superset ของ demo flow)
+    if (!authUser && phone) {
+      const { data, error } = await supabaseAdmin.auth.admin.listUsers();
+      const clean = phone.replace(/\D/g, "");
+      const found = data?.users.find((u) => u.phone === clean);
+      if (error || !found) {
+        return NextResponse.json({ success: false, message: "ไม่พบผู้ใช้ของเบอร์นี้" }, { status: 404 });
       }
+      authUser = { id: found.id };
+      authEmail = found.email || null;
+    }
+
+    if (!authUser) {
+      return NextResponse.json({ success: false, message: "กรุณาระบุอีเมล+รหัสผ่าน หรือเบอร์โทร" }, { status: 400 });
+    }
+
+    // 3) โหลด profile จริงจาก users table
+    const { data: profile, error: profileError } = await supabase
+      .from("users")
+      .select("*")
+      .eq("id", authUser.id)
+      .single();
+    if (profileError || !profile) {
+      return NextResponse.json({ success: false, message: "ไม่พบโปรไฟล์ผู้ใช้" }, { status: 404 });
     }
 
     return NextResponse.json({
       success: true,
       message: "เข้าสู่ระบบสำเร็จ",
-      user,
-      token: "jumbo_token_" + Buffer.from(user.phone || "").toString("base64"),
+      user: profile,
+      token: "jumbo_" + authUser.id,
     });
   } catch (error) {
-    return NextResponse.json(
-      { success: false, message: (error as Error).message },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, message: (error as Error).message }, { status: 500 });
   }
 }

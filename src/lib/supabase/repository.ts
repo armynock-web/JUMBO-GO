@@ -39,10 +39,10 @@ export const JumboRepository = {
 
   // === DRIVERS ===
   async getDrivers() {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseServer
       .from("drivers")
       .select("*, vehicles(*)")
-      .order("rating_avg", { ascending: false });
+      .order("created_at", { ascending: false });
     if (error) throw error;
     return data;
   },
@@ -172,13 +172,15 @@ export const JumboRepository = {
 
   // === NOTIFICATIONS ===
   async getNotificationsByRole(role: "customer" | "driver" | "admin") {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseServer
       .from("notifications")
       .select("*")
-      .eq("role", role)
       .order("created_at", { ascending: false });
     if (error) return [];
-    return data || [];
+    return (data || []).filter((n) => {
+      const d = (n.data as Record<string, unknown> | null) || {};
+      return d.role === role || n.type === `role_${role}`;
+    });
   },
 
   async markNotificationRead(id: string) {

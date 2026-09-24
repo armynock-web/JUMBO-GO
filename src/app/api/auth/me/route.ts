@@ -1,20 +1,40 @@
 import { NextRequest, NextResponse } from "next/server";
+import { supabase } from "@/lib/supabase/client";
+
+function parseToken(token: string): string | null {
+  if (token.startsWith("jumbo_")) return token.slice(6);
+  return null;
+}
 
 export async function GET(req: NextRequest) {
-  // Return current authenticated profile or default mock profile based on query/header
-  const role = req.nextUrl.searchParams.get("role") || "customer";
+  const header = req.headers.get("authorization") || "";
+  const bearer = header.replace(/^Bearer\s+/i, "");
+  const token = bearer || req.nextUrl.searchParams.get("token") || "";
 
-  const user = {
-    id: role === "admin" ? "11111111-1111-1111-1111-111111111001" : (role === "driver" ? "11111111-1111-1111-1111-111111111002" : "11111111-1111-1111-1111-111111111006"),
-    phone: role === "admin" ? "080-000-0001" : (role === "driver" ? "081-234-5678" : "082-345-6789"),
-    first_name: role === "admin" ? "ผู้ดูแลระบบ" : (role === "driver" ? "สมชาย" : "สมหญิง"),
-    last_name: role === "admin" ? "ส่วนกลาง" : (role === "driver" ? "ใจดี" : "ใจเย็น"),
-    role,
-    status: "active",
-  };
+  const userId = parseToken(token);
+
+  if (!userId) {
+    return NextResponse.json({
+      authenticated: false,
+      user: null,
+    });
+  }
+
+  const { data: profile, error } = await supabase
+    .from("users")
+    .select("*")
+    .eq("id", userId)
+    .single();
+
+  if (error || !profile) {
+    return NextResponse.json({
+      authenticated: false,
+      user: null,
+    });
+  }
 
   return NextResponse.json({
     authenticated: true,
-    user,
+    user: profile,
   });
 }

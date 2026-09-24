@@ -30,11 +30,11 @@ if (!url || !serviceKey) {
 
 const supabase = createClient(url, serviceKey, { auth: { persistSession: false } });
 
-const CUSTOMER_ID = "11111111-1111-1111-1111-111111111006";
-const DRIVER_USER_ID = "11111111-1111-1111-1111-111111111002";
-const DRIVER_ID = "33333333-3333-3333-3333-333333333001";
-const VEHICLE_ID = "22222222-2222-2222-2222-222222222001";
-const ADMIN_USER_ID = "11111111-1111-1111-1111-111111111001";
+const CUSTOMER_ID = "a9dce7bb-a9cf-4f21-874a-129b0138fd56"; // test@example.com (ใช้ใน jobs.tsx)
+const DRIVER_USER_ID = "f74c32ed-7cb6-49a8-9963-a21d34e73335"; // somchai@jumbogo.com
+const DRIVER_ID = "6d4a6c6d-d97f-4aca-adbc-25f8a6598f76"; // somchai driver
+const VEHICLE_ID = "85964cdc-aa9b-46f3-91f5-b379ec7612db"; // somchai vehicle
+const ADMIN_USER_ID = "83d3e495-2816-4edf-a972-d7e77c4f9d43"; // admin@jumbogo.com
 
 async function upsert(table, rows, onConflict) {
   const { error } = await supabase.from(table).upsert(rows, { onConflict });
@@ -66,7 +66,7 @@ async function main() {
 
   console.log("[2/7] vehicles");
   await upsert("vehicles", [
-    { id: VEHICLE_ID, driver_id: DRIVER_ID, type: "pickup_box", brand: "Isuzu", model: "D-Max", year: 2023, plate_number: "ขข 1234", color: "ขาว", is_active: true },
+    { id: VEHICLE_ID, driver_id: DRIVER_ID, type: "van", brand: "Toyota", model: "Hiace", year: 2023, plate_number: "ทย 1234", color: "ขาว", is_active: true },
   ], "id");
 
   console.log("[3/7] drivers");
@@ -76,7 +76,7 @@ async function main() {
 
   console.log("[4/7] driver_kyc");
   await upsert("driver_kyc", [
-    { id: "44444444-4444-4444-4444-444444444001", driver_id: DRIVER_ID, status: "approved" },
+    { id: DRIVER_ID, driver_id: DRIVER_ID, status: "approved" },
   ], "id");
 
   console.log("[5/7] bookings + booking_locations");

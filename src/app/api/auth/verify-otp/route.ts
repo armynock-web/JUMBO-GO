@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { otpStore } from "../send-otp/route";
-import { JumboRepository } from "@/lib/supabase/repository";
+import { supabase } from "@/lib/supabase/client";
 
 export async function POST(req: NextRequest) {
   try {
@@ -10,50 +10,50 @@ export async function POST(req: NextRequest) {
     const cleanPhone = phone.replace(/\D/g, "");
 
     const stored = otpStore.get(cleanPhone);
-    const isValid = otp === "123456" || (stored && stored.code === otp);
 
-    if (!isValid) {
-      // For smooth testing & demo: accept 6-digit codes
-      if (!/^\d{6}$/.test(otp || "")) {
-        return NextResponse.json(
-          { success: false, message: "รหัส OTP 6 หลักไม่ถูกต้อง" },
-          { status: 400 }
-        );
-      }
+    // Demo mode: ยอมรับเฉพาะ OTP ที่ระบบสร้างเอง (ไม่มีการ magic bypass "123456")
+    if (!stored || stored.code !== otp) {
+      return NextResponse.json({ success: false, message: "รหัส OTP ไม่ถูกต้องหรือหมดอายุ" }, { status: 400 });
+    }
+    if (stored.expiresAt < Date.now()) {
+      otpStore.delete(cleanPhone);
+      return NextResponse.json({ success: false, message: "รหัส OTP หมดอายุ" }, { status: 400 });
     }
 
-    // Lookup or fallback user
-    let user: any = null;
-    try {
-      user = await JumboRepository.getUserByPhone(phone);
-    } catch {
-      // fallback
-    }
+    // ค้น user จากข้อมูลจริง ถ้ายังไม่มีให้ upsert (id ใหม่)
+    const { data: existing } = await supabase
+      .from("users")
+      .select("*")
+      .eq("phone", phone)
+      .single();
 
+    let user = existing;
     if (!user) {
-      user = {
-        id: "11111111-1111-1111-1111-111111111006",
+      const newId = crypto.randomUUID();
+      const profile = {
+        id: newId,
+        email: `${cleanPhone}@jumbogo.local`,
         phone,
-        first_name: "สมหญิง",
-        last_name: "ใจเย็น",
-        role: "customer",
-        status: "active",
+        first_name: "ผู้ใช้",
+        last_name: "จัมโบ้",
+        role: "user",
       };
+      const { data, error } = await supabase.from("users").insert(profile).select().single();
+      if (error) {
+        return NextResponse.json({ success: false, message: error.message }, { status: 500 });
+      }
+      user = data;
     }
 
-    // Clean up used OTP
     otpStore.delete(cleanPhone);
 
     return NextResponse.json({
       success: true,
       message: "ยืนยัน OTP สำเร็จ",
-      token: "jumbo_token_" + Buffer.from(phone).toString("base64"),
+      token: "jumbo_" + user.id,
       user,
     });
   } catch (error) {
-    return NextResponse.json(
-      { success: false, message: (error as Error).message },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, message: (error as Error).message }, { status: 500 });
   }
 }
