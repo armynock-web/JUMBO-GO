@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
-import { supabase } from "@/lib/supabase/client";
+import { supabaseServer } from "@/lib/supabase/server";
 
 export async function POST(req: NextRequest) {
   try {
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
     }
 
     // 3) โหลด profile จริงจาก users table
-    const { data: profile, error: profileError } = await supabase
+    const { data: profile, error: profileError } = await supabaseServer
       .from("users")
       .select("*")
       .eq("id", authUser.id)

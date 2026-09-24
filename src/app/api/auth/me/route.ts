@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase/client";
+import { supabaseServer } from "@/lib/supabase/server";
 
 function parseToken(token: string): string | null {
   if (token.startsWith("jumbo_")) return token.slice(6);
@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
     });
   }
 
-  const { data: profile, error } = await supabase
+  const { data: profile, error } = await supabaseServer
     .from("users")
     .select("*")
     .eq("id", userId)

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
-import { supabase } from "@/lib/supabase/client";
+import { supabaseServer } from "@/lib/supabase/server";
 
 export async function POST(req: NextRequest) {
   try {
@@ -85,7 +85,7 @@ async function upsertProfile(
   id: string,
   p: { email: string; phone?: string; firstName: string; lastName: string; role: string }
 ) {
-  const { error } = await supabase.from("users").upsert(
+  const { error } = await supabaseServer.from("users").upsert(
     {
       id,
       email: p.email,

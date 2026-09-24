@@ -5,7 +5,7 @@ export async function GET(req: NextRequest) {
   try {
     const userId =
       req.nextUrl.searchParams.get("userId") ||
-      "11111111-1111-1111-1111-111111111006";
+      "a9dce7bb-a9cf-4f21-874a-129b0138fd56";
     const bookings = await JumboRepository.getBookingsByUser(userId);
     return NextResponse.json({ success: true, bookings });
   } catch (error) {
@@ -29,13 +29,10 @@ export async function POST(req: NextRequest) {
       distanceKm = 15.5,
       extraHelperFee = 0,
       expresswayFee = 50,
-      paymentMethod = "promptpay",
       senderName = "สมหญิง ใจเย็น",
       senderPhone = "082-345-6789",
-      senderNote = "",
       receiverName = "ผู้รับปลายทาง",
       receiverPhone = "081-999-8888",
-      receiverNote = "",
     } = body;
 
     const jobNumber =

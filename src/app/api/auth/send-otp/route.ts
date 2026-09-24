@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase/client";
+import { supabaseServer } from "@/lib/supabase/server";
 
 // In-memory OTP storage (demo mode: ไม่ใช้ SMS provider ภายนอกตาม project requirement)
 // หมายเหตุ: Supabase phone provider ยังไม่เปิดใช้งานในโปรเจกต์นี้

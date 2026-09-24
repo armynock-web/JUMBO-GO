@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { otpStore } from "../send-otp/route";
-import { supabase } from "@/lib/supabase/client";
+import { supabaseServer } from "@/lib/supabase/server";
 
 export async function POST(req: NextRequest) {
   try {
@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     }
 
     // ค้น user จากข้อมูลจริง ถ้ายังไม่มีให้ upsert (id ใหม่)
-    const { data: existing } = await supabase
+    const { data: existing } = await supabaseServer
       .from("users")
       .select("*")
       .eq("phone", phone)
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
         last_name: "จัมโบ้",
         role: "user",
       };
-      const { data, error } = await supabase.from("users").insert(profile).select().single();
+      const { data, error } = await supabaseServer.from("users").insert(profile).select().single();
       if (error) {
         return NextResponse.json({ success: false, message: error.message }, { status: 500 });
       }
