@@ -21,16 +21,31 @@ export async function POST(req: NextRequest) {
       authEmail = email;
     }
 
-    // 2) phone lookup (ส่วนประกอบ superset ของ demo flow)
+    // 2) phone lookup (ประกอบ superset ของ demo flow)
     if (!authUser && phone) {
-      const { data, error } = await supabaseAdmin.auth.admin.listUsers();
       const clean = phone.replace(/\D/g, "");
-      const found = data?.users.find((u) => u.phone === clean);
-      if (error || !found) {
-        return NextResponse.json({ success: false, message: "ไม่พบผู้ใช้ของเบอร์นี้" }, { status: 404 });
+      // Auth users หลายตัวมี phone ว่าง — เบอร์จริงเก็บใน users table
+      // ค้น users table ก่อน (id เป็น PK เดียวกับ auth.users)
+      const { data: phoneProfile } = await supabaseServer
+        .from("users")
+        .select("id, email")
+        .ilike("phone", `%${clean}%`)
+        .maybeSingle();
+      if (phoneProfile) {
+        authUser = { id: phoneProfile.id };
+        authEmail = phoneProfile.email;
+      } else {
+        // fallback: user ใหม่ที่สมัครผ่าน register เก็บ phone เป็น E.164 ใน auth
+        const { data, error } = await supabaseAdmin.auth.admin.listUsers();
+        const found = data?.users.find(
+          (u) => u.phone?.replace(/\D/g, "") === clean
+        );
+        if (error || !found) {
+          return NextResponse.json({ success: false, message: "ไม่พบผู้ใช้ของเบอร์นี้" }, { status: 404 });
+        }
+        authUser = { id: found.id };
+        authEmail = found.email || null;
       }
-      authUser = { id: found.id };
-      authEmail = found.email || null;
     }
 
     if (!authUser) {

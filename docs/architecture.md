@@ -120,3 +120,17 @@ jumbo-go/
 1. **Zero Client-Side Fare Calculation:** การคำนวณราคาค่าบริการทั้งหมดเกิดขึ้นที่ Server (`/api/pricing/estimate`) ผ่านการคำนวณระยะทางกับเรทราคาใน `vehicle_types` โดย Client จะส่งเพียงพิกัดและประเภทรถเท่านั้น ป้องกันการดัดแปลงราคาหน้าบ้าน
 2. **Row-Level Security (RLS):** ผู้ใช้งานแต่ละบทบาทจะเข้าถึงได้เฉพาะแถวข้อมูลที่ตนเองเป็นเจ้าของ
 3. **Decoupled Architecture:** Frontend เรียกใช้งานผ่าน API Routes / Repository Layer เท่านั้น โดยไม่มีการฝัง Service Role Key ในฝั่ง Client
+
+---
+
+## 5. Standard Testing & Verification (Vitest + Coverage)
+
+**คำสั่ง:** `npm test` (รัน suite ทั้งหมด), `npm run test:coverage` (พร้อม coverage report)
+
+- **Test Suite:** 130 tests / 14 ไฟล์ — ครอบ Unit (pure functions, error-path) + Integration (Supabase จริง) + Route handlers (Auth, Pricing)
+- **Coverage Thresholds (vitest.config.ts):** lines 80% / functions 80% / statements 80% / branches 70%
+- **ผลล่าสุด (v1.4.0):** Statements 84.34% / Branches 74.21% / Functions 80.35% / Lines 86.28% ✅
+- **โครงสร้าง:** `tests/unit/*` (pricing, api error-path, repository error-path, request-auth, utils, notifications, brand, db, api-subscriptions), `tests/integration/*` (api-client, repository), `tests/routes/*` (auth, pricing)
+- **หลักการ Error Handling:** Repository/API Layer ไม่ swallow error ทุก error ถูก throw ให้ route layer ตอบเป็น HTTP 500/400/401/404 ตามจริง
+
+**Migrations เป็น Single Source of Truth:** สคีมาทุกตัวถูก apply ขึ้น production และบันทึกเป็นไฟล์ใน `supabase/migrations/` (ดู `supabase/migrations/README.md`) เพื่อให้ทีมตรวจสอบและ replay schema เดียวกันผ่าน Supabase CLI

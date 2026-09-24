@@ -19,13 +19,16 @@ export async function POST(req: NextRequest) {
 
     const authEmail = email || `${phone.replace(/\D/g, "")}@jumbogo.local`;
     const authPassword = password || `${firstName.slice(0, 6)}1234`;
+    // Supabase Auth บังคับเบอร์โทรเป็น E.164 (เช่น +66xxxxxxxxx)
+    // เก็บ format ไทยเดิมไว้ใน users table แต่ส่ง E.164 ไปให้ auth เท่านั้น
+    const authPhone = toE164(phone);
 
     // 1) create REAL Supabase Auth user (id ใช้เป็น PK ของ users table จริงด้วย)
     const { data: authData, error: authError } =
       await supabaseAdmin.auth.admin.createUser({
         email: authEmail,
         password: authPassword,
-        phone,
+        phone: authPhone,
         email_confirm: true,
         phone_confirm: false,
         user_metadata: { full_name: fullName, role },
@@ -112,4 +115,14 @@ function toUser(
 
 function makeToken(userId: string) {
   return "jumbo_" + userId;
+}
+
+// แปลงเบอร์โทรทั่วไป (0xx-xxx-xxxx) เป็น E.164 (+66xxxxxxxxx) สำหรับ Supabase Auth
+function toE164(phone?: string): string | undefined {
+  if (!phone) return undefined;
+  const digits = phone.replace(/\D/g, "");
+  if (!digits) return undefined;
+  if (digits.startsWith("00")) return `+${digits.slice(2)}`;
+  if (digits.startsWith("0")) return `+66${digits.slice(1)}`;
+  return `+${digits}`;
 }

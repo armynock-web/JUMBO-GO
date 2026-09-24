@@ -89,7 +89,7 @@ async function run() {
 
   // 4. Update Driver GPS Location
   try {
-    const testDriverId = "00000000-0000-0000-0000-000000000201";
+    const testDriverId = "6d4a6c6d-d97f-4aca-adbc-25f8a6598f76";
     const updateResult = await api.updateDriverLocation({
       driverId: testDriverId,
       lat: 13.75633,
@@ -115,7 +115,7 @@ async function run() {
   let createdBookingId = "";
   try {
     const booking = await api.createBooking({
-      userId: "00000000-0000-0000-0000-000000000001",
+      userId: "a9dce7bb-a9cf-4f21-874a-129b0138fd56",
       vehicleType: "pickup",
       pickup: {
         address: "สยามพารากอน โซน B",
@@ -157,7 +157,7 @@ async function run() {
   // 6. Realtime WebSockets Status Listener
   try {
     let unsubscribeFn: (() => void) | null = null;
-    const testId = createdBookingId || "00000000-0000-0000-0000-000000000001";
+    const testId = createdBookingId || "a9dce7bb-a9cf-4f21-874a-129b0138fd56";
     await new Promise<void>((resolve) => {
       unsubscribeFn = api.subscribeToBookingStatus(testId, () => {});
       setTimeout(() => {

@@ -40,7 +40,7 @@ async function runTests() {
   try {
     console.log("\n👉 Test 2: Creating a new booking request...");
     const booking = await api.createBooking({
-      userId: "11111111-1111-1111-1111-111111111006",
+      userId: "a9dce7bb-a9cf-4f21-874a-129b0138fd56",
       vehicleType: "PICKUP",
       pickup: {
         address: "สาทร สแควร์",
@@ -89,7 +89,7 @@ async function runTests() {
   try {
     console.log("\n👉 Test 3: Updating driver GPS locations...");
     const updatedDriver = await api.updateDriverLocation({
-      driverId: "33333333-3333-3333-3333-333333333001",
+      driverId: "6d4a6c6d-d97f-4aca-adbc-25f8a6598f76",
       lat: 13.723501,
       lng: 100.529812,
     });
@@ -112,7 +112,7 @@ async function runTests() {
   try {
     console.log("\n👉 Test 4: Setting up real-time listener for booking status...");
     const unsubscribe = api.subscribeToBookingStatus(
-      testBookingId || "55555555-5555-5555-5555-555555555001",
+      testBookingId || "a9dce7bb-a9cf-4f21-874a-129b0138fd56",
       (updated) => {
         console.log("Realtime event received:", updated);
       }

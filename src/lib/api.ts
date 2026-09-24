@@ -230,9 +230,15 @@ export const api = {
     if (!vehicleType) return drivers;
 
     const vTypeLower = vehicleType.toLowerCase();
-    // DriverRow ใช้เฉพาะกรณี any — ตัว select ได้ตัด field ออกไปแล้ว
+    // vehicles เป็น to-one relation (driver มีรถ 1 คัน) → Supabase ตอบกลับเป็น object
+    // ต้อง normalize เป็น array เสมอ (มิฉะนั้น .some จะ crash — พบจาก tests)
     return drivers.filter((d: any) => {
-      const vehicles: Array<{ type: string | null }> = d?.vehicles || [];
+      const raw = d?.vehicles;
+      const vehicles: Array<{ type: string | null }> = raw
+        ? Array.isArray(raw)
+          ? raw
+          : [raw]
+        : [];
       return (
         vehicles.length === 0 ||
         vehicles.some((v) => (v?.type ?? "").toLowerCase() === vTypeLower)

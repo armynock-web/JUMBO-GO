@@ -244,3 +244,38 @@ USING (auth.uid() = user_id OR auth.uid() IN (SELECT user_id FROM public.drivers
 - **GET `/api/notifications?role=customer|driver|admin`** -> `{ "notifications": NotificationRecord[] }`
 - **POST `/api/notifications/[id]/read`** -> `{ "success": true }`
 
+---
+
+## 4. สัญญา Auth & ข้อมูลผู้ใช้ (Auth Contract — v1.4.0)
+
+### 4.1 เบอร์โทรศัพท์ E.164 (Register)
+Supabase Auth ต้องการเบอร์โทรศัพท์รูปแบบ **E.164** เท่านั้น (มี `+` นำหน้า) → helper `toE164()` ใน `src/app/api/auth/register/route.ts`:
+- Input ไทย: `082-345-6789` / `0823456789` → `+66823456789`
+- เก็บเบอร์ภาษาไทยเดิม (`082-345-6789`) ลงตาราง `users.phone` และ E.164 ไป Auth
+
+### 4.2 Login by Phone
+Auth users (`auth.users`) มี `phone` ว่างเสมอ → เบอร์จริงเก็บใน `users.phone` ระเบียบการค้นใน `src/app/api/auth/login/route.ts`:
+1. ค้น `users` ก่อนด้วย `.ilike("phone", %clean%)` (ตัด `-`, `+`, space)
+2. fallback: ดึง users จาก Auth แล้วเทียบ digits กับ E.164
+
+### 4.3 ตาราง `driver_kyc` Constraints (migrations)
+- **UNIQUE (driver_id)** — `20260924024145_add_unique_driver_id_to_driver_kyc` ทำให้ `upsertKyc({ onConflict: "driver_id" })` ทำงานจริง
+- **FK driver_id → drivers.id (ON DELETE CASCADE)** — `20260924031840_add_foreign_key_driver_kyc_to_drivers`
+- `reviewKyc(status: "approved")` → set `drivers.is_verified = true`, `driver_kyc.verified_at`; `rejected` → บันทึก `rejection_reason`
+
+---
+
+## 5. API Client Layer Contracts (`src/lib/api.ts`)
+
+- **`getAvailableDrivers(vehicleType?)`**: `drivers.vehicles` เป็น to-one relation (ตอบกลับเป็น **object** ไม่ใช่ array) → normalize เป็น array เสมอใน ฝั่ง client ก่อน `.some()`
+- **`getNotifications(role, userId?)`**: ตาราง `notifications` ไม่มีคอลัมน์ role → filter โดย `data.role === role` หรือ `type === 'role_<role>'`
+- Error ทั้งหมด throw ขึ้น route layer (ไม่ swallow) เพื่อตอบ HTTP ตามจริง
+
+---
+
+## 6. Testing Contracts (Vitest)
+
+ดูรายละเอียดใน `docs/architecture.md` §5 และ `vitest.config.ts`
+- Test script: `npm test` / `npm run test:coverage`
+- Coverage thresholds: lines/functions/statements 80%, branches 70% (ผ่านใน v1.4.0)
+

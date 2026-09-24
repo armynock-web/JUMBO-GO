@@ -2,6 +2,27 @@
 
 All notable changes to the database and backend infrastructure of this project will be documented in this file.
 
+## [1.4.0] - 2026-09-24
+### Production Assembly & Verified Backend (feature/production-flow-assembly)
+- **Vitest Test Suite มาตรฐานเต็มระบบ:**
+  - 130 tests / 14 files ผ่านทั้งหมด (unit + integration + route tests) ต่อฐานข้อมูลจริง
+  - Coverage ผ่าน threshold ทุกตัว: Statements 84.34% / Branches 74.21% / Functions 80.35% / Lines 86.28%
+  - ไฟล์ tests ใหม่: `tests/unit/*` (brand, notifications, utils, api-errors, db, api-subscriptions, repository-errors, pricing, request-auth), `tests/integration/*` (api, api-client, repository), `tests/routes/*` (auth, pricing)
+- **Pricing Engine แยกเป็น Library (DRY):**
+  - สร้าง `src/lib/pricing.ts` — ฟังก์ชันคำนวณราคาบริสุทธิ์ (base fare + per-km + fees)
+  - Refactor `/api/pricing/estimate` และ `/api/driver/jobs` ให้เรียกใช้ lib เดียวกัน
+- **แก้ Bug จริงที่ค้นพบจาก tests:**
+  - `src/lib/api.ts getAvailableDrivers`: `vehicles` เป็น to-one relation (ตอบกลับเป็น object ไม่ใช่ array) → normalize ให้เป็น array เสมอ กัน `TypeError: vehicles.some is not a function`
+  - `src/app/api/auth/register`: Supabase Auth ต้องการเบอร์รูปแบบ E.164 → เพิ่ม helper `toE164()` แปลง `0xx-xxx-xxxx` → `+66xxxxxxxxx` เก็บเบอร์ไทยเดิมใน users table
+  - `src/app/api/auth/login`: เบอร์จริงอยู่ใน users table (auth users มี phone ว่าง) → ค้น users table ก่อนด้วย `ilike` แล้ว fallback เทียบ digits ใน auth
+- **Schema Migrations บันทึกลง repo (Single Source of Truth):**
+  - `supabase/migrations/20260924024145_add_unique_driver_id_to_driver_kyc.sql` — UNIQUE(driver_id) ทำให้ `upsertKyc` ทำงานจริง
+  - `supabase/migrations/20260924031840_add_foreign_key_driver_kyc_to_drivers.sql` — FK `driver_kyc.driver_id → drivers.id` (ON DELETE CASCADE)
+- **Deploy Preparation:**
+  - เพิ่ม `vercel.json` (framework nextjs, region bkk1) และปรับ `.env.example` (ลบ Prisma ที่ไม่ใช้)
+  - เพิ่ม scripts `test` / `test:coverage` ใน package.json
+  - แก้ id ปลอมใน `scripts/verify-backend.ts` / `scripts/test-api.ts` เป็น id จริงใน production
+
 ## [1.3.0] - 2026-09-23
 ### เฟสที่ 1: ขั้นตอนการเรียกรถสำหรับลูกค้า (Phase 1 Customer Booking Flow)
 - **เชื่อมต่อ UI กับ Supabase และ Server Pricing ครบวงจร:**

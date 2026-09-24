@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { JumboRepository } from "@/lib/supabase/repository";
+import { matchVehicleType, calculateFare } from "@/lib/pricing";
 
 type EstimateInput = {
   vehicleType?: string;
@@ -24,15 +25,7 @@ export async function POST(req: NextRequest) {
     }
 
     const dbTypes = await JumboRepository.getVehicleTypes();
-    const matched = dbTypes.find((t) => {
-      const tid = t.id.toLowerCase();
-      if (vehicleType === "pickup" && tid === "pickup") return true;
-      if (vehicleType === "closed_pickup" && (tid.includes("box") || tid.includes("closed"))) return true;
-      if (vehicleType === "cage_pickup" && (tid.includes("fence") || tid.includes("cage"))) return true;
-      if (vehicleType === "jumbo" && tid.includes("jumbo")) return true;
-      if (vehicleType === "six_wheel" && (tid.includes("6w") || tid.includes("six"))) return true;
-      return tid === vehicleType;
-    });
+    const matched = matchVehicleType(vehicleType, dbTypes);
 
     if (!matched || matched.is_active === false) {
       return NextResponse.json(
@@ -41,13 +34,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const baseFare = matched.base_fare;
-    const perKm = matched.price_per_km;
-
-    const distanceFare = Math.round(distanceKm * perKm);
-    const extraHelperFee = hasHelper ? 150 : 0;
-    const expresswayFee = expressway ? 50 : 0;
-    const totalFare = baseFare + distanceFare + extraHelperFee + expresswayFee;
+    const computed = calculateFare({
+      baseFare: matched.base_fare,
+      perKm: matched.price_per_km,
+      distanceKm,
+      hasHelper,
+      expressway,
+    });
 
     return NextResponse.json({
       success: true,
@@ -55,12 +48,12 @@ export async function POST(req: NextRequest) {
       vehicleType,
       vehicleName: matched.name,
       distanceKm,
-      baseFare,
-      perKm,
-      distanceFare,
-      extraHelperFee,
-      expresswayFee,
-      totalFare,
+      baseFare: matched.base_fare,
+      perKm: matched.price_per_km,
+      distanceFare: computed.distanceFare,
+      extraHelperFee: computed.extraHelperFee,
+      expresswayFee: computed.expresswayFee,
+      totalFare: computed.totalFare,
     });
   } catch (error) {
     return NextResponse.json(
