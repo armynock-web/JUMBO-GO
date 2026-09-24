@@ -61,10 +61,8 @@ export async function POST(req: NextRequest) {
       duration_min: Math.round(Number(distanceKm) * 2.2),
       sender_name: senderName || "ลูกค้า JUMBO GO",
       sender_phone: senderPhone || "082-345-6789",
-      sender_note: senderNote || pickup?.sub || "",
       receiver_name: receiverName || dropoff?.main || "ผู้รับสินค้า",
       receiver_phone: receiverPhone || "081-999-8888",
-      receiver_note: receiverNote || dropoff?.sub || "",
     };
 
     const booking = await JumboRepository.createBooking(bookingPayload);

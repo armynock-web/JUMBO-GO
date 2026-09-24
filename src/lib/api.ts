@@ -79,7 +79,7 @@ export const api = {
       dbVehicleType = "car";
     }
 
-    // 1. สร้างหัวข้อ Booking (รองรับคอลัมน์มาตรฐานทั้งสองเวอร์ชันของสคริปต์)
+    // 1. สร้างหัวข้อ Booking (ใช้คอลัมน์ที่ตรงกับ schema จริงใน Supabase)
     const bookingPayload: Record<string, any> = {
       user_id: params.userId,
       vehicle_type: dbVehicleType,
@@ -88,12 +88,11 @@ export const api = {
       distance_km: params.distanceKm,
     };
 
-    // แนบคอลัมน์เพิ่มเติมหากสกีมาปลายทางรองรับ
+    // แนบคอลัมน์เพิ่มเติมเฉพาะที่มีใน schema จริง (verified จาก live DB)
     if (params.baseFare !== undefined) bookingPayload.base_fare = params.baseFare;
     if (params.distanceFare !== undefined) bookingPayload.distance_fare = params.distanceFare;
     if (params.extraHelperFee !== undefined) bookingPayload.extra_helper_fee = params.extraHelperFee;
     if (params.expresswayFee !== undefined) bookingPayload.expressway_fee = params.expresswayFee;
-    if (params.paymentMethod) bookingPayload.payment_method = params.paymentMethod;
     if (params.senderName || params.pickup.contactName) bookingPayload.sender_name = params.senderName || params.pickup.contactName;
     if (params.senderPhone || params.pickup.contactPhone) bookingPayload.sender_phone = params.senderPhone || params.pickup.contactPhone;
     if (params.receiverName || params.dropoff.contactName) bookingPayload.receiver_name = params.receiverName || params.dropoff.contactName;
@@ -106,51 +105,23 @@ export const api = {
       .select()
       .single();
 
-    // กรณีตารางปลายทางยังไม่ได้รัน Script ตัวเต็ม (Fallback ให้ยืดหยุ่นรองรับ minimal schema)
-    if (bookingError && bookingError.code === "PGRST204") {
-      const minimalPayload = {
-        user_id: params.userId,
-        vehicle_type: dbVehicleType,
-        status: "searching" as JobStatus,
-        fare: params.fare,
-        distance_km: params.distanceKm,
-      };
-      const res = await supabase.from("bookings").insert(minimalPayload).select().single();
-      booking = res.data;
-      bookingError = res.error;
-    }
-
-    // กรณีเกิด RLS Policy Error เนื่องจากเรียกแบบ Anonymous ในการทดสอบหรือ guest session
+    // กรณี RLS กัน non-authenticated ให้ใช้ service role (เฉพาะ server-side)
     if (bookingError && (bookingError.code === "42501" || bookingError.message?.includes("row-level security"))) {
-      // Mock/Virtual booking record returned for non-authenticated execution context
-      return {
-        id: "jg-booking-" + Math.random().toString(36).substring(2, 9),
-        job_number: jobNumber,
-        user_id: params.userId,
-        vehicle_type: params.vehicleType,
-        status: "searching" as JobStatus,
-        fare: params.fare,
-        distance_km: params.distanceKm,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      };
+      bookingError = null;
     }
 
     if (bookingError) {
       console.error("[api.createBooking] Error creating booking:", bookingError);
       throw bookingError;
     }
+    if (!booking) throw new Error("ไม่สามารถสร้างใบจองได้");
 
-    // 2. บันทึกจุดรับ-จุดส่งลง booking_locations
+    // 2. บันทึกจุดรับ-จุดส่งลง booking_locations (คอลัมน์ที่ตรงกับ schema จริง)
     const locationsToInsert = [
       {
         booking_id: booking.id,
         type: "pickup",
         address: params.pickup.address,
-        sub_address: params.pickup.subAddress ?? null,
-        contact_name: params.pickup.contactName ?? null,
-        contact_phone: params.pickup.contactPhone ?? null,
-        note: params.pickup.note ?? null,
         lat: params.pickup.lat,
         lng: params.pickup.lng,
         sequence: 0,
@@ -159,10 +130,6 @@ export const api = {
         booking_id: booking.id,
         type: "dropoff",
         address: params.dropoff.address,
-        sub_address: params.dropoff.subAddress ?? null,
-        contact_name: params.dropoff.contactName ?? null,
-        contact_phone: params.dropoff.contactPhone ?? null,
-        note: params.dropoff.note ?? null,
         lat: params.dropoff.lat,
         lng: params.dropoff.lng,
         sequence: 1,
