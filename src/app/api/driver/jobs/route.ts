@@ -1,44 +1,75 @@
 import { NextRequest, NextResponse } from "next/server";
+import { JumboRepository } from "@/lib/supabase/repository";
+import { resolveDriverId } from "@/lib/request-auth";
 
-export async function GET(_req: NextRequest) {
+export async function GET(req: NextRequest) {
   try {
-    const availableJobs = [
-      {
-        id: "55555555-5555-5555-5555-555555555001",
-        job_number: "JG-2025-00108",
-        status: "in_transit",
-        pickup_address: "บางนา กม.4 ซอย 12",
-        dropoff_address: "สนามบินสุวรรณภูมิ คลังสินค้า 3",
-        distance_km: 23.5,
-        fare: 619.0,
-        driver_earning: 526.0,
-        vehicle_type: "กระบะตู้ทึบ",
-        items_note: "กล่องเอกสาร 15 ลัง + อุปกรณ์ไอที",
-        distance_from_driver_km: 1.2,
-      },
-      {
-        id: "55555555-5555-5555-5555-555555555009",
-        job_number: "JG-2025-00109",
-        status: "searching",
-        pickup_address: "สาทร สแควร์ ชั้น 18",
-        dropoff_address: "ไอคอนสยาม ประตู 4",
-        distance_km: 12.0,
-        fare: 350.0,
-        driver_earning: 297.5,
-        vehicle_type: "กระบะ",
-        items_note: "โต๊ะทำงาน 1 ตัว และเก้าอี้สำนักงาน",
-        distance_from_driver_km: 4.2,
-      },
-    ];
+    const driverId = await resolveDriverId(
+      req,
+      req.nextUrl.searchParams.get("driverId")
+    );
+    if (!driverId) {
+      return NextResponse.json(
+        { success: false, message: "ไม่พบตัวตนคนขับ กรุณาเข้าสู่ระบบ" },
+        { status: 401 }
+      );
+    }
 
-    return NextResponse.json({
-      success: true,
-      jobs: availableJobs,
+    const driver = await JumboRepository.getDriverById(driverId);
+    if (!driver) {
+      return NextResponse.json(
+        { success: false, message: "ไม่พบข้อมูลคนขับ" },
+        { status: 404 }
+      );
+    }
+
+    // งานที่รอคนขับรับ (สถานะ searching) ตามขนาดรถของคนขับ
+    const vehicleTypes = [driver.vehicle_id]
+      .filter(Boolean)
+      .map(() => driver.vehicles?.[0]?.type || null)
+      .filter((t): t is string => !!t);
+
+    const allJobs = await JumboRepository.getAvailableJobs();
+
+    let jobs = allJobs;
+    if (vehicleTypes.length > 0) {
+      jobs = allJobs.filter((b) => vehicleTypes.includes(b.vehicle_type));
+    }
+
+    // คำนวณระยะทางจากคนขับถึงจุดรับ (ใช้พิกัดจริง ถ้ามี)
+    const driverLat = driver.current_location_lat;
+    const driverLng = driver.current_location_lng;
+    const jobsWithDistance = jobs.map((b) => {
+      const pickup = b.booking_locations?.find((l) => l.type === "pickup");
+      let distanceFromDriverKm: number | null = null;
+      if (driverLat != null && driverLng != null && pickup) {
+        distanceFromDriverKm = Math.round(
+          haversineKm(driverLat, driverLng, pickup.lat, pickup.lng) * 10
+        ) / 10;
+      }
+      return {
+        ...b,
+        distance_from_driver_km: distanceFromDriverKm,
+      };
     });
+
+    return NextResponse.json({ success: true, jobs: jobsWithDistance });
   } catch (error) {
     return NextResponse.json(
       { success: false, message: (error as Error).message },
       { status: 500 }
     );
   }
+}
+
+function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number) {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }

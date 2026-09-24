@@ -9,23 +9,16 @@ export async function GET(
     const { id } = await params;
     const booking = await JumboRepository.getBookingById(id);
 
+    if (!booking) {
+      return NextResponse.json(
+        { success: false, message: "ไม่พบรายการจอง" },
+        { status: 404 }
+      );
+    }
+
     return NextResponse.json({
       success: true,
-      booking: booking || {
-        id,
-        job_number: "JG-2025-00108",
-        status: "in_transit",
-        fare: 619,
-        distance_km: 23.5,
-        vehicle_type: "pickup_box",
-        driver: {
-          name: "สมชาย ใจดี",
-          phone: "081-234-5678",
-          rating: 4.8,
-          plate: "ขข 1234 กทม.",
-          vehicle: "Isuzu D-Max ตู้ทึบ",
-        },
-      },
+      booking,
     });
   } catch (error) {
     return NextResponse.json(

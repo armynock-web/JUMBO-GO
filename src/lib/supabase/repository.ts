@@ -299,6 +299,25 @@ export const JumboRepository = {
     return this.updateBooking(bookingId, { driver_id: driverId, status: "driver_assigned" });
   },
 
+  /** คนขับปฏิเสธงาน: คืน booking กลับไปสู่สถานะ searching และปลด driver ออก */
+  async rejectAssignment(bookingId: string) {
+    return this.updateBooking(bookingId, { driver_id: null, status: "searching" });
+  },
+
+  /** บันทึกหลักฐานส่งมอบสินค้า (delivery_proofs) */
+  async createDeliveryProof(proof: Omit<
+    Database["public"]["Tables"]["delivery_proofs"]["Insert"],
+    "id" | "captured_at"
+  >) {
+    const { data, error } = await supabaseServer
+      .from("delivery_proofs")
+      .insert({ ...proof, captured_at: new Date().toISOString() })
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  },
+
   // ======================= KYC =======================
   async getKycStatus(driverId: string): Promise<KycRow | null> {
     const { data, error } = await supabaseServer
@@ -328,6 +347,17 @@ export const JumboRepository = {
       .order("created_at", { ascending: false });
     if (error) throw error;
     return data;
+  },
+
+  /** แอดมินตรวจ KYC: approve -> verified จริง / reject -> เก็บเหตุผล + ยกเลิก verified */
+  async reviewKyc(driverId: string, status: "approved" | "rejected", rejectionReason?: string) {
+    const updated = await this.upsertKyc(driverId, {
+      status,
+      verified_at: status === "approved" ? new Date().toISOString() : null,
+      rejection_reason: status === "rejected" ? (rejectionReason ?? null) : null,
+    });
+    await this.updateDriver(driverId, { is_verified: status === "approved" });
+    return updated;
   },
 
   // ======================= SAVED LOCATIONS =======================

@@ -1,17 +1,9 @@
 import { NextResponse } from "next/server";
+import { JumboRepository } from "@/lib/supabase/repository";
 
 export async function GET() {
   try {
-    const stats = {
-      activeBookings: 18,
-      onlineDrivers: 42,
-      totalRevenueToday: 38450.0,
-      totalBookingsToday: 142,
-      pendingKycCount: 14,
-      abnormalCancellations: 2,
-      systemHealth: "operational",
-      updatedAt: new Date().toISOString(),
-    };
+    const stats = await JumboRepository.getAdminStats();
 
     return NextResponse.json({
       success: true,

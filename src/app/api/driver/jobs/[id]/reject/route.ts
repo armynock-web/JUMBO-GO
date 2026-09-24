@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { JumboRepository } from "@/lib/supabase/repository";
 
 export async function POST(
   req: NextRequest,
@@ -6,14 +7,20 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
-    const body = await req.json().catch(() => ({}));
-    const reason = body.reason || "ไม่สะดวกรับงานในขณะนี้";
+    const body: Record<string, unknown> = await req.json().catch(() => ({}));
+    const reason = body.reason ? String(body.reason) : null;
+
+    const booking = await JumboRepository.rejectAssignment(id);
+    if (reason) {
+      await JumboRepository.updateBooking(id, { cancel_reason: reason });
+    }
 
     return NextResponse.json({
       success: true,
-      message: "ปฏิเสธงานเรียบร้อย",
+      message: "ปฏิเสธงานเรียบร้อย งานกลับเข้าสู่ระบบ",
       jobId: id,
       reason,
+      booking,
     });
   } catch (error) {
     return NextResponse.json(

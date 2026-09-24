@@ -1,53 +1,48 @@
 import { NextRequest, NextResponse } from "next/server";
-import { VEHICLES, VehicleType } from "@/lib/brand";
 import { JumboRepository } from "@/lib/supabase/repository";
+
+type EstimateInput = {
+  vehicleType?: string;
+  distanceKm?: number;
+  hasHelper?: boolean;
+  expressway?: boolean;
+};
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json().catch(() => ({}));
-    const {
-      vehicleType = "PICKUP",
-      distanceKm = 12.5,
-      hasHelper = false,
-      expressway = false,
-    } = body;
+    const body: EstimateInput = await req.json().catch(() => ({}));
+    const vehicleType = String(body.vehicleType || "PICKUP").toLowerCase();
+    const distanceKm = Number(body.distanceKm ?? 12.5);
+    const hasHelper = Boolean(body.hasHelper);
+    const expressway = Boolean(body.expressway);
 
-    // Fetch live rates from vehicle_types table
-    const dbTypes = await JumboRepository.getVehicleTypes();
-    let baseFare = 350;
-    let perKm = 15;
-    let vehicleName = "รถกระบะตอนเดียว";
-
-    if (dbTypes && dbTypes.length > 0) {
-      // Find matching type by id or name
-      const matched = dbTypes.find((t: any) => {
-        const tid = (t.id || "").toLowerCase();
-        const vKey = (vehicleType as string).toLowerCase();
-        if (vKey === "pickup" && tid === "pickup") return true;
-        if (vKey === "closed_pickup" && (tid.includes("box") || tid.includes("closed"))) return true;
-        if (vKey === "cage_pickup" && (tid.includes("fence") || tid.includes("cage"))) return true;
-        if (vKey === "jumbo" && tid.includes("jumbo")) return true;
-        if (vKey === "six_wheel" && (tid.includes("6w") || tid.includes("six"))) return true;
-        return tid === vKey;
-      });
-
-      if (matched) {
-        baseFare = matched.base_fare ?? matched.base_price ?? 350;
-        perKm = matched.price_per_km ?? 15;
-        vehicleName = matched.name ?? matched.name_th ?? vehicleName;
-      }
-    } else {
-      // Fallback
-      const vInfo =
-        VEHICLES.find(
-          (v) =>
-            v.type === vehicleType ||
-            v.type.toLowerCase() === (vehicleType as string).toLowerCase()
-        ) || VEHICLES[0];
-      baseFare = vInfo.basePrice;
-      perKm = vInfo.perKm;
-      vehicleName = vInfo.name;
+    if (!Number.isFinite(distanceKm) || distanceKm <= 0) {
+      return NextResponse.json(
+        { success: false, message: "ระยะทางต้องมากกว่า 0" },
+        { status: 400 }
+      );
     }
+
+    const dbTypes = await JumboRepository.getVehicleTypes();
+    const matched = dbTypes.find((t) => {
+      const tid = t.id.toLowerCase();
+      if (vehicleType === "pickup" && tid === "pickup") return true;
+      if (vehicleType === "closed_pickup" && (tid.includes("box") || tid.includes("closed"))) return true;
+      if (vehicleType === "cage_pickup" && (tid.includes("fence") || tid.includes("cage"))) return true;
+      if (vehicleType === "jumbo" && tid.includes("jumbo")) return true;
+      if (vehicleType === "six_wheel" && (tid.includes("6w") || tid.includes("six"))) return true;
+      return tid === vehicleType;
+    });
+
+    if (!matched || matched.is_active === false) {
+      return NextResponse.json(
+        { success: false, message: `ไม่พบประเภทยานพาหนะ "${vehicleType}"` },
+        { status: 404 }
+      );
+    }
+
+    const baseFare = matched.base_fare;
+    const perKm = matched.price_per_km;
 
     const distanceFare = Math.round(distanceKm * perKm);
     const extraHelperFee = hasHelper ? 150 : 0;
@@ -58,7 +53,7 @@ export async function POST(req: NextRequest) {
       success: true,
       source: "database",
       vehicleType,
-      vehicleName,
+      vehicleName: matched.name,
       distanceKm,
       baseFare,
       perKm,

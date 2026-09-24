@@ -1,28 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
 import { JumboRepository } from "@/lib/supabase/repository";
+import { resolveDriverId } from "@/lib/request-auth";
 
 export async function GET(req: NextRequest) {
   try {
-    const driverId =
-      req.nextUrl.searchParams.get("driverId") ||
-      "33333333-3333-3333-3333-333333333001";
+    const driverId = await resolveDriverId(
+      req,
+      req.nextUrl.searchParams.get("driverId")
+    );
+    if (!driverId) {
+      return NextResponse.json(
+        { success: false, message: "ไม่พบตัวตนคนขับ กรุณาเข้าสู่ระบบ" },
+        { status: 401 }
+      );
+    }
+
     const driver = await JumboRepository.getDriverById(driverId);
+    if (!driver) {
+      return NextResponse.json(
+        { success: false, message: "ไม่พบข้อมูลคนขับ" },
+        { status: 404 }
+      );
+    }
 
     return NextResponse.json({
       success: true,
-      driver: driver || {
-        id: driverId,
-        driver_code: "JG-00108",
-        first_name: "สมชาย",
-        last_name: "ใจดี",
-        phone: "081-234-5678",
-        is_online: true,
-        rating_avg: 4.8,
-        rating_count: 128,
-        total_earnings: 38400,
-        bank_name: "กสิกรไทย",
-        bank_account_number: "123-4-56789-0",
-      },
+      driver,
     });
   } catch (error) {
     return NextResponse.json(

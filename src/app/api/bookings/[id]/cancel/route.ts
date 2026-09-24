@@ -8,9 +8,12 @@ export async function POST(
   try {
     const { id } = await params;
     const body = await req.json().catch(() => ({}));
-    const reason = body.reason || "ลูกค้ายกเลิกคำขอ";
+    const reason = (body.reason as string | undefined) || "ลูกค้ายกเลิกคำขอ";
 
-    const updated = await JumboRepository.updateBookingStatus(id, "cancelled");
+    const updated = await JumboRepository.updateBooking(id, {
+      status: "cancelled",
+      cancel_reason: reason,
+    });
 
     return NextResponse.json({
       success: true,

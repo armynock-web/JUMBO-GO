@@ -7,12 +7,7 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
-    let updated;
-    try {
-      updated = await JumboRepository.markNotificationRead(id);
-    } catch {
-      updated = { id, is_read: true };
-    }
+    const updated = await JumboRepository.markNotificationRead(id);
 
     return NextResponse.json({
       success: true,
