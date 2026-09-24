@@ -77,14 +77,14 @@ npx tsx scripts/verify-backend.ts
 เมื่อคุณนำโค้ดขึ้นระบบโฮสติ้ง (เช่น Vercel, Netlify, Cloud Run, หรือ Docker Container) ให้ตั้งค่าตัวแปรสภาพแวดล้อมดังนี้:
 
 ```env
-# Supabase Configuration
-NEXT_PUBLIC_SUPABASE_URL=https://oqopribnhovxfaxnjoia.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=NEXT_PUBLIC_SUPABASE_ANON_KEY_REPLACED
-SUPABASE_SERVICE_ROLE_KEY=SUPABASE_SERVICE_ROLE_KEY_REPLACED
+# Supabase Configuration (ใส่ค่าจริงจาก Dashboard: Settings → API)
+NEXT_PUBLIC_SUPABASE_URL=<your-project-url>
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-anon-key>
+SUPABASE_SERVICE_ROLE_KEY=<your-service-role-key>
 
 # Google OAuth (Optional สำหรับ Google Sign-in)
-NEXT_PUBLIC_GOOGLE_CLIENT_ID=367023007747-nsd07nl5831qm9un989fbk1efk6poknr.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=GOOGLE_CLIENT_SECRET_REPLACED
+NEXT_PUBLIC_GOOGLE_CLIENT_ID=<your-google-client-id>
+GOOGLE_CLIENT_SECRET=<your-google-client-secret>
 ```
 
 ---

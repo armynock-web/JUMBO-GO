@@ -1,11 +1,12 @@
 import { createClient } from "@supabase/supabase-js";
 
-const url =
-  process.env.NEXT_PUBLIC_SUPABASE_URL ||
-  "https://oqopribnhovxfaxnjoia.supabase.co";
-const serviceKey =
-  process.env.SUPABASE_SERVICE_ROLE_KEY ||
-  "SUPABASE_SERVICE_ROLE_KEY_REPLACED";
+const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!url || !serviceKey) {
+  console.error("Missing env: NEXT_PUBLIC_SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY");
+  process.exit(1);
+}
 
 const supabase = createClient(url, serviceKey, {
   auth: { persistSession: false },
