@@ -183,7 +183,7 @@ async function run() {
 
   // 7. Notification System Query
   try {
-    const notifications = await api.getNotifications("customer");
+    const notifications = await api.getNotifications("user");
     reports.push({
       title: "Notifications Retrieval System",
       passed: true,

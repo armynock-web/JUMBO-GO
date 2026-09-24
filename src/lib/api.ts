@@ -1,25 +1,30 @@
 /**
- * JUMBO GO - API Client Layer (Supabase Client Wrapper)
- * 
+ * JUMBO GO - API Client Layer (Server-side Supabase Wrapper)
+ *
  * ให้บริการ:
  * 1. การสร้าง Booking (พร้อม Locations จุดรับ-ส่ง)
  * 2. การดึงและติดตามสถานะงานของคนขับ (Driver Job Status)
- * 3. การอัปเดตตำแหน่ง GPS ของคนขับแบบ Realtime
+ * 3. การอัปเดตตำแหน่ง GPS ของคนขับ
  * 4. Realtime Subscription ติดตามตำแหน่งคนขับและสถานะงาน
- * 
- * มาตรฐาน: ARM-AES / AEOS v1.0 พร้อม RLS Compliance
+ *
+ * มาตรฐาน: ARM-AES / AEOS v1.0
+ * - Data Operation ใช้ service role (`supabaseServer`) เท่านั้น ตรง schema จริง
+ * - ไม่มี fake fallback / ไม่ swallow error ทุก error ถูก throw ให้ผู้เรียกเห็น
+ * - Realtime subscription ใช้ client anon สำหรับฝั่ง browser
  */
 
+import { supabaseServer } from "./supabase/server";
 import { supabase } from "./supabase/client";
-import type { 
-  JobStatus, 
-  PaymentMethod, 
-  VehicleTypeCode 
-} from "./supabase/types";
+import type { Database } from "./supabase/types";
+
+type BookingRow = Database["public"]["Tables"]["bookings"]["Row"];
+type VehicleTypeRow = Database["public"]["Tables"]["vehicle_types"]["Row"];
+type DriverRow = Database["public"]["Tables"]["drivers"]["Row"];
+type NotificationRow = Database["public"]["Tables"]["notifications"]["Row"];
 
 export interface CreateBookingParams {
   userId: string;
-  vehicleType: VehicleTypeCode | string;
+  vehicleType: string;
   pickup: {
     address: string;
     subAddress?: string;
@@ -44,7 +49,7 @@ export interface CreateBookingParams {
   extraHelperFee?: number;
   expresswayFee?: number;
   distanceKm: number;
-  paymentMethod?: PaymentMethod;
+  paymentMethod?: string;
   senderName?: string;
   senderPhone?: string;
   receiverName?: string;
@@ -57,6 +62,8 @@ export interface DriverLocationUpdate {
   lng: number;
 }
 
+export type NotificationRole = "user" | "driver" | "admin";
+
 export const api = {
   // =========================================================================
   // 1. BOOKING MANAGEMENT
@@ -66,29 +73,18 @@ export const api = {
    * สร้างรายการจองรถใหม่ (Create Booking)
    * บันทึกข้อมูลลงตาราง bookings และ booking_locations (จุดรับและจุดส่ง)
    */
-  async createBooking(params: CreateBookingParams) {
+  async createBooking(params: CreateBookingParams): Promise<BookingRow> {
     const jobNumber = `JG-${new Date().getFullYear()}-${Math.floor(10000 + Math.random() * 90000)}`;
 
-    // Normalization เพื่อรองรับ Database constraint ('motorcycle', 'van', 'car' หรือตาม custom schema)
-    let dbVehicleType = params.vehicleType ? params.vehicleType.toLowerCase() : "car";
-    if (dbVehicleType.includes("pickup") || dbVehicleType.includes("truck") || dbVehicleType.includes("jumbo")) {
-      dbVehicleType = "van"; // แม็ปประเภทรถบรรทุก/กระบะให้เข้ากับ schema ปลายทาง
-    } else if (dbVehicleType.includes("bike") || dbVehicleType.includes("motorcycle")) {
-      dbVehicleType = "motorcycle";
-    } else if (!["motorcycle", "van", "car"].includes(dbVehicleType)) {
-      dbVehicleType = "car";
-    }
-
-    // 1. สร้างหัวข้อ Booking (ใช้คอลัมน์ที่ตรงกับ schema จริงใน Supabase)
-    const bookingPayload: Record<string, any> = {
+    const bookingPayload: Database["public"]["Tables"]["bookings"]["Insert"] = {
       user_id: params.userId,
-      vehicle_type: dbVehicleType,
-      status: "searching" as JobStatus,
+      vehicle_type: params.vehicleType,
+      status: "searching",
       fare: params.fare,
       distance_km: params.distanceKm,
+      job_number: jobNumber,
     };
 
-    // แนบคอลัมน์เพิ่มเติมเฉพาะที่มีใน schema จริง (verified จาก live DB)
     if (params.baseFare !== undefined) bookingPayload.base_fare = params.baseFare;
     if (params.distanceFare !== undefined) bookingPayload.distance_fare = params.distanceFare;
     if (params.extraHelperFee !== undefined) bookingPayload.extra_helper_fee = params.extraHelperFee;
@@ -97,26 +93,16 @@ export const api = {
     if (params.senderPhone || params.pickup.contactPhone) bookingPayload.sender_phone = params.senderPhone || params.pickup.contactPhone;
     if (params.receiverName || params.dropoff.contactName) bookingPayload.receiver_name = params.receiverName || params.dropoff.contactName;
     if (params.receiverPhone || params.dropoff.contactPhone) bookingPayload.receiver_phone = params.receiverPhone || params.dropoff.contactPhone;
-    bookingPayload.job_number = jobNumber;
 
-    let { data: booking, error: bookingError } = await supabase
+    const { data: booking, error: bookingError } = await supabaseServer
       .from("bookings")
       .insert(bookingPayload)
       .select()
       .single();
 
-    // กรณี RLS กัน non-authenticated ให้ใช้ service role (เฉพาะ server-side)
-    if (bookingError && (bookingError.code === "42501" || bookingError.message?.includes("row-level security"))) {
-      bookingError = null;
-    }
-
-    if (bookingError) {
-      console.error("[api.createBooking] Error creating booking:", bookingError);
-      throw bookingError;
-    }
+    if (bookingError) throw bookingError;
     if (!booking) throw new Error("ไม่สามารถสร้างใบจองได้");
 
-    // 2. บันทึกจุดรับ-จุดส่งลง booking_locations (คอลัมน์ที่ตรงกับ schema จริง)
     const locationsToInsert = [
       {
         booking_id: booking.id,
@@ -136,22 +122,20 @@ export const api = {
       },
     ];
 
-    const { error: locError } = await supabase
+    const { error: locError } = await supabaseServer
       .from("booking_locations")
       .insert(locationsToInsert);
 
-    if (locError) {
-      console.warn("[api.createBooking] Warning saving locations:", locError);
-    }
+    if (locError) throw locError;
 
     return booking;
   },
 
   /**
-   * ดึงรายละเอียดของ Booking พร้อมคนขับและตำแหน่ง
+   * ดึงรายละเอียดของ Booking พร้อมจุดรับ-ส่งและคนขับ
    */
   async getBookingDetail(bookingId: string) {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseServer
       .from("bookings")
       .select(`
         *,
@@ -176,11 +160,7 @@ export const api = {
       .eq("id", bookingId)
       .single();
 
-    if (error) {
-      console.error("[api.getBookingDetail] Error:", error);
-      throw error;
-    }
-
+    if (error) throw error;
     return data;
   },
 
@@ -192,7 +172,7 @@ export const api = {
    * ดึงสถานะงานปัจจุบันของคนขับ (Driver Active Job Status)
    */
   async getDriverActiveJob(driverId: string) {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseServer
       .from("bookings")
       .select(`
         *,
@@ -205,24 +185,20 @@ export const api = {
         "arrived_pickup",
         "picked_up",
         "in_transit",
-        "arrived_dropoff"
+        "arrived_dropoff",
       ])
       .order("created_at", { ascending: false })
       .maybeSingle();
 
-    if (error) {
-      console.error("[api.getDriverActiveJob] Error:", error);
-      throw error;
-    }
-
+    if (error) throw error;
     return data;
   },
 
   /**
-   * ค้นหาและดึงรายชื่อคนขับที่พร้อมรับงานและสถานะปัจจุบัน (Query available drivers and their current status)
+   * ค้นหาและดึงรายชื่อคนขับที่พร้อมรับงานพร้อมรถและพิกัด
    */
   async getAvailableDrivers(vehicleType?: string) {
-    let query = supabase
+    const query = supabaseServer
       .from("drivers")
       .select(`
         id,
@@ -248,26 +224,27 @@ export const api = {
       .eq("is_online", true);
 
     const { data, error } = await query;
-    if (error) {
-      console.error("[api.getAvailableDrivers] Error:", error);
-      throw error;
-    }
+    if (error) throw error;
 
-    if (vehicleType && data) {
-      const vTypeLower = vehicleType.toLowerCase();
-      return data.filter((d: any) => 
-        !d.vehicles?.type || d.vehicles?.type.toLowerCase() === vTypeLower
+    const drivers = data || [];
+    if (!vehicleType) return drivers;
+
+    const vTypeLower = vehicleType.toLowerCase();
+    // DriverRow ใช้เฉพาะกรณี any — ตัว select ได้ตัด field ออกไปแล้ว
+    return drivers.filter((d: any) => {
+      const vehicles: Array<{ type: string | null }> = d?.vehicles || [];
+      return (
+        vehicles.length === 0 ||
+        vehicles.some((v) => (v?.type ?? "").toLowerCase() === vTypeLower)
       );
-    }
-
-    return data || [];
+    });
   },
 
   /**
    * ดึงรายการงานที่รอรับสำหรับคนขับ (Available Jobs)
    */
   async getAvailableJobsForDriver() {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseServer
       .from("bookings")
       .select(`
         *,
@@ -277,43 +254,35 @@ export const api = {
       .order("created_at", { ascending: false })
       .limit(10);
 
-    if (error) {
-      console.error("[api.getAvailableJobsForDriver] Error:", error);
-      throw error;
-    }
-
-    return data;
+    if (error) throw error;
+    return data || [];
   },
 
   /**
    * คนขับรับงาน (Accept Job)
    */
-  async acceptJob(bookingId: string, driverId: string) {
-    const { data, error } = await supabase
+  async acceptJob(bookingId: string, driverId: string): Promise<BookingRow> {
+    const { data, error } = await supabaseServer
       .from("bookings")
       .update({
         driver_id: driverId,
-        status: "driver_assigned" as JobStatus,
+        status: "driver_assigned",
         updated_at: new Date().toISOString(),
       })
       .eq("id", bookingId)
-      .eq("status", "searching") // ป้องกัน race condition
+      .eq("status", "searching")
       .select()
       .single();
 
-    if (error) {
-      console.error("[api.acceptJob] Error accepting job:", error);
-      throw error;
-    }
-
+    if (error) throw error;
     return data;
   },
 
   /**
-   * คนขับอัปเดตสถานะงาน (เช่น going_to_pickup, picked_up, in_transit, completed)
+   * คนขับอัปเดตสถานะงาน
    */
-  async updateJobStatus(bookingId: string, status: JobStatus) {
-    const { data, error } = await supabase
+  async updateJobStatus(bookingId: string, status: string): Promise<BookingRow> {
+    const { data, error } = await supabaseServer
       .from("bookings")
       .update({
         status,
@@ -323,11 +292,7 @@ export const api = {
       .select()
       .single();
 
-    if (error) {
-      console.error("[api.updateJobStatus] Error:", error);
-      throw error;
-    }
-
+    if (error) throw error;
     return data;
   },
 
@@ -336,11 +301,10 @@ export const api = {
   // =========================================================================
 
   /**
-   * อัปเดตตำแหน่งพิกัด GPS สดของคนขับ (Realtime Location Update)
-   * ทำการบันทึกลงฟิลด์ current_location_lat และ current_location_lng ของตาราง drivers
+   * อัปเดตตำแหน่งพิกัด GPS สดของคนขับลงตาราง drivers
    */
   async updateDriverLocation({ driverId, lat, lng }: DriverLocationUpdate) {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseServer
       .from("drivers")
       .update({
         current_location_lat: lat,
@@ -351,26 +315,16 @@ export const api = {
       .select("id, current_location_lat, current_location_lng, is_online")
       .maybeSingle();
 
-    if (error) {
-      console.error("[api.updateDriverLocation] Error updating location:", error);
-      throw error;
-    }
-
-    return (
-      data ?? {
-        id: driverId,
-        current_location_lat: lat,
-        current_location_lng: lng,
-        is_online: true,
-      }
-    );
+    if (error) throw error;
+    if (!data) throw new Error(`ไม่พบคนขับ id=${driverId}`);
+    return data;
   },
 
   /**
    * สลับสถานะ ออนไลน์ / ออฟไลน์ ของคนขับ
    */
-  async toggleDriverOnline(driverId: string, isOnline: boolean) {
-    const { data, error } = await supabase
+  async toggleDriverOnline(driverId: string, isOnline: boolean): Promise<DriverRow> {
+    const { data, error } = await supabaseServer
       .from("drivers")
       .update({
         is_online: isOnline,
@@ -380,11 +334,7 @@ export const api = {
       .select()
       .single();
 
-    if (error) {
-      console.error("[api.toggleDriverOnline] Error:", error);
-      throw error;
-    }
-
+    if (error) throw error;
     return data;
   },
 
@@ -407,7 +357,7 @@ export const api = {
           filter: `id=eq.${driverId}`,
         },
         (payload) => {
-          const newRecord = payload.new as any;
+          const newRecord = payload.new as unknown as { current_location_lat?: number | null; current_location_lng?: number | null };
           if (newRecord?.current_location_lat && newRecord?.current_location_lng) {
             onUpdate({
               lat: Number(newRecord.current_location_lat),
@@ -426,7 +376,7 @@ export const api = {
   /**
    * ติดตามการเปลี่ยนสถานะของ Booking แบบ Realtime
    */
-  subscribeToBookingStatus(bookingId: string, onStatusChange: (booking: any) => void) {
+  subscribeToBookingStatus(bookingId: string, onStatusChange: (booking: BookingRow) => void) {
     const channel = supabase
       .channel(`booking_status_${bookingId}`)
       .on(
@@ -438,7 +388,7 @@ export const api = {
           filter: `id=eq.${bookingId}`,
         },
         (payload) => {
-          onStatusChange(payload.new);
+          onStatusChange(payload.new as BookingRow);
         }
       )
       .subscribe();
@@ -454,9 +404,10 @@ export const api = {
 
   /**
    * ดึงรายการแจ้งเตือนตาม Role
+   * remarks: ตาราง notifications ไม่มีคอลัมน์ role — ใช้ field data.role หรือ type prefix `role_`
    */
-  async getNotifications(role: "customer" | "driver" | "admin" = "customer", userId?: string) {
-    let query = supabase
+  async getNotifications(roleParam: "user" | "driver" | "admin" = "user", userId?: string): Promise<NotificationRow[]> {
+    let query = supabaseServer
       .from("notifications")
       .select("*")
       .order("created_at", { ascending: false });
@@ -465,42 +416,27 @@ export const api = {
       query = query.or(`user_id.eq.${userId},user_id.is.null`);
     }
 
-    // ลองกรองด้วย role ก่อน หากตารางมีคอลัมน์ role
-    let { data, error } = await query.eq("role", role);
-    
-    // กรณีที่ฐานข้อมูลเดิมยังไม่ได้รัน Master Script (ไม่มี column role)
-    if (error && (error.code === "42703" || error.message?.includes("role does not exist"))) {
-      const fallbackQuery = supabase
-        .from("notifications")
-        .select("*")
-        .order("created_at", { ascending: false });
-      const fallbackRes = await fallbackQuery;
-      data = fallbackRes.data;
-      error = fallbackRes.error;
-    }
+    const { data, error } = await query;
+    if (error) throw error;
 
-    if (error) {
-      console.error("[api.getNotifications] Error:", error);
-      return [];
-    }
-    return data || [];
+    return (data || []).filter((n) => {
+      const d = (n.data as Record<string, unknown> | null) || {};
+      return d.role === roleParam || n.type === `role_${roleParam}`;
+    });
   },
 
   /**
    * ทำเครื่องหมายแจ้งเตือนว่าอ่านแล้ว
    */
-  async markNotificationRead(notificationId: string) {
-    const { data, error } = await supabase
+  async markNotificationRead(notificationId: string): Promise<NotificationRow> {
+    const { data, error } = await supabaseServer
       .from("notifications")
       .update({ is_read: true })
       .eq("id", notificationId)
       .select()
       .single();
 
-    if (error) {
-      console.error("[api.markNotificationRead] Error:", error);
-      throw error;
-    }
+    if (error) throw error;
     return data;
   },
 
@@ -509,26 +445,16 @@ export const api = {
   // =========================================================================
 
   /**
-   * ดึงรายการประเภทยานพาหนะและอัตราค่าบริการ (Vehicle Types Catalog & Pricing)
+   * ดึงรายการประเภทยานพาหนะและอัตราค่าบริการที่ใช้งานอยู่ (เรียงตาม base_fare)
    */
-  async getVehicleTypes() {
-    const { data, error } = await supabase
+  async getVehicleTypes(): Promise<VehicleTypeRow[]> {
+    const { data, error } = await supabaseServer
       .from("vehicle_types")
       .select("*")
       .eq("is_active", true)
-      .order("base_price", { ascending: true });
+      .order("base_fare", { ascending: true });
 
-    if (error) {
-      // Fallback ข้อมูลเริ่มต้นกรณีฐานข้อมูลยังไม่ได้รัน seed
-      return [
-        { code: "pickup", name_th: "กระบะ", capacity_ton: 1.0, base_price: 350, price_per_km: 15, dimensions: "2.1 x 1.7 x 0.4 ม." },
-        { code: "pickup_box", name_th: "กระบะตู้ทึบ", capacity_ton: 1.0, base_price: 450, price_per_km: 18, dimensions: "2.1 x 1.7 x 1.9 ม." },
-        { code: "pickup_fence", name_th: "กระบะคอก", capacity_ton: 1.5, base_price: 420, price_per_km: 17, dimensions: "2.1 x 1.7 x 1.8 ม." },
-        { code: "jumbo", name_th: "จัมโบ้", capacity_ton: 2.0, base_price: 650, price_per_km: 22, dimensions: "3.2 x 1.8 x 2.0 ม." },
-        { code: "truck_6w", name_th: "6 ล้อ", capacity_ton: 5.0, base_price: 1200, price_per_km: 35, dimensions: "5.5 x 2.2 x 2.2 ม." },
-      ];
-    }
-
+    if (error) throw error;
     return data || [];
   },
 
@@ -536,17 +462,13 @@ export const api = {
    * ดึงข้อมูลโปรไฟล์ผู้ใช้
    */
   async getUserProfile(userId: string) {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseServer
       .from("users")
       .select("*")
       .eq("id", userId)
       .maybeSingle();
 
-    if (error) {
-      console.error("[api.getUserProfile] Error:", error);
-      throw error;
-    }
-
+    if (error) throw error;
     return data;
   },
 };

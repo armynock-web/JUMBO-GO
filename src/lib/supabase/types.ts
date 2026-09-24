@@ -4,404 +4,651 @@ export type Json =
   | boolean
   | null
   | { [key: string]: Json | undefined }
-  | Json[];
+  | Json[]
 
-export type UserRole = "customer" | "driver" | "admin" | "user";
-export type UserStatus = "active" | "suspended" | "pending";
-
-export type VehicleTypeCode =
-  | "pickup"
-  | "pickup_box"
-  | "pickup_fence"
-  | "jumbo"
-  | "truck_6w";
-
-export type JobStatus =
-  | "draft"
-  | "searching"
-  | "driver_assigned"
-  | "going_to_pickup"
-  | "arrived_pickup"
-  | "picked_up"
-  | "in_transit"
-  | "arrived_dropoff"
-  | "completed"
-  | "cancelled";
-
-export type PaymentMethod = "cash" | "promptpay" | "credit_card" | "wallet";
-export type PaymentStatus = "unpaid" | "paid" | "refunded" | "pending";
-export type KycStatus = "draft" | "pending" | "approved" | "rejected";
-
-export interface Database {
+export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.5"
+  }
   public: {
     Tables: {
-      users: {
-        Row: {
-          id: string;
-          email: string | null;
-          phone: string | null;
-          first_name: string;
-          last_name: string;
-          avatar_url: string | null;
-          role: UserRole;
-          status: UserStatus;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          id?: string;
-          email?: string | null;
-          phone?: string | null;
-          first_name: string;
-          last_name: string;
-          avatar_url?: string | null;
-          role?: UserRole;
-          status?: UserStatus;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Update: {
-          id?: string;
-          email?: string | null;
-          phone?: string | null;
-          first_name?: string;
-          last_name?: string;
-          avatar_url?: string | null;
-          role?: UserRole;
-          status?: UserStatus;
-          updated_at?: string;
-        };
-      };
-      vehicle_types: {
-        Row: {
-          id: string;
-          code: VehicleTypeCode;
-          name_th: string;
-          capacity_ton: number;
-          base_price: number;
-          price_per_km: number;
-          dimensions: string | null;
-          icon_name: string | null;
-          description: string | null;
-          is_active: boolean;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          id?: string;
-          code: VehicleTypeCode;
-          name_th: string;
-          capacity_ton: number;
-          base_price: number;
-          price_per_km: number;
-          dimensions?: string | null;
-          icon_name?: string | null;
-          description?: string | null;
-          is_active?: boolean;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Update: {
-          code?: VehicleTypeCode;
-          name_th?: string;
-          capacity_ton?: number;
-          base_price?: number;
-          price_per_km?: number;
-          dimensions?: string | null;
-          icon_name?: string | null;
-          description?: string | null;
-          is_active?: boolean;
-          updated_at?: string;
-        };
-      };
-      drivers: {
-        Row: {
-          id: string;
-          user_id: string;
-          driver_code: string | null;
-          phone: string;
-          first_name: string;
-          last_name: string;
-          avatar_url: string | null;
-          id_card_url: string | null;
-          license_url: string | null;
-          vehicle_id: string | null;
-          is_verified: boolean;
-          is_online: boolean;
-          current_location_lat: number | null;
-          current_location_lng: number | null;
-          rating_avg: number;
-          rating_count: number;
-          total_earnings: number;
-          bank_name: string | null;
-          bank_account_number: string | null;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          id?: string;
-          user_id: string;
-          driver_code?: string | null;
-          phone: string;
-          first_name: string;
-          last_name: string;
-          avatar_url?: string | null;
-          id_card_url?: string | null;
-          license_url?: string | null;
-          vehicle_id?: string | null;
-          is_verified?: boolean;
-          is_online?: boolean;
-          current_location_lat?: number | null;
-          current_location_lng?: number | null;
-          rating_avg?: number;
-          rating_count?: number;
-          total_earnings?: number;
-          bank_name?: string | null;
-          bank_account_number?: string | null;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Update: Partial<Database["public"]["Tables"]["drivers"]["Insert"]>;
-      };
-      driver_kyc: {
-        Row: {
-          id: string;
-          driver_id: string;
-          kyc_code: string;
-          current_step: number;
-          emergency_contact: string | null;
-          emergency_phone: string | null;
-          address_current: string | null;
-          province: string | null;
-          district: string | null;
-          id_card_number: string | null;
-          id_card_front_url: string | null;
-          id_card_back_url: string | null;
-          laser_id: string | null;
-          selfie_url: string | null;
-          license_number: string | null;
-          license_type: string | null;
-          license_expiry: string | null;
-          license_front_url: string | null;
-          license_back_url: string | null;
-          vehicle_type: string | null;
-          vehicle_brand: string | null;
-          vehicle_plate: string | null;
-          vehicle_province: string | null;
-          vehicle_registration_url: string | null;
-          compulsory_insurance_url: string | null;
-          vehicle_front_url: string | null;
-          vehicle_side_url: string | null;
-          bank_name: string | null;
-          bank_account_number: string | null;
-          bank_account_name: string | null;
-          bank_book_url: string | null;
-          consent_pdpa: boolean;
-          consent_background_check: boolean;
-          consent_terms: boolean;
-          status: KycStatus;
-          reject_reason: string | null;
-          reviewed_by: string | null;
-          reviewed_at: string | null;
-          submitted_at: string | null;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: Partial<Database["public"]["Tables"]["driver_kyc"]["Row"]> & {
-          driver_id: string;
-          kyc_code: string;
-        };
-        Update: Partial<Database["public"]["Tables"]["driver_kyc"]["Row"]>;
-      };
-      vehicles: {
-        Row: {
-          id: string;
-          driver_id: string | null;
-          type: string;
-          brand: string;
-          model: string;
-          year: number | null;
-          plate_number: string;
-          plate_province: string | null;
-          color: string | null;
-          inspection_status: string | null;
-          is_active: boolean;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: Partial<Database["public"]["Tables"]["vehicles"]["Row"]> & {
-          type: string;
-          brand: string;
-          model: string;
-          plate_number: string;
-        };
-        Update: Partial<Database["public"]["Tables"]["vehicles"]["Row"]>;
-      };
-      bookings: {
-        Row: {
-          id: string;
-          job_number: string | null;
-          user_id: string;
-          driver_id: string | null;
-          vehicle_type: string;
-          status: JobStatus;
-          fare: number;
-          base_fare: number;
-          distance_fare: number;
-          extra_helper_fee: number;
-          expressway_fee: number;
-          discount: number;
-          driver_earning: number;
-          distance_km: number;
-          duration_min: number;
-          payment_method: PaymentMethod;
-          payment_status: PaymentStatus;
-          sender_name: string | null;
-          sender_phone: string | null;
-          receiver_name: string | null;
-          receiver_phone: string | null;
-          cancel_reason: string | null;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: Partial<Database["public"]["Tables"]["bookings"]["Row"]> & {
-          user_id: string;
-          vehicle_type: string;
-        };
-        Update: Partial<Database["public"]["Tables"]["bookings"]["Row"]>;
-      };
       booking_locations: {
         Row: {
-          id: string;
-          booking_id: string;
-          type: "pickup" | "dropoff";
-          address: string;
-          sub_address: string | null;
-          tag: string | null;
-          contact_name: string | null;
-          contact_phone: string | null;
-          note: string | null;
-          lat: number;
-          lng: number;
-          sequence: number;
-          created_at: string;
-        };
-        Insert: Partial<Database["public"]["Tables"]["booking_locations"]["Row"]> & {
-          booking_id: string;
-          type: "pickup" | "dropoff";
-          address: string;
-          lat: number;
-          lng: number;
-        };
-        Update: Partial<Database["public"]["Tables"]["booking_locations"]["Row"]>;
-      };
+          address: string
+          booking_id: string | null
+          created_at: string | null
+          id: string
+          lat: number
+          lng: number
+          sequence: number
+          type: string
+        }
+        Insert: {
+          address: string
+          booking_id?: string | null
+          created_at?: string | null
+          id?: string
+          lat: number
+          lng: number
+          sequence?: number
+          type: string
+        }
+        Update: {
+          address?: string
+          booking_id?: string | null
+          created_at?: string | null
+          id?: string
+          lat?: number
+          lng?: number
+          sequence?: number
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booking_locations_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bookings: {
+        Row: {
+          base_fare: number | null
+          cancel_reason: string | null
+          created_at: string | null
+          distance_fare: number | null
+          distance_km: number | null
+          driver_id: string | null
+          duration_min: number | null
+          expressway_fee: number | null
+          extra_helper_fee: number | null
+          fare: number | null
+          id: string
+          job_number: string | null
+          receiver_name: string | null
+          receiver_note: string | null
+          receiver_phone: string | null
+          sender_name: string | null
+          sender_note: string | null
+          sender_phone: string | null
+          status: string
+          updated_at: string | null
+          user_id: string | null
+          vehicle_type: string
+        }
+        Insert: {
+          base_fare?: number | null
+          cancel_reason?: string | null
+          created_at?: string | null
+          distance_fare?: number | null
+          distance_km?: number | null
+          driver_id?: string | null
+          duration_min?: number | null
+          expressway_fee?: number | null
+          extra_helper_fee?: number | null
+          fare?: number | null
+          id?: string
+          job_number?: string | null
+          receiver_name?: string | null
+          receiver_note?: string | null
+          receiver_phone?: string | null
+          sender_name?: string | null
+          sender_note?: string | null
+          sender_phone?: string | null
+          status?: string
+          updated_at?: string | null
+          user_id?: string | null
+          vehicle_type: string
+        }
+        Update: {
+          base_fare?: number | null
+          cancel_reason?: string | null
+          created_at?: string | null
+          distance_fare?: number | null
+          distance_km?: number | null
+          driver_id?: string | null
+          duration_min?: number | null
+          expressway_fee?: number | null
+          extra_helper_fee?: number | null
+          fare?: number | null
+          id?: string
+          job_number?: string | null
+          receiver_name?: string | null
+          receiver_note?: string | null
+          receiver_phone?: string | null
+          sender_name?: string | null
+          sender_note?: string | null
+          sender_phone?: string | null
+          status?: string
+          updated_at?: string | null
+          user_id?: string | null
+          vehicle_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      delivery_proofs: {
+        Row: {
+          booking_id: string
+          captured_at: string | null
+          driver_id: string
+          id: string
+          note: string | null
+          photo_url: string
+          proof_type: string
+        }
+        Insert: {
+          booking_id: string
+          captured_at?: string | null
+          driver_id: string
+          id?: string
+          note?: string | null
+          photo_url: string
+          proof_type: string
+        }
+        Update: {
+          booking_id?: string
+          captured_at?: string | null
+          driver_id?: string
+          id?: string
+          note?: string | null
+          photo_url?: string
+          proof_type?: string
+        }
+        Relationships: []
+      }
+      driver_kyc: {
+        Row: {
+          act_insurance_image_url: string | null
+          bank_account_name: string | null
+          bank_account_number: string | null
+          bank_name: string | null
+          created_at: string | null
+          driver_id: string
+          driving_license_image_url: string | null
+          driving_license_number: string | null
+          id: string
+          id_card_image_url: string | null
+          id_card_number: string | null
+          rejection_reason: string | null
+          status: string | null
+          step_completed: number | null
+          updated_at: string | null
+          vehicle_registration_image_url: string | null
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          act_insurance_image_url?: string | null
+          bank_account_name?: string | null
+          bank_account_number?: string | null
+          bank_name?: string | null
+          created_at?: string | null
+          driver_id: string
+          driving_license_image_url?: string | null
+          driving_license_number?: string | null
+          id?: string
+          id_card_image_url?: string | null
+          id_card_number?: string | null
+          rejection_reason?: string | null
+          status?: string | null
+          step_completed?: number | null
+          updated_at?: string | null
+          vehicle_registration_image_url?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          act_insurance_image_url?: string | null
+          bank_account_name?: string | null
+          bank_account_number?: string | null
+          bank_name?: string | null
+          created_at?: string | null
+          driver_id?: string
+          driving_license_image_url?: string | null
+          driving_license_number?: string | null
+          id?: string
+          id_card_image_url?: string | null
+          id_card_number?: string | null
+          rejection_reason?: string | null
+          status?: string | null
+          step_completed?: number | null
+          updated_at?: string | null
+          vehicle_registration_image_url?: string | null
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: []
+      }
+      driver_wallet: {
+        Row: {
+          balance: number | null
+          credit_limit: number | null
+          driver_id: string
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          balance?: number | null
+          credit_limit?: number | null
+          driver_id: string
+          id?: string
+          updated_at?: string | null
+        }
+        Update: {
+          balance?: number | null
+          credit_limit?: number | null
+          driver_id?: string
+          id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      drivers: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          current_location_lat: number | null
+          current_location_lng: number | null
+          first_name: string
+          id: string
+          id_card_url: string | null
+          is_online: boolean | null
+          is_verified: boolean | null
+          last_name: string
+          license_url: string | null
+          phone: string
+          rating_avg: number | null
+          rating_count: number | null
+          total_earnings: number | null
+          updated_at: string | null
+          user_id: string | null
+          vehicle_id: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          current_location_lat?: number | null
+          current_location_lng?: number | null
+          first_name: string
+          id?: string
+          id_card_url?: string | null
+          is_online?: boolean | null
+          is_verified?: boolean | null
+          last_name: string
+          license_url?: string | null
+          phone: string
+          rating_avg?: number | null
+          rating_count?: number | null
+          total_earnings?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+          vehicle_id?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          current_location_lat?: number | null
+          current_location_lng?: number | null
+          first_name?: string
+          id?: string
+          id_card_url?: string | null
+          is_online?: boolean | null
+          is_verified?: boolean | null
+          last_name?: string
+          license_url?: string | null
+          phone?: string
+          rating_avg?: number | null
+          rating_count?: number | null
+          total_earnings?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "drivers_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
-          id: string;
-          user_id: string | null;
-          role: "customer" | "driver" | "admin";
-          category: string;
-          priority: "low" | "normal" | "high" | "urgent";
-          title: string;
-          message: string;
-          is_read: boolean;
-          job_id: string | null;
-          amount: number | null;
-          action_label: string | null;
-          action_target: string | null;
-          data: Json;
-          created_at: string;
-        };
-        Insert: Partial<Database["public"]["Tables"]["notifications"]["Row"]> & {
-          role: "customer" | "driver" | "admin";
-          title: string;
-          message: string;
-        };
-        Update: Partial<Database["public"]["Tables"]["notifications"]["Row"]>;
-      };
+          created_at: string | null
+          data: Json | null
+          id: string
+          is_read: boolean | null
+          message: string
+          title: string
+          type: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          data?: Json | null
+          id?: string
+          is_read?: boolean | null
+          message: string
+          title: string
+          type: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          data?: Json | null
+          id?: string
+          is_read?: boolean | null
+          message?: string
+          title?: string
+          type?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       payments: {
         Row: {
-          id: string;
-          booking_id: string | null;
-          amount: number;
-          method: string;
-          status: string;
-          transaction_id: string | null;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: Partial<Database["public"]["Tables"]["payments"]["Row"]> & {
-          amount: number;
-          method: string;
-          status: string;
-        };
-        Update: Partial<Database["public"]["Tables"]["payments"]["Row"]>;
-      };
-      transactions: {
-        Row: {
-          id: string;
-          txn_number: string;
-          driver_id: string | null;
-          user_id: string | null;
-          booking_id: string | null;
-          type: "job_fare" | "driver_payout" | "toll_refund" | "bonus" | "commission_fee";
-          amount: number;
-          status: "pending" | "processing" | "completed" | "failed";
-          bank_name: string | null;
-          bank_account: string | null;
-          failure_reason: string | null;
-          created_at: string;
-        };
-        Insert: Partial<Database["public"]["Tables"]["transactions"]["Row"]> & {
-          txn_number: string;
-          type: "job_fare" | "driver_payout" | "toll_refund" | "bonus" | "commission_fee";
-          amount: number;
-        };
-        Update: Partial<Database["public"]["Tables"]["transactions"]["Row"]>;
-      };
+          amount: number
+          booking_id: string | null
+          created_at: string | null
+          id: string
+          method: string
+          status: string
+          transaction_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          amount: number
+          booking_id?: string | null
+          created_at?: string | null
+          id?: string
+          method: string
+          status?: string
+          transaction_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          amount?: number
+          booking_id?: string | null
+          created_at?: string | null
+          id?: string
+          method?: string
+          status?: string
+          transaction_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reviews: {
         Row: {
-          id: string;
-          booking_id: string;
-          user_id: string;
-          driver_id: string;
-          rating: number;
-          comment: string | null;
-          created_at: string;
-        };
+          booking_id: string | null
+          comment: string | null
+          created_at: string | null
+          driver_id: string | null
+          id: string
+          rating: number
+          user_id: string | null
+        }
         Insert: {
-          id?: string;
-          booking_id: string;
-          user_id: string;
-          driver_id: string;
-          rating: number;
-          comment?: string | null;
-          created_at?: string;
-        };
-        Update: Partial<Database["public"]["Tables"]["reviews"]["Row"]>;
-      };
+          booking_id?: string | null
+          comment?: string | null
+          created_at?: string | null
+          driver_id?: string | null
+          id?: string
+          rating: number
+          user_id?: string | null
+        }
+        Update: {
+          booking_id?: string | null
+          comment?: string | null
+          created_at?: string | null
+          driver_id?: string | null
+          id?: string
+          rating?: number
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       saved_locations: {
         Row: {
-          id: string;
-          user_id: string;
-          name: string;
-          address: string;
-          sub_address: string | null;
-          tag: string;
-          lat: number;
-          lng: number;
-          created_at: string;
-        };
-        Insert: Partial<Database["public"]["Tables"]["saved_locations"]["Row"]> & {
-          user_id: string;
-          name: string;
-          address: string;
-          tag: string;
-          lat: number;
-          lng: number;
-        };
-        Update: Partial<Database["public"]["Tables"]["saved_locations"]["Row"]>;
-      };
-    };
-  };
+          address: string
+          contact_name: string | null
+          contact_phone: string | null
+          created_at: string | null
+          id: string
+          is_default: boolean | null
+          label: string
+          lat: number
+          lng: number
+          user_id: string
+        }
+        Insert: {
+          address: string
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          id?: string
+          is_default?: boolean | null
+          label: string
+          lat: number
+          lng: number
+          user_id: string
+        }
+        Update: {
+          address?: string
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          id?: string
+          is_default?: boolean | null
+          label?: string
+          lat?: number
+          lng?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      transactions: {
+        Row: {
+          amount: number
+          booking_id: string | null
+          created_at: string | null
+          driver_id: string | null
+          id: string
+          status: string | null
+          type: string
+        }
+        Insert: {
+          amount: number
+          booking_id?: string | null
+          created_at?: string | null
+          driver_id?: string | null
+          id?: string
+          status?: string | null
+          type: string
+        }
+        Update: {
+          amount?: number
+          booking_id?: string | null
+          created_at?: string | null
+          driver_id?: string | null
+          id?: string
+          status?: string | null
+          type?: string
+        }
+        Relationships: []
+      }
+      users: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          email: string | null
+          first_name: string | null
+          id: string
+          last_name: string | null
+          phone: string | null
+          role: string
+          updated_at: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          email?: string | null
+          first_name?: string | null
+          id: string
+          last_name?: string | null
+          phone?: string | null
+          role?: string
+          updated_at?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          email?: string | null
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          phone?: string | null
+          role?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      vehicle_types: {
+        Row: {
+          base_distance_km: number | null
+          base_fare: number
+          capacity_kg: number
+          category: string
+          created_at: string | null
+          description: string | null
+          dimension_text: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          popular: boolean | null
+          price_per_km: number
+        }
+        Insert: {
+          base_distance_km?: number | null
+          base_fare: number
+          capacity_kg: number
+          category: string
+          created_at?: string | null
+          description?: string | null
+          dimension_text?: string | null
+          id: string
+          is_active?: boolean | null
+          name: string
+          popular?: boolean | null
+          price_per_km: number
+        }
+        Update: {
+          base_distance_km?: number | null
+          base_fare?: number
+          capacity_kg?: number
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          dimension_text?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          popular?: boolean | null
+          price_per_km?: number
+        }
+        Relationships: []
+      }
+      vehicles: {
+        Row: {
+          brand: string | null
+          color: string | null
+          created_at: string | null
+          driver_id: string | null
+          id: string
+          is_active: boolean | null
+          model: string | null
+          plate_number: string | null
+          type: string
+          updated_at: string | null
+          year: number | null
+        }
+        Insert: {
+          brand?: string | null
+          color?: string | null
+          created_at?: string | null
+          driver_id?: string | null
+          id?: string
+          is_active?: boolean | null
+          model?: string | null
+          plate_number?: string | null
+          type: string
+          updated_at?: string | null
+          year?: number | null
+        }
+        Update: {
+          brand?: string | null
+          color?: string | null
+          created_at?: string | null
+          driver_id?: string | null
+          id?: string
+          is_active?: boolean | null
+          model?: string | null
+          plate_number?: string | null
+          type?: string
+          updated_at?: string | null
+          year?: number | null
+        }
+        Relationships: []
+      }
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      is_admin: { Args: never; Returns: boolean }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
 }

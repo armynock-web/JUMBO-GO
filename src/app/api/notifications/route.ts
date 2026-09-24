@@ -3,13 +3,14 @@ import { JumboRepository } from "@/lib/supabase/repository";
 
 export async function GET(req: NextRequest) {
   try {
-    const roleParam = req.nextUrl.searchParams.get("role") || "customer";
-    const role = (["driver", "customer", "admin"].includes(roleParam) ? roleParam : "customer") as "driver" | "customer" | "admin";
-    const notifications = await JumboRepository.getNotificationsByRole(role);
+    const roleParam = req.nextUrl.searchParams.get("role") || "user";
+    const role = (["user", "customer", "driver", "admin"].includes(roleParam) ? roleParam : "user") as "user" | "customer" | "driver" | "admin";
+    const normalizedRole: "user" | "driver" | "admin" = role === "customer" ? "user" : role;
+    const notifications = await JumboRepository.getNotificationsByRole(normalizedRole);
 
     return NextResponse.json({
       success: true,
-      role,
+      role: normalizedRole,
       notifications,
     });
   } catch (error) {
