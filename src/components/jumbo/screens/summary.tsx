@@ -40,10 +40,11 @@ export function SummaryScreen() {
     const calculatedKm = Math.max(3.2, Math.round(Math.sqrt(dLat * dLat + dLng * dLng) * 10) / 10);
 
     let isMounted = true;
-    setCalculating(true);
+    void (async () => {
+      setCalculating(true);
 
-    async function fetchServerEstimate() {
-      try {
+      async function fetchServerEstimate() {
+        try {
         const res = await fetch("/api/pricing/estimate", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -70,9 +71,11 @@ export function SummaryScreen() {
       } finally {
         if (isMounted) setCalculating(false);
       }
-    }
+      }
 
-    fetchServerEstimate();
+      await fetchServerEstimate();
+    })();
+
     return () => {
       isMounted = false;
     };

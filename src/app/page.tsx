@@ -24,17 +24,18 @@ import {
 export default function Page() {
   const screen = useJumbo((s) => s.screen);
   const mode = useJumbo((s) => s.mode);
-  const go = useJumbo((s) => s.go);
   const setMode = useJumbo((s) => s.setMode);
+  const go = useJumbo((s) => s.go);
   const [isDesktop, setIsDesktop] = useState(false);
 
   useEffect(() => {
+    setMode("user");
     const mq = window.matchMedia("(min-width: 1024px)");
     const onChange = () => setIsDesktop(mq.matches);
     onChange();
     mq.addEventListener("change", onChange);
     return () => mq.removeEventListener("change", onChange);
-  }, []);
+  }, [setMode]);
 
   // Mobile: render the app shell directly (full screen app)
   if (!isDesktop) {

@@ -35,7 +35,6 @@ export function JobsScreen() {
   const [loading, setLoading] = useState(true);
 
   const fetchBookings = async () => {
-    setLoading(true);
     try {
       const res = await fetch("/api/bookings?userId=a9dce7bb-a9cf-4f21-874a-129b0138fd56");
       const json = await res.json();
@@ -49,8 +48,15 @@ export function JobsScreen() {
     }
   };
 
+  const refresh = () => {
+    setLoading(true);
+    void fetchBookings();
+  };
+
   useEffect(() => {
-    fetchBookings();
+    void (async () => {
+      await fetchBookings();
+    })();
   }, []);
 
   // Filter list
@@ -76,7 +82,7 @@ export function JobsScreen() {
             </span>
           </div>
           <button
-            onClick={fetchBookings}
+            onClick={refresh}
             className="flex h-9 w-9 items-center justify-center rounded-full bg-surface transition active:scale-95"
             aria-label="รีเฟรชข้อมูล"
             title="รีเฟรชข้อมูลจากฐานข้อมูล"

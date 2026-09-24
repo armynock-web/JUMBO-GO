@@ -306,8 +306,7 @@ async function runSeedAndTest() {
   ];
 
   for (const n of notificationsToSeed) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await supabase.from("notifications").upsert(n as any);
+    const { error } = await supabase.from("notifications").upsert({ ...n, data: n.data as Record<string, unknown> });
     if (error) console.error("Notification upsert error:", n.title, error.message);
     else console.log("✓ Notification synced:", n.title);
   }
