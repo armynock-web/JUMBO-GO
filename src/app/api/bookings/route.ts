@@ -1,11 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getTokenUserId } from "@/lib/request-auth";
 import { JumboRepository } from "@/lib/supabase/repository";
 
 export async function GET(req: NextRequest) {
   try {
-    const userId =
-      req.nextUrl.searchParams.get("userId") ||
-      "a9dce7bb-a9cf-4f21-874a-129b0138fd56";
+    const userId = getTokenUserId(req);
+    if (!userId) {
+      return NextResponse.json(
+        { success: false, message: "ไม่ได้รับอนุญาต" },
+        { status: 401 }
+      );
+    }
     const bookings = await JumboRepository.getBookingsByUser(userId);
     return NextResponse.json({ success: true, bookings });
   } catch (error) {
@@ -41,8 +46,14 @@ export async function POST(req: NextRequest) {
       "-" +
       Math.floor(10000 + Math.random() * 90000);
 
-    // Determine valid user_id from session or default test user in database
-    const validUserId = body.userId || "a9dce7bb-a9cf-4f21-874a-129b0138fd56";
+    const tokenUserId = getTokenUserId(req);
+    if (!tokenUserId) {
+      return NextResponse.json(
+        { success: false, message: "ไม่ได้รับอนุญาต" },
+        { status: 401 }
+      );
+    }
+    const validUserId = body.userId || tokenUserId;
 
     const bookingPayload = {
       user_id: validUserId,

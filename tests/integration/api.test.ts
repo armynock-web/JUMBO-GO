@@ -122,7 +122,7 @@ describe("vehicle-types", () => {
 
 describe("bookings", () => {
   it("GET returns list (defaults to seed customer)", async () => {
-    const res = await getBookings(req("GET", "/api/bookings"));
+    const res = await getBookings(req("GET", "/api/bookings", { token: CUSTOMER_ID }));
     const body = await res.json();
     expect(body.success).toBe(true);
     expect(Array.isArray(body.bookings)).toBe(true);
@@ -139,6 +139,7 @@ describe("bookings", () => {
           distanceKm: 10,
           fare: 500,
         },
+        token: CUSTOMER_ID,
       })
     );
     const postBody = await postRes.json();
@@ -149,15 +150,15 @@ describe("bookings", () => {
     created.jobNumber = postBody.jobNumber;
     expect(postBody.jobNumber).toMatch(/^JG-\d{4}-/);
 
-    const detailRes = await getBookingById(req("GET", "/api/bookings/x"), {
+    const detailRes = await getBookingById(req("GET", "/api/bookings/x", { token: CUSTOMER_ID }), {
       params: Promise.resolve({ id: created.bookingId }),
     });
-    const detailBody = await detailRes.json();
-    expect(detailBody.success).toBe(true);
+const detailBody = await detailRes.json();
+expect(detailBody.success).toBe(true);
     expect(detailBody.booking.id).toBe(created.bookingId);
 
     const cancelRes = await cancelBooking(
-      req("POST", "/api/bookings/x", { body: { reason: "ทดสอบยกเลิก" } }),
+      req("POST", "/api/bookings/x", { token: CUSTOMER_ID, body: { reason: "ทดสอบยกเลิก" } }),
       { params: Promise.resolve({ id: created.bookingId }) }
     );
     const cancelBody = await cancelRes.json();
@@ -272,6 +273,7 @@ describe("driver job accept -> status chain -> proof (on created booking)", () =
     const p = await postBooking(
       req("POST", "/api/bookings", {
         body: { userId: CUSTOMER_ID, vehicleType: "PICKUP", distanceKm: 8, fare: 620 },
+        token: CUSTOMER_ID,
       })
     );
     const pb = await p.json();
@@ -321,6 +323,7 @@ describe("rate booking (needs a driver-assigned completed booking)", () => {
     const p = await postBooking(
       req("POST", "/api/bookings", {
         body: { userId: CUSTOMER_ID, vehicleType: "PICKUP", fare: 450 },
+        token: CUSTOMER_ID,
       })
     );
     const pb = await p.json();
