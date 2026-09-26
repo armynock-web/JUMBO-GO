@@ -43,85 +43,66 @@ export function HomeScreen() {
   return (
     <div className="relative flex min-h-full flex-col bg-white pb-20">
       {/* === HERO HEADER === */}
-      <div className="relative overflow-hidden">
-        {/* skyline bg */}
-        <div className="absolute inset-0 bg-gradient-to-br from-jumbo via-jumbo-dark to-[#7a0d11]" />
-        <div className="bg-grid absolute inset-0 opacity-10" />
-        {/* city skyline */}
-        <svg
-          className="absolute bottom-0 left-0 right-0 h-24 w-full opacity-20"
-          viewBox="0 0 400 100"
-          preserveAspectRatio="none"
-        >
-          <g fill="#000">
-            <rect x="10" y="40" width="20" height="60" />
-            <rect x="40" y="20" width="28" height="80" />
-            <rect x="80" y="50" width="18" height="50" />
-            <rect x="105" y="10" width="32" height="90" />
-            <rect x="145" y="35" width="22" height="65" />
-            <rect x="175" y="5" width="38" height="95" />
-            <rect x="220" y="45" width="20" height="55" />
-            <rect x="245" y="25" width="30" height="75" />
-            <rect x="285" y="40" width="22" height="60" />
-            <rect x="315" y="15" width="34" height="85" />
-            <rect x="355" y="50" width="18" height="50" />
-          </g>
-        </svg>
+      <div className="relative overflow-hidden bg-slate-900">
+        {/* Background real trucks banner with gradient */}
+        <div className="relative h-56 w-full overflow-hidden">
+          <img
+            src="/images/banner/hero-trucks.jpg"
+            alt="JUMBO GO Fleet"
+            className="h-full w-full object-cover object-center brightness-90"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/30" />
 
-        <div className="relative">
-          <StatusBar dark />
-          {/* top bar */}
-          <div className="flex items-center justify-between px-4 pb-2 pt-1 text-white">
+          {/* Top Nav Bar inside Hero */}
+          <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-4 pt-3 text-white">
             <button
               onClick={() => setMenuOpen(true)}
-              className="flex h-9 w-9 items-center justify-center rounded-full bg-white/15"
+              className="flex h-9 w-9 items-center justify-center rounded-full bg-black/40 backdrop-blur-md"
               aria-label="เมนู"
             >
               <Menu className="h-5 w-5" />
             </button>
-            <div className="flex items-center gap-1.5">
-              <span className="text-[17px] font-extrabold italic tracking-tight">
+            <div className="flex items-center gap-1.5 rounded-full bg-black/40 px-3 py-1 backdrop-blur-md">
+              <img
+                src="/images/brand/app-icon.jpg"
+                alt="JUMBO GO"
+                className="h-5 w-5 rounded object-contain"
+              />
+              <span className="text-[15px] font-extrabold italic tracking-tight text-white">
                 JUMBO
               </span>
-              <span className="rounded bg-white px-1.5 py-0.5 text-[17px] font-extrabold italic tracking-tight text-jumbo">
+              <span className="rounded bg-jumbo px-1.5 py-0.2 text-[13px] font-extrabold italic tracking-tight text-white">
                 GO
               </span>
             </div>
             <button
               onClick={() => go("notifications")}
-              className="relative flex h-9 w-9 items-center justify-center rounded-full bg-white/15"
+              className="relative flex h-9 w-9 items-center justify-center rounded-full bg-black/40 backdrop-blur-md"
               aria-label="แจ้งเตือน"
             >
               <Bell className="h-5 w-5" />
-              <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-white ring-2 ring-jumbo" />
+              <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-jumbo ring-2 ring-white" />
             </button>
           </div>
 
-          {/* hero text */}
-          <div className="px-4 pb-1 text-white">
+          {/* Official Slogan and Branding */}
+          <div className="absolute bottom-3 left-4 right-4 z-10 text-white">
             <motion.h1
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-[26px] font-extrabold leading-tight"
+              className="text-[22px] font-black leading-tight drop-shadow-md text-white"
             >
-              อยาก ขับรถ ใหญ่
-              <br />
-              <span className="text-white">JUMBO GO</span>
+              จะขน จะย้าย เรียก JUMBO GO
             </motion.h1>
-            <div className="mt-2 inline-block -rotate-1 rounded-md bg-white px-3 py-1 text-[12px] font-bold text-jumbo shadow">
-              ส่งของ • ย้ายบ้าน • ใช้งานง่าย
-            </div>
-          </div>
-
-          {/* hero truck */}
-          <div className="relative flex justify-center pb-1">
-            <HeroTruck className="h-24 w-48 drop-shadow-xl" />
+            <p className="mt-0.5 text-[13px] font-bold text-amber-300 drop-shadow">
+              สะดวก • ปลอดภัย • ไว้ใจได้
+            </p>
           </div>
         </div>
       </div>
 
       {/* === CONTENT === */}
-      <div className="relative -mt-3 rounded-t-3xl bg-white px-4 pt-5">
+      <div className="relative -mt-2 rounded-t-3xl bg-white px-4 pt-4">
         {/* location input */}
         <div className="rounded-2xl border border-line bg-white p-3 shadow-sm">
           <button
@@ -160,15 +141,15 @@ export function HomeScreen() {
           </button>
         </div>
 
-        {/* vehicle selector */}
+        {/* vehicle selector with real vehicle photos */}
         <div className="mt-5">
           <div className="mb-2 flex items-center justify-between">
             <h2 className="text-[15px] font-bold text-ink">
-              เลือกประเภทรถ
+              เลือกรถจริงตามความต้องการ
             </h2>
             <button
               onClick={() => go("vehicle-type")}
-              className="text-[12px] font-medium text-jumbo"
+              className="text-[12px] font-medium text-jumbo hover:underline"
             >
               ดูทั้งหมด
             </button>
@@ -183,25 +164,36 @@ export function HomeScreen() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.05 }}
                   onClick={() => go("vehicle-type")}
-                  className={`flex flex-shrink-0 flex-col items-center gap-1 rounded-2xl border-2 p-3 transition ${
+                  className={`flex flex-shrink-0 flex-col items-center gap-1 rounded-2xl border-2 p-2.5 transition ${
                     active
-                      ? "border-jumbo bg-jumbo-light"
-                      : "border-line bg-white"
+                      ? "border-jumbo bg-jumbo-light shadow-sm"
+                      : "border-line bg-white hover:border-slate-300"
                   }`}
-                  style={{ width: 96 }}
+                  style={{ width: 102 }}
                 >
                   <div
-                    className={`flex h-14 w-20 items-center justify-center rounded-xl ${
-                      active ? "bg-white" : "bg-surface"
+                    className={`flex h-14 w-20 items-center justify-center overflow-hidden rounded-xl p-0.5 ${
+                      active ? "bg-white ring-1 ring-jumbo/20" : "bg-surface"
                     }`}
                   >
-                    <VehicleIcon
-                      type={v.type}
-                      className="h-9 w-auto"
-                      color={active ? "#ED1C24" : "#111111"}
+                    <img
+                      src={`/images/vehicles/${
+                        v.type === "PICKUP"
+                          ? "pickup"
+                          : v.type === "CLOSED_PICKUP"
+                          ? "box"
+                          : v.type === "CAGE_PICKUP"
+                          ? "cage"
+                          : v.type === "JUMBO"
+                          ? "jumbo"
+                          : "six-wheel"
+                      }.jpg`}
+                      alt={v.name}
+                      className="h-full w-full object-contain"
+                      loading="lazy"
                     />
                   </div>
-                  <span className="text-[12px] font-bold text-ink">
+                  <span className="text-[12px] font-bold text-ink truncate w-full text-center">
                     {v.name}
                   </span>
                   <span className="text-[10px] text-ink-muted">
@@ -213,49 +205,39 @@ export function HomeScreen() {
           </div>
         </div>
 
-        {/* CTA */}
+        {/* Red CTA Pill Button matching official poster */}
         <button
           onClick={handleCallToAction}
-          className="mt-5 flex w-full items-center justify-between rounded-2xl bg-jumbo px-5 py-4 text-white shadow-lg shadow-jumbo/30 transition active:scale-[0.98]"
+          className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-jumbo py-3.5 text-[16px] font-black text-white shadow-lg shadow-jumbo/35 transition hover:bg-jumbo-dark active:scale-[0.98]"
         >
-          <span className="flex items-center gap-2.5">
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/15">
-              <VehicleIcon
-                type={draft.vehicleType ?? "PICKUP"}
-                className="h-5 w-auto"
-                color="#FFFFFF"
-              />
-            </span>
-            <span className="text-[16px] font-bold">ดูราคาและเรียกรถ</span>
-          </span>
-          <ChevronRight className="h-5 w-5" strokeWidth={2.5} />
+          <span>เรียกรถเลย</span>
+          <ChevronRight className="h-5 w-5" strokeWidth={3} />
         </button>
-
-        {/* feature highlights */}
+        {/* feature highlights matching official advertisement */}
         <div className="mt-5 grid grid-cols-3 gap-2">
-          {FEATURE_HIGHLIGHTS.map((f, i) => {
-            const Icon =
-              f.icon === "tag" ? Tag : f.icon === "pin" ? Navigation : ShieldCheck;
-            return (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 + i * 0.05 }}
-                className="flex flex-col items-center gap-1 rounded-xl bg-surface p-2.5 text-center"
-              >
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-jumbo text-white">
-                  <Icon className="h-4 w-4" strokeWidth={2.5} />
-                </span>
-                <p className="text-[11px] font-bold leading-tight text-ink">
-                  {f.title}
-                </p>
-                <p className="text-[9px] leading-tight text-ink-muted">
-                  {f.sub}
-                </p>
-              </motion.div>
-            );
-          })}
+          {[
+            { title: "รวดเร็ว ทันใจ", sub: "เรียกรถได้ตลอด 24 ชม.", icon: Tag },
+            { title: "ปลอดภัย ไร้กังวล", sub: "คนขับตรวจประวัติ 100%", icon: ShieldCheck },
+            { title: "ราคามาตรฐาน", sub: "โปร่งใส ไม่มีบวกเพิ่ม", icon: Navigation },
+          ].map((f, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 + i * 0.05 }}
+              className="flex flex-col items-center gap-1 rounded-2xl border border-line bg-surface p-2.5 text-center shadow-xs"
+            >
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-jumbo text-white shadow-xs">
+                <f.icon className="h-4 w-4" strokeWidth={2.5} />
+              </span>
+              <p className="text-[11px] font-bold leading-tight text-ink">
+                {f.title}
+              </p>
+              <p className="text-[9px] leading-tight text-ink-muted">
+                {f.sub}
+              </p>
+            </motion.div>
+          ))}
         </div>
 
         {/* recent locations */}
@@ -288,34 +270,32 @@ export function HomeScreen() {
           </div>
         </div>
 
-        {/* promo banner */}
-        <div className="mt-5 overflow-hidden rounded-2xl border border-line bg-gradient-to-br from-surface to-white shadow-sm">
-          <div className="flex items-center">
-            <div className="relative flex h-20 w-20 flex-shrink-0 items-center justify-center bg-jumbo-light">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-jumbo text-white">
-                <UserRound className="h-7 w-7" strokeWidth={2.5} />
-              </div>
-              <span className="absolute bottom-1 rounded bg-white px-1 text-[8px] font-bold text-jumbo">
-                Driver
+        {/* Real Brand Driver & Trust Showcase Banner */}
+        <div className="mt-5 overflow-hidden rounded-2xl border border-line bg-white shadow-sm">
+          <div className="relative h-44 w-full overflow-hidden bg-slate-100">
+            <img
+              src="/images/banner/driver-showcase.jpg"
+              alt="JUMBO GO Verified Driver & Delivery"
+              className="h-full w-full object-cover object-top"
+              loading="lazy"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
+            <div className="absolute bottom-3 left-3 right-3 text-white">
+              <span className="rounded bg-jumbo px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-white">
+                มาตรฐาน JUMBO GO
               </span>
-            </div>
-            <div className="flex-1 p-3">
-              <p className="text-[13px] font-extrabold text-ink">JUMBO GO</p>
-              <p className="brush-underline text-[12px] font-medium text-ink">
-                บริการขนส่งของ หนักเบาทุกชนิด
+              <p className="mt-1 text-[13px] font-extrabold leading-tight text-white drop-shadow">
+                ทุกการเดินทางของคุณ คือความไว้วางใจของเรา
               </p>
-              <button
-                onClick={() => go("vehicle-type")}
-                className="mt-1.5 inline-flex items-center gap-1 text-[11px] font-bold text-jumbo"
-              >
-                เรียกรถเลย <ChevronRight className="h-3 w-3" />
-              </button>
+              <p className="text-[11px] font-medium text-slate-200">
+                JUMBO GO มากกว่าการขนของ คือความสบายใจ
+              </p>
             </div>
           </div>
         </div>
 
         <p className="mt-4 text-center text-[10px] text-ink-muted">
-          JUMBO GO v1.0.0 • ใช้งานได้จริงตามพิมพ์เขียว
+          JUMBO GO v1.5.0 • ใช้งานได้จริงตามมาตรฐานแพลตฟอร์มเชิงพาณิชย์
         </p>
       </div>
 

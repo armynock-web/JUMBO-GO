@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useJumbo } from "@/store/jumbo";
 import { StatusBar } from "../status-bar";
 import { StepIndicator } from "../step-indicator";
-import { VehicleIcon } from "../vehicle-icon";
+import { VehicleIcon, VehiclePhoto } from "../vehicle-icon";
 import { VEHICLES, VehicleType } from "@/lib/brand";
 import { ChevronLeft, Check, Database, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
@@ -135,16 +135,16 @@ export function VehicleTypeScreen() {
                       : "border-line bg-white active:bg-surface"
                   }`}
                 >
-                  {/* vehicle illustration */}
+                  {/* real vehicle illustration */}
                   <div
-                    className={`flex h-20 w-24 flex-shrink-0 items-center justify-center rounded-xl ${
-                      active ? "bg-white" : "bg-surface"
+                    className={`flex h-20 w-24 flex-shrink-0 items-center justify-center rounded-xl overflow-hidden p-1 ${
+                      active ? "bg-white ring-2 ring-jumbo/30" : "bg-surface"
                     }`}
                   >
-                    <VehicleIcon
+                    <VehiclePhoto
                       type={v.typeKey}
-                      className="h-12 w-auto"
-                      color={active ? "#ED1C24" : "#111111"}
+                      className="h-16 w-full object-contain"
+                      alt={v.name}
                     />
                   </div>
                   <div className="flex-1">

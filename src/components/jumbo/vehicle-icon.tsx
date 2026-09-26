@@ -202,3 +202,31 @@ export function HeroTruck({ className }: { className?: string }) {
     </svg>
   );
 }
+
+export const VEHICLE_IMAGES: Record<VehicleType, string> = {
+  PICKUP: "/images/vehicles/pickup.jpg",
+  CLOSED_PICKUP: "/images/vehicles/box.jpg",
+  CAGE_PICKUP: "/images/vehicles/cage.jpg",
+  JUMBO: "/images/vehicles/jumbo.jpg",
+  SIX_WHEEL: "/images/vehicles/six-wheel.jpg",
+};
+
+export function VehiclePhoto({
+  type,
+  className,
+  alt,
+}: {
+  type: VehicleType;
+  className?: string;
+  alt?: string;
+}) {
+  const src = VEHICLE_IMAGES[type] || "/images/vehicles/pickup.jpg";
+  return (
+    <img
+      src={src}
+      alt={alt ?? type}
+      className={cn("object-contain rounded-lg", className)}
+      loading="lazy"
+    />
+  );
+}
