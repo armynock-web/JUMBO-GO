@@ -61,4 +61,4 @@ jobs:
         run: |
           docker pull zricethezav/gitleaks:latest
           docker run -v "${{ github.workspace }}:/repo" --rm zricethezav/gitleaks:latest detect \
-            --source=/repo --redact --exit-code=1 --log-opts=--no-merges --first-parent
+            --source=/repo --redact --exit-code=1 --log-opts="--no-merges --first-parent"
