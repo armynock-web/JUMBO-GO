@@ -326,13 +326,16 @@ function SummaryCard({
   value,
   change,
   up,
+  down,
 }: {
   icon: React.ElementType;
   label: string;
   value: string;
   change: string;
   up?: boolean;
+  down?: boolean;
 }) {
+  const isUp = up ?? !down;
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -345,10 +348,10 @@ function SummaryCard({
         </span>
         <span
           className={`flex items-center gap-0.5 text-[10px] font-bold ${
-            up ? "text-green-600" : "text-jumbo"
+            isUp ? "text-green-600" : "text-jumbo"
           }`}
         >
-          {up ? (
+          {isUp ? (
             <TrendingUp className="h-3 w-3" />
           ) : (
             <TrendingDown className="h-3 w-3" />

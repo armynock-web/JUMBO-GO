@@ -72,6 +72,8 @@ export type BookingDraft = {
   estimatedPrice: number | null;
   waitFee: number;
   expresswayFee: number;
+  activeBookingId?: string | null;
+  activeJobNumber?: string | null;
 };
 
 type JumboState = {
@@ -95,6 +97,7 @@ type JumboState = {
   setDropoff: (p: LocationPoint) => void;
   setVehicle: (v: VehicleType) => void;
   setPrice: (km: number, price: number) => void;
+  setActiveBooking: (id: string, jobNumber: string) => void;
   setSearchProgress: (n: number) => void;
   setTrackingStep: (n: number) => void;
   setKycStep: (n: number) => void;
@@ -105,21 +108,31 @@ type JumboState = {
 };
 
 const initialDraft: BookingDraft = {
-  pickup: null,
-  dropoff: null,
-  vehicleType: null,
-  distanceKm: null,
-  estimatedPrice: null,
+  pickup: {
+    address: "สยามพารากอน (จุดรับสินค้า)",
+    sub: "991 ถ.พระราม 1 ปทุมวัน กรุงเทพฯ",
+    latitude: 13.7462,
+    longitude: 100.5347,
+  },
+  dropoff: {
+    address: "เมกาบางนา (จุดส่งสินค้า)",
+    sub: "39 หมู่ 6 ถ.บางนา-ตราด กม.8 บางพลี สมุทรปราการ",
+    latitude: 13.6467,
+    longitude: 100.6802,
+  },
+  vehicleType: "JUMBO",
+  distanceKm: 18.2,
+  estimatedPrice: 619,
   waitFee: 0,
-  expresswayFee: 0,
+  expresswayFee: 50,
 };
 
 export const useJumbo = create<JumboState>((set) => ({
   mode: "user",
-  screen: "splash",
+  screen: "home",
   history: [],
   draft: initialDraft,
-  isAuthenticated: false,
+  isAuthenticated: true,
   searchProgress: 0,
   trackingStep: 0,
   kycStep: 1,
@@ -162,6 +175,10 @@ export const useJumbo = create<JumboState>((set) => ({
   setPrice: (km, price) =>
     set((st) => ({
       draft: { ...st.draft, distanceKm: km, estimatedPrice: price },
+    })),
+  setActiveBooking: (id, jobNumber) =>
+    set((st) => ({
+      draft: { ...st.draft, activeBookingId: id, activeJobNumber: jobNumber },
     })),
   setSearchProgress: (n) => set({ searchProgress: n }),
   setTrackingStep: (n) => set({ trackingStep: n }),

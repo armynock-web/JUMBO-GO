@@ -24,17 +24,18 @@ import {
 export default function Page() {
   const screen = useJumbo((s) => s.screen);
   const mode = useJumbo((s) => s.mode);
-  const go = useJumbo((s) => s.go);
   const setMode = useJumbo((s) => s.setMode);
+  const go = useJumbo((s) => s.go);
   const [isDesktop, setIsDesktop] = useState(false);
 
   useEffect(() => {
+    setMode("user");
     const mq = window.matchMedia("(min-width: 1024px)");
     const onChange = () => setIsDesktop(mq.matches);
     onChange();
     mq.addEventListener("change", onChange);
     return () => mq.removeEventListener("change", onChange);
-  }, []);
+  }, [setMode]);
 
   // Mobile: render the app shell directly (full screen app)
   if (!isDesktop) {
@@ -228,12 +229,89 @@ export default function Page() {
   );
 }
 
-// Mobile view - render the app full screen with role switcher overlay
+// Mobile view - render the app full screen with role switcher & screen picker overlay
 function MobileApp() {
   const mode = useJumbo((s) => s.mode);
+  const screen = useJumbo((s) => s.screen);
   const setMode = useJumbo((s) => s.setMode);
+  const go = useJumbo((s) => s.go);
+  const [showPicker, setShowPicker] = useState(false);
+
+  const screensForMode =
+    mode === "user"
+      ? [
+          { id: "home" as const, label: "05 หน้าหลัก" },
+          { id: "pickup" as const, label: "06 จุดรับ" },
+          { id: "dropoff" as const, label: "07 จุดส่ง" },
+          { id: "vehicle-type" as const, label: "08 เลือกรถ" },
+          { id: "summary" as const, label: "09 สรุปราคา" },
+          { id: "confirm" as const, label: "10 ยืนยัน" },
+          { id: "searching" as const, label: "11 หาคนขับ" },
+          { id: "tracking" as const, label: "13 ติดตาม" },
+          { id: "jobs" as const, label: "15 ประวัติงาน (Live DB)" },
+          { id: "profile" as const, label: "17 โปรไฟล์" },
+        ]
+      : mode === "driver"
+        ? [
+            { id: "driver-dashboard" as const, label: "Dashboard คนขับ" },
+            { id: "driver-jobs" as const, label: "งานคนขับ" },
+            { id: "driver-onboarding" as const, label: "KYC 10 ขั้น" },
+            { id: "driver-earnings" as const, label: "รายได้" },
+          ]
+        : [
+            { id: "admin-dashboard" as const, label: "Admin Dash" },
+            { id: "admin-jobs" as const, label: "งานทั้งหมด" },
+            { id: "admin-drivers" as const, label: "คนขับ" },
+            { id: "admin-kyc" as const, label: "ตรวจ KYC" },
+          ];
+
   return (
     <div className="fixed inset-0 w-full overflow-hidden bg-white">
+      {/* top quick bar to jump screens */}
+      <div className="fixed top-2 right-2 z-50 flex items-center gap-1.5">
+        <button
+          onClick={() => setShowPicker(!showPicker)}
+          className="flex items-center gap-1 rounded-full border border-black/10 bg-black/85 px-3 py-1 text-[11px] font-bold text-white shadow-md backdrop-blur active:scale-95"
+          title="สลับหน้าพรีวิว UI"
+        >
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          หน้า: {screen}
+        </button>
+      </div>
+
+      {/* Screen quick switcher popup on mobile */}
+      {showPicker && (
+        <div className="fixed inset-x-3 top-12 z-50 max-h-[70vh] overflow-y-auto rounded-2xl border border-line bg-white/95 p-3 shadow-2xl backdrop-blur">
+          <div className="mb-2 flex items-center justify-between border-b border-line pb-2">
+            <span className="text-[12px] font-bold text-ink">เลือกดูหน้า UI (Preview)</span>
+            <button
+              onClick={() => setShowPicker(false)}
+              className="text-[11px] font-bold text-jumbo"
+            >
+              ปิด ✕
+            </button>
+          </div>
+          <div className="grid grid-cols-2 gap-1.5">
+            {screensForMode.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => {
+                  go(item.id);
+                  setShowPicker(false);
+                }}
+                className={`rounded-lg px-2.5 py-1.5 text-left text-[11px] font-medium transition ${
+                  screen === item.id
+                    ? "bg-jumbo text-white"
+                    : "bg-surface text-ink hover:bg-line/50"
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* floating role switcher */}
       <div className="fixed bottom-3 left-1/2 z-50 flex -translate-x-1/2 items-center gap-1 rounded-full border border-line bg-white/95 p-1 shadow-lg backdrop-blur">
         {[
