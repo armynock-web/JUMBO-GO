@@ -74,6 +74,15 @@ export type BookingDraft = {
   expresswayFee: number;
   activeBookingId?: string | null;
   activeJobNumber?: string | null;
+  senderName: string;
+  senderPhone: string;
+  receiverName: string;
+  receiverPhone: string;
+  hasHelper: boolean;
+  hasExpressway: boolean;
+  scheduleTime: string;
+  routeCoordinates: [number, number][];
+  durationMinutes: number;
 };
 
 type JumboState = {
@@ -88,6 +97,7 @@ type JumboState = {
   kycStep: number;
   kycSubmitted: boolean;
   driverOnline: boolean;
+  isAdminAuthenticated: boolean;
   // actions
   setMode: (m: Mode) => void;
   go: (s: ScreenId) => void;
@@ -97,12 +107,14 @@ type JumboState = {
   setDropoff: (p: LocationPoint) => void;
   setVehicle: (v: VehicleType) => void;
   setPrice: (km: number, price: number) => void;
+  updateDraft: (fields: Partial<BookingDraft>) => void;
   setActiveBooking: (id: string, jobNumber: string) => void;
   setSearchProgress: (n: number) => void;
   setTrackingStep: (n: number) => void;
   setKycStep: (n: number) => void;
   submitKyc: () => void;
   toggleDriverOnline: () => void;
+  setAdminAuthenticated: (val: boolean) => void;
   login: () => void;
   logout: () => void;
 };
@@ -125,6 +137,15 @@ const initialDraft: BookingDraft = {
   estimatedPrice: 619,
   waitFee: 0,
   expresswayFee: 50,
+  senderName: "สมหญิง ใจเย็น",
+  senderPhone: "082-345-6789",
+  receiverName: "ผู้รับสินค้าปลายทาง",
+  receiverPhone: "081-999-8888",
+  hasHelper: false,
+  hasExpressway: true,
+  scheduleTime: "immediate",
+  routeCoordinates: [],
+  durationMinutes: 32,
 };
 
 export const useJumbo = create<JumboState>((set) => ({
@@ -138,22 +159,25 @@ export const useJumbo = create<JumboState>((set) => ({
   kycStep: 1,
   kycSubmitted: false,
   driverOnline: false,
+  isAdminAuthenticated: false,
 
   setMode: (m) =>
-    set({
+    set((st) => ({
       mode: m,
       screen:
         m === "user"
-          ? "splash"
+          ? "home"
           : m === "driver"
-            ? "driver-register"
-            : "admin-login",
+            ? "driver-dashboard"
+            : st.isAdminAuthenticated
+              ? "admin-dashboard"
+              : "admin-login",
       history: [],
       draft: { ...initialDraft },
       kycStep: 1,
       kycSubmitted: false,
       driverOnline: false,
-    }),
+    })),
 
   go: (s) =>
     set((st) => ({
@@ -176,6 +200,10 @@ export const useJumbo = create<JumboState>((set) => ({
     set((st) => ({
       draft: { ...st.draft, distanceKm: km, estimatedPrice: price },
     })),
+  updateDraft: (fields) =>
+    set((st) => ({
+      draft: { ...st.draft, ...fields },
+    })),
   setActiveBooking: (id, jobNumber) =>
     set((st) => ({
       draft: { ...st.draft, activeBookingId: id, activeJobNumber: jobNumber },
@@ -185,16 +213,18 @@ export const useJumbo = create<JumboState>((set) => ({
   setKycStep: (n) => set({ kycStep: Math.max(1, Math.min(10, n)) }),
   submitKyc: () => set({ kycSubmitted: true }),
   toggleDriverOnline: () => set((st) => ({ driverOnline: !st.driverOnline })),
+  setAdminAuthenticated: (val) => set({ isAdminAuthenticated: val }),
 
   login: () => set({ isAuthenticated: true }),
   logout: () =>
-    set({
+    set((st) => ({
       isAuthenticated: false,
-      screen: "splash",
+      isAdminAuthenticated: false,
+      screen: st.mode === "admin" ? "admin-login" : "splash",
       history: [],
       draft: { ...initialDraft },
       kycStep: 1,
       kycSubmitted: false,
       driverOnline: false,
-    }),
+    })),
 }));

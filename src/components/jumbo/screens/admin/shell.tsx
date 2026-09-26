@@ -22,7 +22,8 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { AdminFleetMap } from "./fleet-map";
 
 const NAV: { id: ScreenId; label: string; icon: React.ElementType }[] = [
   { id: "admin-dashboard", label: "แดชบอร์ด", icon: LayoutGrid },
@@ -44,7 +45,17 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const go = useJumbo((s) => s.go);
   const screen = useJumbo((s) => s.screen);
   const logout = useJumbo((s) => s.logout);
+  const setAdminAuthenticated = useJumbo((s) => s.setAdminAuthenticated);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+
+  const handleLogout = () => {
+    if (typeof window !== "undefined") {
+      sessionStorage.removeItem("jumbo_admin_auth");
+    }
+    setAdminAuthenticated(false);
+    logout();
+    go("admin-login");
+  };
 
   return (
     <div className="flex h-full bg-surface">
@@ -90,7 +101,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         </nav>
         <div className="border-t border-line p-2">
           <button
-            onClick={logout}
+            onClick={handleLogout}
             className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-[12px] font-medium text-jumbo hover:bg-jumbo-light"
           >
             <LogOut className="h-4 w-4" />
@@ -155,6 +166,18 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                   );
                 })}
               </nav>
+              <div className="border-t border-line p-2 mt-2">
+                <button
+                  onClick={() => {
+                    handleLogout();
+                    setMobileNavOpen(false);
+                  }}
+                  className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-[12px] font-medium text-jumbo hover:bg-jumbo-light"
+                >
+                  <LogOut className="h-4 w-4" />
+                  ออกจากระบบ
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -176,39 +199,68 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
 // === Dashboard content ===
 export function AdminDashboardContent() {
+  const [stats, setStats] = useState<{
+    totalUsers?: number;
+    totalDrivers?: number;
+    onlineDrivers?: number;
+    totalBookingsToday?: number;
+    pendingKycCount?: number;
+    totalRevenueToday?: number;
+    completedBookings?: number;
+  }>({});
+
+  useEffect(() => {
+    fetch("/api/admin/stats")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success && data.stats) {
+          setStats(data.stats);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const usersCount = stats.totalUsers ?? 1420;
+  const driversCount = stats.totalDrivers ?? 248;
+  const bookingsToday = stats.totalBookingsToday ?? 86;
+  const kycPending = stats.pendingKycCount ?? 14;
+
   return (
     <div className="flex flex-col gap-4">
       {/* summary cards */}
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <SummaryCard
           icon={Users}
-          label="ผู้ใช้งาน"
-          value="1,420"
+          label="ผู้ใช้งานทั้งหมด"
+          value={usersCount.toLocaleString()}
           change="+128"
           up
         />
         <SummaryCard
           icon={Truck}
-          label="Driver"
-          value="248"
+          label="คนขับพาร์ทเนอร์"
+          value={driversCount.toLocaleString()}
           change="+12"
           up
         />
         <SummaryCard
           icon={Briefcase}
           label="งานวันนี้"
-          value="86"
+          value={bookingsToday.toLocaleString()}
           change="+15%"
           up
         />
         <SummaryCard
           icon={ShieldCheck}
           label="KYC รอตรวจ"
-          value="14"
+          value={kycPending.toLocaleString()}
           change="-3"
-          down
+          down={kycPending > 0}
         />
       </div>
+
+      {/* Live Fleet Map */}
+      <AdminFleetMap />
 
       {/* today stats */}
       <div className="grid grid-cols-1 gap-3 md:grid-cols-3">

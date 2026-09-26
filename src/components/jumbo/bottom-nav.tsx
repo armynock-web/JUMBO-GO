@@ -54,8 +54,6 @@ export function BottomNav() {
           );
         })}
       </div>
-      {/* iOS home indicator */}
-      <div className="mx-auto mb-1 h-1 w-28 rounded-full bg-ink/30" />
     </nav>
   );
 }

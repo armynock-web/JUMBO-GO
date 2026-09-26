@@ -31,9 +31,10 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    const body = await req.json().catch(() => ({}));
     const driverId = await resolveDriverId(
       req,
-      (await req.json().catch(() => ({}))).driverId
+      typeof body.driverId === "string" ? body.driverId : null
     );
     if (!driverId) {
       return NextResponse.json(
@@ -42,7 +43,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const body = await req.json().catch(() => ({}));
     const step = Number(body.step);
     const fields = (body.data || {}) as Record<string, unknown>;
 

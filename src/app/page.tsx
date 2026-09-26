@@ -2,22 +2,22 @@
 
 import { useEffect, useState } from "react";
 import { AppShell } from "@/components/jumbo/app-shell";
-import { CommercialMap } from "@/components/jumbo/commercial-map";
-import { JumboLogo } from "@/components/jumbo/logo";
-import { useJumbo, type ScreenId } from "@/store/jumbo";
+import { RealMap } from "@/components/jumbo/real-map";
+import { DesktopOnboarding } from "@/components/jumbo/desktop-onboarding";
+import { CustomerBookingConsole } from "@/components/jumbo/customer-booking-console";
+import { JobsScreen } from "@/components/jumbo/screens/jobs";
+import { ProfileScreen } from "@/components/jumbo/screens/profile";
+import { SearchingScreen } from "@/components/jumbo/screens/searching";
+import { TrackingScreen } from "@/components/jumbo/screens/tracking";
+import { CompletedScreen } from "@/components/jumbo/screens/completed";
+import { useJumbo } from "@/store/jumbo";
 import { BRAND } from "@/lib/brand";
 import {
   Truck,
-  ShieldCheck,
   PhoneCall,
-  Clock,
-  UserCheck,
   Briefcase,
-  Layers,
-  Sparkles,
-  ExternalLink,
+  HelpCircle,
 } from "lucide-react";
-import Link from "next/link";
 
 export default function Page() {
   const mode = useJumbo((s) => s.mode);
@@ -35,7 +35,7 @@ export default function Page() {
     return () => mq.removeEventListener("change", onChange);
   }, [setMode]);
 
-  // Mobile View (< 1024px): Real Full-screen Web App (No phone mockup, no developer frame)
+  // Mobile View (< 1024px): Full-screen Native Mobile Web App (100% viewport, no desktop sidebar)
   if (!isDesktop) {
     return (
       <div className="h-dvh w-full overflow-hidden bg-white">
@@ -44,17 +44,27 @@ export default function Page() {
     );
   }
 
-  // Desktop View (>= 1024px): Full Commercial Split-screen Logistics Web Platform (Lalamove / Deliveree style)
+  // Desktop View (>= 1024px):
+  // 1. If user clicks "แนะนำบริการ (1-2-3)", present the Full-width 1-2-3 Value Showcase
+  if (screen === "onboarding") {
+    return <DesktopOnboarding />;
+  }
+
+  // 2. Commercial Booking Console + Real Live Fleet Map
   return (
     <div className="flex h-screen w-screen flex-col overflow-hidden bg-slate-950 text-slate-900 font-sans">
-      {/* 1. Top Commercial Navbar */}
-      <header className="z-30 flex h-16 w-full flex-shrink-0 items-center justify-between border-b border-slate-200/20 bg-slate-900/90 px-6 backdrop-blur-md text-white">
+      {/* 1. Top Commercial Navbar (Customer Portal) */}
+      <header className="z-30 flex h-16 w-full flex-shrink-0 items-center justify-between border-b border-slate-200/20 bg-slate-900 px-6 text-white shadow-md">
         <div className="flex items-center gap-6">
           <div
             onClick={() => go("home")}
             className="flex cursor-pointer items-center gap-2.5 transition hover:opacity-90"
           >
-            <JumboLogo size={34} showWord={false} />
+            <img
+              src="/images/brand/app-icon.jpg"
+              alt="JUMBO GO"
+              className="h-8 w-8 rounded-lg object-contain shadow-xs"
+            />
             <div>
               <div className="flex items-center gap-1.5">
                 <span className="text-[17px] font-black italic tracking-tight text-white">
@@ -75,7 +85,7 @@ export default function Page() {
             <button
               onClick={() => go("home")}
               className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[13px] font-medium transition ${
-                screen !== "jobs"
+                screen !== "jobs" && screen !== "profile"
                   ? "bg-white/15 text-white"
                   : "text-slate-300 hover:bg-white/10"
               }`}
@@ -94,22 +104,13 @@ export default function Page() {
               <Briefcase className="h-4 w-4" />
               รายการจองของฉัน
             </button>
-            <Link
-              href="/driver"
+            <button
+              onClick={() => go("onboarding")}
               className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[13px] font-medium text-slate-300 hover:bg-white/10 hover:text-white transition"
             >
-              <UserCheck className="h-4 w-4 text-amber-400" />
-              สำหรับคนขับ (Driver Portal)
-              <ExternalLink className="h-3 w-3 text-slate-500" />
-            </Link>
-            <Link
-              href="/admin"
-              className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[13px] font-medium text-slate-300 hover:bg-white/10 hover:text-white transition"
-            >
-              <ShieldCheck className="h-4 w-4 text-blue-400" />
-              ผู้ดูแลระบบ (Admin)
-              <ExternalLink className="h-3 w-3 text-slate-500" />
-            </Link>
+              <HelpCircle className="h-4 w-4 text-amber-400" />
+              แนะนำบริการ (1-2-3)
+            </button>
           </nav>
         </div>
 
@@ -133,16 +134,28 @@ export default function Page() {
 
       {/* 2. Main Split-screen Workspace */}
       <main className="relative flex flex-1 overflow-hidden">
-        {/* Left Column: Customer Booking Console (AppShell without phone mockup) */}
-        <section className="relative z-20 flex h-full w-[480px] flex-shrink-0 flex-col border-r border-slate-200 bg-white shadow-2xl">
+        {/* Left Column: Customer Booking Console */}
+        <section className="relative z-20 flex h-full w-[490px] flex-shrink-0 flex-col border-r border-slate-200 bg-white shadow-2xl">
           <div className="flex-1 overflow-hidden">
-            <AppShell />
+            {screen === "jobs" ? (
+              <JobsScreen />
+            ) : screen === "profile" ? (
+              <ProfileScreen />
+            ) : screen === "searching" ? (
+              <SearchingScreen />
+            ) : screen === "tracking" ? (
+              <TrackingScreen />
+            ) : screen === "completed" ? (
+              <CompletedScreen />
+            ) : (
+              <CustomerBookingConsole />
+            )}
           </div>
         </section>
 
-        {/* Right Column: Commercial Interactive Logistics Map & Real-time Fleet Canvas */}
+        {/* Right Column: Commercial Interactive Logistics Map with Real Road Routing */}
         <section className="relative flex-1 h-full overflow-hidden">
-          <CommercialMap />
+          <RealMap />
         </section>
       </main>
     </div>

@@ -52,3 +52,6 @@ prompt
 
 # server log
 server.log
+
+# agent artifacts
+.agents

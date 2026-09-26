@@ -12,7 +12,7 @@ import { PickupScreen } from "./screens/pickup";
 import { DropoffScreen } from "./screens/dropoff";
 import { VehicleTypeScreen } from "./screens/vehicle-type";
 import { SummaryScreen } from "./screens/summary";
-import { ConfirmScreen } from "./screens/confirm";
+import { CustomerBookingConsole } from "./customer-booking-console";
 import { SearchingScreen } from "./screens/searching";
 import { DriverFoundScreen } from "./screens/driver-found";
 import { TrackingScreen } from "./screens/tracking";
@@ -122,17 +122,12 @@ function renderScreen(screen: string) {
     case "verify-otp":
       return <VerifyOtpScreen />;
     case "home":
-      return <HomeScreen />;
     case "pickup":
-      return <PickupScreen />;
     case "dropoff":
-      return <DropoffScreen />;
     case "vehicle-type":
-      return <VehicleTypeScreen />;
     case "summary":
-      return <SummaryScreen />;
     case "confirm":
-      return <ConfirmScreen />;
+      return <CustomerBookingConsole />;
     case "searching":
       return <SearchingScreen />;
     case "driver-found":
