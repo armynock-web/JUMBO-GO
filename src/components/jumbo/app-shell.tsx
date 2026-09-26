@@ -89,7 +89,7 @@ export function AppShell() {
   return (
     <div
       id="jumbo-scroll"
-      className="relative h-full w-full overflow-y-auto overflow-x-hidden bg-white scrollbar-hide"
+      className="relative flex h-full w-full flex-col overflow-y-auto overflow-x-hidden bg-white scrollbar-hide"
     >
       <AnimatePresence mode="wait">
         <motion.div
@@ -98,7 +98,7 @@ export function AppShell() {
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -24 }}
           transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
-          className="min-h-full"
+          className="flex min-h-full flex-1 flex-col"
         >
           {renderScreen(screen)}
         </motion.div>
