@@ -43,6 +43,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:
@@ -55,7 +57,8 @@ jobs:
       - name: npm audit (fail on high+)
         run: npm audit --audit-level=high
 
-      - name: Secret scan (Gitleaks)
-        uses: gitleaks/gitleaks-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Secret scan (Gitleaks - full history)
+        run: |
+          docker pull zricethezav/gitleaks:latest
+          docker run -v "${{ github.workspace }}:/repo" --rm zricethezav/gitleaks:latest detect \
+            --source=/repo --redact --exit-code=1 --log-opts=--no-merges --first-parent
