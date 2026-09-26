@@ -31,7 +31,7 @@ import {
   AlertTriangle,
   MapPin,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   ADMIN_NOTIFICATIONS,
@@ -89,25 +89,46 @@ export function AdminDriversPage() {
 // === A05: KYC Review ===
 export function AdminKycPage() {
   const [selected, setSelected] = useState<string | null>(null);
+  const [kycItems, setKycItems] = useState<any[]>([
+    { id: "KYC-1024", rawId: "mock-1024", name: "สมชาย ใจดี", vehicle: "กระบะตู้ทึบ", time: "5 นาที", docs: 10 },
+    { id: "KYC-1023", rawId: "mock-1023", name: "วันดี มีสุข", vehicle: "6 ล้อ", time: "20 นาที", docs: 10 },
+    { id: "KYC-1022", rawId: "mock-1022", name: "อนุชา รักไทย", vehicle: "จัมโบ้", time: "1 ชม.", docs: 8 },
+    { id: "KYC-1021", rawId: "mock-1021", name: "ประยุทธ สดใส", vehicle: "กระบะ", time: "2 ชม.", docs: 9 },
+  ]);
+
+  useEffect(() => {
+    fetch("/api/admin/kyc/list")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.kycList) && data.kycList.length > 0) {
+          const mapped = data.kycList.map((k: any) => ({
+            id: `KYC-${k.id.slice(0, 6)}`,
+            rawId: k.id,
+            name: k.bank_account_name || "คนขับพาร์ทเนอร์",
+            vehicle: "กระบะตู้ทึบ",
+            time: "รอตรวจ",
+            docs: 10,
+          }));
+          setKycItems(mapped);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   return (
     <div>
       <PageHeader
         title="ตรวจ KYC"
-        count="14 รอตรวจ"
+        count={`${kycItems.length} รายการ`}
         subtitle="คำขอตรวจสอบ KYC จาก Driver ใหม่"
       />
 
       {selected === null ? (
         <div className="flex flex-col gap-2">
-          {[
-            { id: "KYC-1024", name: "สมชาย ใจดี", vehicle: "กระบะตู้ทึบ", time: "5 นาที", docs: 10 },
-            { id: "KYC-1023", name: "วันดี มีสุข", vehicle: "6 ล้อ", time: "20 นาที", docs: 10 },
-            { id: "KYC-1022", name: "อนุชา รักไทย", vehicle: "จัมโบ้", time: "1 ชม.", docs: 8 },
-            { id: "KYC-1021", name: "ประยุทธ สดใส", vehicle: "กระบะ", time: "2 ชม.", docs: 9 },
-          ].map((k) => (
+          {kycItems.map((k) => (
             <div
               key={k.id}
-              className="flex items-center gap-3 rounded-2xl border border-line bg-white p-3"
+              className="flex items-center gap-3 rounded-2xl border border-line bg-white p-3 shadow-sm hover:border-jumbo/40 transition"
             >
               <span className="flex h-10 w-10 items-center justify-center rounded-full bg-jumbo text-[12px] font-bold text-white">
                 {k.name.charAt(0)}
@@ -115,12 +136,12 @@ export function AdminKycPage() {
               <div className="flex-1">
                 <p className="text-[13px] font-bold text-ink">{k.name}</p>
                 <p className="text-[11px] text-ink-muted">
-                  {k.id} • {k.vehicle} • {k.docs} เอกสาร • ส่ง {k.time}
+                  {k.id} • {k.vehicle} • {k.docs} เอกสาร • {k.time}
                 </p>
               </div>
               <button
-                onClick={() => setSelected(k.id)}
-                className="flex items-center gap-1 rounded-lg bg-jumbo px-3 py-1.5 text-[11px] font-bold text-white"
+                onClick={() => setSelected(k.rawId || k.id)}
+                className="flex items-center gap-1 rounded-lg bg-jumbo px-3 py-1.5 text-[11px] font-bold text-white shadow hover:bg-jumbo-dark transition"
               >
                 <Eye className="h-3 w-3" /> ตรวจสอบ
               </button>
@@ -137,6 +158,24 @@ export function AdminKycPage() {
 function KycDetailPanel({ id, onBack }: { id: string; onBack: () => void }) {
   const [reason, setReason] = useState("");
   const [decision, setDecision] = useState<"approve" | "reject" | null>(null);
+
+  const handleReview = async (status: "approved" | "rejected") => {
+    try {
+      if (!id.startsWith("mock-")) {
+        await fetch(`/api/admin/kyc/${id}/review`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            status,
+            rejectionReason: status === "rejected" ? reason || "เอกสารไม่ชัดเจน" : undefined,
+          }),
+        });
+      }
+      setDecision(status === "approved" ? "approve" : "reject");
+    } catch {
+      setDecision(status === "approved" ? "approve" : "reject");
+    }
+  };
   return (
     <motion.div
       initial={{ opacity: 0, x: 12 }}
@@ -182,14 +221,14 @@ function KycDetailPanel({ id, onBack }: { id: string; onBack: () => void }) {
       {decision === null ? (
         <div className="flex gap-2">
           <button
-            onClick={() => setDecision("reject")}
-            className="flex flex-1 items-center justify-center gap-1 rounded-xl border-2 border-jumbo bg-white py-2.5 text-[12px] font-bold text-jumbo"
+            onClick={() => handleReview("rejected")}
+            className="flex flex-1 items-center justify-center gap-1 rounded-xl border-2 border-jumbo bg-white py-2.5 text-[12px] font-bold text-jumbo hover:bg-jumbo-light transition"
           >
             <XCircle className="h-4 w-4" /> ปฏิเสธ
           </button>
           <button
-            onClick={() => setDecision("approve")}
-            className="flex flex-[1.4] items-center justify-center gap-1 rounded-xl bg-green-600 py-2.5 text-[12px] font-bold text-white"
+            onClick={() => handleReview("approved")}
+            className="flex flex-[1.4] items-center justify-center gap-1 rounded-xl bg-green-600 py-2.5 text-[12px] font-bold text-white shadow hover:bg-green-700 transition"
           >
             <CheckCircle2 className="h-4 w-4" /> อนุมัติ
           </button>

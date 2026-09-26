@@ -1,16 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect } from "react";
 import { useJumbo } from "@/store/jumbo";
 import { AppShell } from "@/components/jumbo/app-shell";
 
 export default function AdminPage() {
-  useState(() => {
-    useJumbo.getState().setMode("admin");
-  });
+  useEffect(() => {
+    const store = useJumbo.getState();
+    store.setMode("admin");
+    if (!store.screen.startsWith("admin-") || store.screen === "admin-login") {
+      store.go("admin-dashboard");
+    }
+  }, []);
 
   return (
-    <div className="h-dvh w-full overflow-hidden bg-white">
+    <div className="h-screen w-screen overflow-hidden bg-surface">
       <AppShell />
     </div>
   );

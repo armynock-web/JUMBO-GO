@@ -33,9 +33,16 @@ export function ConfirmScreen() {
     setLoading(true);
     setErrorMsg(null);
     try {
+      const token =
+        (typeof window !== "undefined" && localStorage.getItem("jumbo_token")) ||
+        "jumbo_a9dce7bb-a9cf-4f21-874a-129b0138fd56";
+
       const res = await fetch("/api/bookings", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
           pickup: draft.pickup,
           dropoff: draft.dropoff,

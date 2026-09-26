@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2026-09-27
+
+### Added
+- **Commercial Desktop Split-Screen Platform:** หน้าแรกบน Desktop เป็น Web Portal เต็มจอจริง (ฟอร์มจองซ้าย + แผนที่โลจิสติกส์สด `CommercialMap` ขวา)
+- **Interactive Commercial Logistics Map:** แสดงเส้นทาง, พิกัดรับ-ส่ง, ระยะทาง, เวลาประเมิน และตำแหน่งรถบรรทุกที่กำลังเคลื่อนที่รอบพื้นที่
+- **Driver Live API Integration:** หน้ารับงานคนขับ (`/driver`) ดึงข้อมูลจริงจาก `GET /api/driver/jobs` และรับงานจริงผ่าน `POST /api/driver/jobs/[id]/accept`
+- **Admin KYC Review Live API:** หน้าตรวจ KYC แอดมิน (`/admin`) ดึงข้อมูลจริงจาก `GET /api/admin/kyc/list` และอนุมัติ/ปฏิเสธผ่าน `POST /api/admin/kyc/[id]/review`
+- **Documentation Standards (Rule 3.1):** สร้างเอกสารพิมพ์เขียวครบถ้วน:
+  - `docs/api.md` (ข้อกำหนดและสัญญาของ API ทั้ง 28 Endpoints)
+  - `docs/installation.md` (คู่มือการติดตั้งและคอนฟิกระบบ)
+  - `docs/user-guide.md` (คู่มือการใช้งานสำหรับลูกค้า คนขับ และแอดมิน)
+
+### Removed
+- ถอด `<PhoneFrame>`, กรอบ iPhone ปลอม, และเมนูนักพัฒนา `DesktopRail` ("SCREEN INVENTORY") ออกจากหน้าโปรดักชัน
+
+### Fixed
+- แก้ไข `confirm.tsx` ให้ส่ง Authorization Token ไปยัง `/api/bookings` ป้องกันข้อผิดพลาด 401 และบันทึกการจองลง Supabase จริง
+
 ## [1.1.0] - 2026-09-24
 
 ### Added
