@@ -61,7 +61,7 @@ export function JobsScreen() {
 
   // Filter list
   const filteredList = dbBookings.filter((b) => {
-    if (filter === "active") return b.status === "searching" || b.status === "pending" || b.status === "accepted" || b.status === "in_progress";
+    if (filter === "active") return b.status !== "completed" && b.status !== "cancelled";
     if (filter === "done") return b.status === "completed";
     return true;
   });

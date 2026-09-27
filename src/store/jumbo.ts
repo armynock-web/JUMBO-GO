@@ -220,7 +220,12 @@ export const useJumbo = create<JumboState>((set) => ({
     set((st) => ({
       isAuthenticated: false,
       isAdminAuthenticated: false,
-      screen: st.mode === "admin" ? "admin-login" : "splash",
+      screen:
+        st.mode === "admin"
+          ? "admin-login"
+          : st.mode === "driver"
+            ? "driver-login"
+            : "home",
       history: [],
       draft: { ...initialDraft },
       kycStep: 1,
