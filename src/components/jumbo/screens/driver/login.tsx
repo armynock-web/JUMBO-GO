@@ -30,8 +30,11 @@ export function DriverLoginScreen() {
     setTimeout(() => {
       setLoading(false);
       login();
-      // Driver who logs in goes to onboarding (KYC not yet approved) OR dashboard
-      go("driver-onboarding");
+      if (phone.includes("081-234-5678") || password === "driver") {
+        go("driver-dashboard");
+      } else {
+        go("driver-onboarding");
+      }
     }, 700);
   };
 

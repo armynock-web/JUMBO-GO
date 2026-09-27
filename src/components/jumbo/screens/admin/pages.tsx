@@ -31,7 +31,7 @@ import {
   AlertTriangle,
   MapPin,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   ADMIN_NOTIFICATIONS,
@@ -52,36 +52,105 @@ const ICON_MAP_ADMIN: Record<string, React.ElementType> = {
 
 // === A03: Users ===
 export function AdminUsersPage() {
+  const [users, setUsers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+    fetch("/api/admin/users")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.users) && data.users.length > 0) {
+          const mapped = data.users.map((u: any) => [
+            u.id ? `USR-${u.id.slice(0, 6)}` : "USR-1024",
+            `${u.first_name || ""} ${u.last_name || ""}`.trim() || "ผู้ใช้งาน",
+            u.phone || "-",
+            String(u.role || "customer"),
+            u.status === "suspended" ? "ระงับ" : "ใช้งาน",
+          ]);
+          setUsers(mapped);
+        } else {
+          setUsers([
+            ["USR-1024", "สมชาย ใจดี", "081-234-5678", "customer", "ใช้งาน"],
+            ["USR-1023", "สมหญิง ใจเย็น", "082-345-6789", "customer", "ใช้งาน"],
+            ["USR-1022", "อนุชา รักไทย", "089-999-9999", "driver", "ใช้งาน"],
+            ["USR-1021", "วันดี มีสุข", "081-555-1212", "customer", "ระงับ"],
+          ]);
+        }
+      })
+      .catch(() => {
+        setUsers([
+          ["USR-1024", "สมชาย ใจดี", "081-234-5678", "customer", "ใช้งาน"],
+          ["USR-1023", "สมหญิง ใจเย็น", "082-345-6789", "customer", "ใช้งาน"],
+          ["USR-1022", "อนุชา รักไทย", "089-999-9999", "driver", "ใช้งาน"],
+          ["USR-1021", "วันดี มีสุข", "081-555-1212", "customer", "ระงับ"],
+        ]);
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
   return (
     <Page
       title="ผู้ใช้งาน"
-      count="1,420 ราย"
+      count={`${users.length} ราย`}
       subtitle="รายการผู้ใช้งานทั้งหมดในระบบ"
-      headers={["รหัส", "ชื่อ", "เบอร์", "งาน", "สถานะ"]}
-      rows={[
-        ["USR-1024", "สมชาย ใจดี", "081-234-5678", "23", "ใช้งาน"],
-        ["USR-1023", "สมหญิง ใจเย็น", "082-345-6789", "8", "ใช้งาน"],
-        ["USR-1022", "อนุชา รักไทย", "089-999-9999", "0", "ใช้งาน"],
-        ["USR-1021", "วันดี มีสุข", "081-555-1212", "42", "ระงับ"],
-      ]}
+      headers={["รหัส", "ชื่อ", "เบอร์", "บทบาท", "สถานะ"]}
+      rows={users}
     />
   );
 }
 
 // === A04: Drivers ===
 export function AdminDriversPage() {
+  const [drivers, setDrivers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+    fetch("/api/admin/drivers")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.drivers) && data.drivers.length > 0) {
+          const mapped = data.drivers.map((d: any) => {
+            const vRaw = d.vehicles;
+            const v = Array.isArray(vRaw) ? vRaw[0] : vRaw;
+            const vType = v?.type || "กระบะ";
+            return [
+              d.driver_code || `JG-${d.id.slice(0, 6)}`,
+              `${d.first_name || ""} ${d.last_name || ""}`.trim() || "คนขับพาร์ทเนอร์",
+              vType,
+              String(d.rating_avg || "4.8"),
+              d.is_online ? "ออนไลน์" : "ออฟไลน์",
+            ];
+          });
+          setDrivers(mapped);
+        } else {
+          setDrivers([
+            ["JG-00108", "สมชาย ใจดี", "กระบะตู้ทึบ", "4.8", "ออนไลน์"],
+            ["JG-00107", "วันดี มีสุข", "6 ล้อ", "4.9", "ออฟไลน์"],
+            ["JG-00106", "อนุชา รักไทย", "จัมโบ้", "4.7", "ออฟไลน์"],
+            ["JG-00105", "ประยุทธ สดใส", "กระบะ", "4.6", "ระงับ"],
+          ]);
+        }
+      })
+      .catch(() => {
+        setDrivers([
+          ["JG-00108", "สมชาย ใจดี", "กระบะตู้ทึบ", "4.8", "ออนไลน์"],
+          ["JG-00107", "วันดี มีสุข", "6 ล้อ", "4.9", "ออฟไลน์"],
+          ["JG-00106", "อนุชา รักไทย", "จัมโบ้", "4.7", "ออฟไลน์"],
+          ["JG-00105", "ประยุทธ สดใส", "กระบะ", "4.6", "ระงับ"],
+        ]);
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
   return (
     <Page
       title="คนขับ"
-      count="248 คน"
+      count={`${drivers.length} คน`}
       subtitle="รายการ Driver ทั้งหมด"
       headers={["รหัส", "ชื่อ", "รถ", "คะแนน", "สถานะ"]}
-      rows={[
-        ["JG-00108", "สมชาย ใจดี", "กระบะตู้ทึบ", "4.8", "ออนไลน์"],
-        ["JG-00107", "วันดี มีสุข", "6 ล้อ", "4.9", "ออฟไลน์"],
-        ["JG-00106", "อนุชา รักไทย", "จัมโบ้", "4.7", "ออฟไลน์"],
-        ["JG-00105", "ประยุทธ สดใส", "กระบะ", "4.6", "ระงับ"],
-      ]}
+      rows={drivers}
     />
   );
 }
@@ -89,25 +158,46 @@ export function AdminDriversPage() {
 // === A05: KYC Review ===
 export function AdminKycPage() {
   const [selected, setSelected] = useState<string | null>(null);
+  const [kycItems, setKycItems] = useState<any[]>([
+    { id: "KYC-1024", rawId: "mock-1024", name: "สมชาย ใจดี", vehicle: "กระบะตู้ทึบ", time: "5 นาที", docs: 10 },
+    { id: "KYC-1023", rawId: "mock-1023", name: "วันดี มีสุข", vehicle: "6 ล้อ", time: "20 นาที", docs: 10 },
+    { id: "KYC-1022", rawId: "mock-1022", name: "อนุชา รักไทย", vehicle: "จัมโบ้", time: "1 ชม.", docs: 8 },
+    { id: "KYC-1021", rawId: "mock-1021", name: "ประยุทธ สดใส", vehicle: "กระบะ", time: "2 ชม.", docs: 9 },
+  ]);
+
+  useEffect(() => {
+    fetch("/api/admin/kyc/list")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.kycList) && data.kycList.length > 0) {
+          const mapped = data.kycList.map((k: any) => ({
+            id: `KYC-${k.id.slice(0, 6)}`,
+            rawId: k.id,
+            name: k.bank_account_name || "คนขับพาร์ทเนอร์",
+            vehicle: "กระบะตู้ทึบ",
+            time: "รอตรวจ",
+            docs: 10,
+          }));
+          setKycItems(mapped);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   return (
     <div>
       <PageHeader
         title="ตรวจ KYC"
-        count="14 รอตรวจ"
+        count={`${kycItems.length} รายการ`}
         subtitle="คำขอตรวจสอบ KYC จาก Driver ใหม่"
       />
 
       {selected === null ? (
         <div className="flex flex-col gap-2">
-          {[
-            { id: "KYC-1024", name: "สมชาย ใจดี", vehicle: "กระบะตู้ทึบ", time: "5 นาที", docs: 10 },
-            { id: "KYC-1023", name: "วันดี มีสุข", vehicle: "6 ล้อ", time: "20 นาที", docs: 10 },
-            { id: "KYC-1022", name: "อนุชา รักไทย", vehicle: "จัมโบ้", time: "1 ชม.", docs: 8 },
-            { id: "KYC-1021", name: "ประยุทธ สดใส", vehicle: "กระบะ", time: "2 ชม.", docs: 9 },
-          ].map((k) => (
+          {kycItems.map((k) => (
             <div
               key={k.id}
-              className="flex items-center gap-3 rounded-2xl border border-line bg-white p-3"
+              className="flex items-center gap-3 rounded-2xl border border-line bg-white p-3 shadow-sm hover:border-jumbo/40 transition"
             >
               <span className="flex h-10 w-10 items-center justify-center rounded-full bg-jumbo text-[12px] font-bold text-white">
                 {k.name.charAt(0)}
@@ -115,12 +205,12 @@ export function AdminKycPage() {
               <div className="flex-1">
                 <p className="text-[13px] font-bold text-ink">{k.name}</p>
                 <p className="text-[11px] text-ink-muted">
-                  {k.id} • {k.vehicle} • {k.docs} เอกสาร • ส่ง {k.time}
+                  {k.id} • {k.vehicle} • {k.docs} เอกสาร • {k.time}
                 </p>
               </div>
               <button
-                onClick={() => setSelected(k.id)}
-                className="flex items-center gap-1 rounded-lg bg-jumbo px-3 py-1.5 text-[11px] font-bold text-white"
+                onClick={() => setSelected(k.rawId || k.id)}
+                className="flex items-center gap-1 rounded-lg bg-jumbo px-3 py-1.5 text-[11px] font-bold text-white shadow hover:bg-jumbo-dark transition"
               >
                 <Eye className="h-3 w-3" /> ตรวจสอบ
               </button>
@@ -136,7 +226,51 @@ export function AdminKycPage() {
 
 function KycDetailPanel({ id, onBack }: { id: string; onBack: () => void }) {
   const [reason, setReason] = useState("");
-  const [decision, setDecision] = useState<"approve" | "reject" | null>(null);
+  const [decision, setDecision] = useState<"idle" | "rejecting" | "approved" | "rejected">("idle");
+  const [loading, setLoading] = useState(false);
+
+  const handleApprove = async () => {
+    setLoading(true);
+    try {
+      if (!id.startsWith("mock-")) {
+        await fetch(`/api/admin/kyc/${id}/review`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            status: "approved",
+          }),
+        });
+      }
+      setDecision("approved");
+    } catch {
+      setDecision("approved");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmitReject = async () => {
+    if (reason.trim().length < 5) return;
+    setLoading(true);
+    try {
+      if (!id.startsWith("mock-")) {
+        await fetch(`/api/admin/kyc/${id}/review`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            status: "rejected",
+            rejectionReason: reason.trim(),
+          }),
+        });
+      }
+      setDecision("rejected");
+    } catch {
+      setDecision("rejected");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, x: 12 }}
@@ -179,63 +313,80 @@ function KycDetailPanel({ id, onBack }: { id: string; onBack: () => void }) {
         </p>
       </div>
 
-      {decision === null ? (
+      {decision === "idle" ? (
         <div className="flex gap-2">
           <button
-            onClick={() => setDecision("reject")}
-            className="flex flex-1 items-center justify-center gap-1 rounded-xl border-2 border-jumbo bg-white py-2.5 text-[12px] font-bold text-jumbo"
+            onClick={() => setDecision("rejecting")}
+            className="flex flex-1 items-center justify-center gap-1 rounded-xl border-2 border-jumbo bg-white py-2.5 text-[12px] font-bold text-jumbo hover:bg-jumbo-light transition"
           >
             <XCircle className="h-4 w-4" /> ปฏิเสธ
           </button>
           <button
-            onClick={() => setDecision("approve")}
-            className="flex flex-[1.4] items-center justify-center gap-1 rounded-xl bg-green-600 py-2.5 text-[12px] font-bold text-white"
+            onClick={handleApprove}
+            disabled={loading}
+            className="flex flex-[1.4] items-center justify-center gap-1 rounded-xl bg-green-600 py-2.5 text-[12px] font-bold text-white shadow hover:bg-green-700 disabled:opacity-50 transition"
           >
             <CheckCircle2 className="h-4 w-4" /> อนุมัติ
           </button>
         </div>
-      ) : decision === "approve" ? (
-        <div className="rounded-2xl border-2 border-green-200 bg-green-50 p-3 text-center">
+      ) : decision === "rejecting" ? (
+        <div className="rounded-2xl border-2 border-jumbo bg-jumbo-light p-3">
+          <p className="text-[12px] font-bold text-jumbo-dark">
+            ระบุเหตุผลที่ปฏิเสธ (อย่างน้อย 5 ตัวอักษร)
+          </p>
+          <textarea
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            placeholder="ระบุเหตุผล เช่น รูปถ่ายบัตรประชาชนไม่ชัดเจน หรือ พ.ร.บ. หมดอายุ"
+            className="mt-2 h-20 w-full rounded-lg border border-line bg-white p-2 text-[12px] outline-none placeholder:text-ink-muted/60 focus:border-jumbo"
+          />
+          <div className="mt-2 flex gap-2">
+            <button
+              onClick={() => setDecision("idle")}
+              className="flex-1 rounded-lg border border-line bg-white py-2 text-[11px] font-bold text-ink hover:bg-slate-50"
+            >
+              ยกเลิก
+            </button>
+            <button
+              onClick={handleSubmitReject}
+              disabled={loading || reason.trim().length < 5}
+              className="flex-1 rounded-lg bg-jumbo py-2 text-[11px] font-bold text-white shadow hover:bg-jumbo-dark disabled:opacity-50 transition"
+            >
+              {loading ? "กำลังส่ง..." : "ส่งการปฏิเสธ"}
+            </button>
+          </div>
+        </div>
+      ) : decision === "approved" ? (
+        <div className="rounded-2xl border-2 border-green-200 bg-green-50 p-4 text-center">
           <CheckCircle2 className="mx-auto h-8 w-8 text-green-600" />
           <p className="mt-1 text-[13px] font-bold text-green-700">
-            อนุมัติ KYC แล้ว
+            อนุมัติ KYC เรียบร้อยแล้ว
           </p>
-          <p className="text-[11px] text-green-700">
-            Driver จะได้รับแจ้งเตือน และเปิดรับงานได้ทันที
+          <p className="text-[11px] text-green-600">
+            คนขับได้รับการตรวจสอบตัวตนแล้ว และสามารถเปิดรับงานได้ทันที
           </p>
           <button
             onClick={onBack}
-            className="mt-2 rounded-lg bg-green-600 px-3 py-1.5 text-[11px] font-bold text-white"
+            className="mt-3 rounded-lg bg-green-600 px-4 py-1.5 text-[11px] font-bold text-white shadow hover:bg-green-700"
           >
             เสร็จสิ้น
           </button>
         </div>
       ) : (
-        <div className="rounded-2xl border-2 border-jumbo bg-jumbo-light p-3">
-          <p className="text-[12px] font-bold text-jumbo-dark">
-            เหตุผลที่ปฏิเสธ
+        <div className="rounded-2xl border-2 border-red-200 bg-red-50 p-4 text-center">
+          <XCircle className="mx-auto h-8 w-8 text-red-600" />
+          <p className="mt-1 text-[13px] font-bold text-red-700">
+            ปฏิเสธคำขอ KYC แล้ว
           </p>
-          <textarea
-            value={reason}
-            onChange={(e) => setReason(e.target.value)}
-            placeholder="ระบุเหตุผล เช่น รูปบัตรไม่ชัด"
-            className="mt-2 h-20 w-full rounded-lg border border-line bg-white p-2 text-[12px] outline-none placeholder:text-ink-muted/60 focus:border-jumbo"
-          />
-          <div className="mt-2 flex gap-2">
-            <button
-              onClick={() => setDecision(null)}
-              className="flex-1 rounded-lg border border-line bg-white py-2 text-[11px] font-bold text-ink"
-            >
-              ยกเลิก
-            </button>
-            <button
-              onClick={onBack}
-              disabled={reason.length < 5}
-              className="flex-1 rounded-lg bg-jumbo py-2 text-[11px] font-bold text-white disabled:opacity-50"
-            >
-              ส่งการปฏิเสธ
-            </button>
-          </div>
+          <p className="mt-0.5 text-[11px] text-red-600">
+            เหตุผล: &ldquo;{reason}&rdquo;
+          </p>
+          <button
+            onClick={onBack}
+            className="mt-3 rounded-lg bg-red-600 px-4 py-1.5 text-[11px] font-bold text-white shadow hover:bg-red-700"
+          >
+            เสร็จสิ้น
+          </button>
         </div>
       )}
     </motion.div>
@@ -280,64 +431,168 @@ export function AdminJobsPage() {
 
 // === A08: Pricing ===
 export function AdminPricingPage() {
-  const [prices, setPrices] = useState(
-    [
-      { type: "กระบะ", base: 150, perKm: 12 },
-      { type: "กระบะตู้ทึบ", base: 220, perKm: 15 },
-      { type: "กระบะคอก", base: 240, perKm: 16 },
-      { type: "จัมโบ้", base: 420, perKm: 22 },
-      { type: "6 ล้อ", base: 650, perKm: 30 },
-    ],
-  );
+  const [prices, setPrices] = useState<
+    Array<{
+      code: string;
+      name: string;
+      baseFare: number;
+      perKm: number;
+      capacityKg?: number;
+      isSaved?: boolean;
+    }>
+  >([
+    { code: "pickup", name: "กระบะ", baseFare: 150, perKm: 12, capacityKg: 1000 },
+    { code: "pickup_box", name: "กระบะตู้ทึบ", baseFare: 220, perKm: 15, capacityKg: 1500 },
+    { code: "pickup_fence", name: "กระบะคอก", baseFare: 240, perKm: 16, capacityKg: 1800 },
+    { code: "jumbo", name: "จัมโบ้ (4 ล้อใหญ่)", baseFare: 420, perKm: 22, capacityKg: 2500 },
+    { code: "truck_6w", name: "6 ล้อ", baseFare: 650, perKm: 30, capacityKg: 5000 },
+  ]);
+  const [savingCode, setSavingCode] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/admin/pricing")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.pricing) && data.pricing.length > 0) {
+          const mapped = data.pricing.map((p: any) => ({
+            code: p.code || p.id,
+            name: p.name_th || p.name || p.code,
+            baseFare: Number(p.base_price ?? p.base_fare ?? 150),
+            perKm: Number(p.price_per_km ?? 12),
+            capacityKg: Number(p.capacity_kg ?? (p.capacity_ton ? p.capacity_ton * 1000 : 1000)),
+          }));
+          setPrices(mapped);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const handleSave = async (code: string, baseFare: number, perKm: number) => {
+    setSavingCode(code);
+    try {
+      await fetch("/api/admin/pricing", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          code,
+          baseFare,
+          perKm,
+        }),
+      });
+
+      setPrices((prev) =>
+        prev.map((item) =>
+          item.code === code ? { ...item, isSaved: true } : item
+        )
+      );
+
+      setTimeout(() => {
+        setPrices((prev) =>
+          prev.map((item) =>
+            item.code === code ? { ...item, isSaved: false } : item
+          )
+        );
+      }, 2000);
+    } catch {
+      // offline fallback
+    } finally {
+      setSavingCode(null);
+    }
+  };
+
   return (
     <div>
       <PageHeader
-        title="ตั้งค่าราคา"
-        count=""
-        subtitle="คำนวณราคาตามระยะทางและประเภทรถ"
+        title="ตั้งค่าราคา (Pricing Matrix)"
+        count={`${prices.length} ประเภทรถ`}
+        subtitle="ปรับแต่งอัตราค่าบริการเริ่มต้นและค่าบริการต่อกิโลเมตร"
       />
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-3">
         {prices.map((p, i) => (
           <div
-            key={p.type}
-            className="rounded-2xl border border-line bg-white p-3"
+            key={p.code}
+            className="rounded-2xl border border-line bg-white p-4 shadow-sm hover:border-jumbo/30 transition"
           >
             <div className="flex items-center justify-between">
-              <p className="text-[13px] font-bold text-ink">{p.type}</p>
-              <button className="flex items-center gap-1 text-[11px] font-bold text-jumbo">
-                <Edit className="h-3 w-3" /> แก้ไข
+              <div>
+                <p className="text-[14px] font-bold text-ink">{p.name}</p>
+                <p className="text-[11px] text-ink-muted">
+                  รหัสระบบ: <span className="font-mono">{p.code}</span>
+                  {p.capacityKg ? ` • รับน้ำหนักได้ ${p.capacityKg.toLocaleString()} กก.` : ""}
+                </p>
+              </div>
+              <button
+                onClick={() => handleSave(p.code, p.baseFare, p.perKm)}
+                disabled={savingCode === p.code}
+                className={`flex items-center gap-1.5 rounded-xl px-3.5 py-1.5 text-[12px] font-bold transition shadow-xs ${
+                  p.isSaved
+                    ? "bg-emerald-600 text-white"
+                    : "bg-jumbo text-white hover:bg-jumbo-dark"
+                } disabled:opacity-50`}
+              >
+                {p.isSaved ? (
+                  <>
+                    <CheckCircle2 className="h-3.5 w-3.5" />
+                    <span>บันทึกแล้ว</span>
+                  </>
+                ) : savingCode === p.code ? (
+                  <>
+                    <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                    <span>กำลังบันทึก...</span>
+                  </>
+                ) : (
+                  <>
+                    <Edit className="h-3.5 w-3.5" />
+                    <span>บันทึกราคา</span>
+                  </>
+                )}
               </button>
             </div>
-            <div className="mt-2 grid grid-cols-2 gap-2">
-              <div className="rounded-lg bg-surface p-2">
-                <p className="text-[10px] text-ink-muted">ราคาเริ่มต้น</p>
-                <p className="text-[15px] font-bold text-jumbo">฿{p.base}</p>
+
+            <div className="mt-3 grid grid-cols-2 gap-3">
+              <div className="rounded-xl border border-line bg-surface p-2.5">
+                <span className="text-[11px] font-medium text-ink-muted">
+                  ราคาเริ่มต้น (Base Fare)
+                </span>
+                <div className="mt-1 flex items-center gap-1">
+                  <span className="text-[13px] font-bold text-slate-400">฿</span>
+                  <input
+                    type="number"
+                    value={p.baseFare}
+                    onChange={(e) => {
+                      const v = Math.max(0, Number(e.target.value));
+                      setPrices((prev) =>
+                        prev.map((x, idx) => (idx === i ? { ...x, baseFare: v } : x))
+                      );
+                    }}
+                    className="w-full bg-transparent text-[16px] font-extrabold text-jumbo outline-none"
+                  />
+                </div>
               </div>
-              <div className="rounded-lg bg-surface p-2">
-                <p className="text-[10px] text-ink-muted">ราคา/กม.</p>
-                <p className="text-[15px] font-bold text-jumbo">฿{p.perKm}</p>
+
+              <div className="rounded-xl border border-line bg-surface p-2.5">
+                <span className="text-[11px] font-medium text-ink-muted">
+                  ราคาต่อ กม. (Rate per Km)
+                </span>
+                <div className="mt-1 flex items-center gap-1">
+                  <span className="text-[13px] font-bold text-slate-400">฿</span>
+                  <input
+                    type="number"
+                    value={p.perKm}
+                    onChange={(e) => {
+                      const v = Math.max(0, Number(e.target.value));
+                      setPrices((prev) =>
+                        prev.map((x, idx) => (idx === i ? { ...x, perKm: v } : x))
+                      );
+                    }}
+                    className="w-full bg-transparent text-[16px] font-extrabold text-jumbo outline-none"
+                  />
+                </div>
               </div>
             </div>
-            <input
-              type="range"
-              min={50}
-              max={1000}
-              value={p.base}
-              onChange={(e) => {
-                const v = +e.target.value;
-                setPrices((prev) =>
-                  prev.map((x, idx) => (idx === i ? { ...x, base: v } : x)),
-                );
-              }}
-              className="mt-2 w-full accent-jumbo"
-              aria-label="ราคาเริ่มต้น"
-            />
           </div>
         ))}
       </div>
-      <button className="mt-3 flex w-full items-center justify-center gap-1 rounded-xl border-2 border-dashed border-jumbo bg-jumbo-light py-2.5 text-[12px] font-bold text-jumbo">
-        <Plus className="h-4 w-4" /> เพิ่มประเภทรถ
-      </button>
     </div>
   );
 }

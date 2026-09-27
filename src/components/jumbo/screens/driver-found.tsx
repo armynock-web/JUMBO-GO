@@ -27,72 +27,32 @@ export function DriverFoundScreen() {
     <div className="relative flex h-full flex-col bg-white">
       <StatusBar />
 
-      {/* top map strip */}
-      <div className="relative h-44 overflow-hidden bg-surface">
-        <div className="bg-grid absolute inset-0" />
-        <svg
-          viewBox="0 0 300 180"
-          className="absolute inset-0 h-full w-full"
-          preserveAspectRatio="xMidYMid slice"
-        >
-          <path d="M0 60 L300 70" stroke="#fff" strokeWidth="10" />
-          <path d="M120 0 L140 180" stroke="#fff" strokeWidth="8" />
-          <path
-            d="M40 40 Q150 100 260 140"
-            stroke="#ED1C24"
-            strokeWidth="3.5"
-            fill="none"
-            strokeDasharray="6 4"
-          />
-          <g transform="translate(40 40)">
-            <circle r="6" fill="#16A34A" />
-            <circle r="2" fill="#fff" />
-          </g>
-          <g transform="translate(260 140)">
-            <path d="M0 -10 L7 -2 L0 8 L-7 -2 Z" fill="#ED1C24" />
-          </g>
-          {/* driver truck approaching */}
-          <g transform="translate(150 90)">
-            <motion.g
-              animate={{ scale: [1, 1.1, 1] }}
-              transition={{ duration: 1.4, repeat: Infinity }}
-            >
-              <circle r="20" fill="#ED1C2422" />
-              <circle r="12" fill="#ED1C24" />
-              <text
-                x="0"
-                y="5"
-                textAnchor="middle"
-                fontSize="14"
-                fill="white"
-              >
-                {/* truck SVG path (no emoji) */}
-              </text>
-              <path
-                d="M-6 -2 L-6 4 L-2 4 L-2 2 L2 2 L2 4 L6 4 L6 -2 Z M-5 -1 L-3 -1 L-3 1 L-5 1 Z M-1 0 L1 0"
-                fill="white"
-                stroke="none"
-              />
-            </motion.g>
-          </g>
-        </svg>
+      {/* Top Commercial Status Header */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 px-5 pt-4 pb-12 text-white shadow-md">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-[13px] font-bold text-emerald-400">
+              คนขับตอบรับงานเรียบร้อยแล้ว
+            </span>
+          </div>
+          <button
+            onClick={() => go("home")}
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 transition"
+            aria-label="ปิด"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
 
-        {/* badge */}
-        <motion.div
-          initial={{ y: -20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-green-600 px-3 py-1 text-[11px] font-bold text-white shadow"
-        >
-          <span className="h-1.5 w-1.5 rounded-full bg-white" />
-          คนขับรับงานแล้ว!
-        </motion.div>
-        <button
-          onClick={() => go("home")}
-          className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/95"
-          aria-label="ปิด"
-        >
-          <X className="h-4 w-4 text-ink" />
-        </button>
+        <div className="mt-3">
+          <h2 className="text-xl font-black tracking-tight text-white">
+            คนขับกำลังมุ่งหน้าไปยังจุดรับสินค้า
+          </h2>
+          <p className="mt-0.5 text-xs text-slate-300">
+            {draft.pickup?.address ? `กำลังไปที่: ${draft.pickup.address}` : "ระยะเวลาเดินทางประมาณ 10-15 นาที"}
+          </p>
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 pb-3 scrollbar-hide">

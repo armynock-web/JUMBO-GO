@@ -20,6 +20,26 @@ export function DriverDashboardScreen() {
   const driverOnline = useJumbo((s) => s.driverOnline);
   const toggleDriverOnline = useJumbo((s) => s.toggleDriverOnline);
 
+  const handleToggleOnline = async () => {
+    const nextState = !driverOnline;
+    toggleDriverOnline();
+    try {
+      const endpoint = nextState
+        ? "/api/driver/availability/online"
+        : "/api/driver/availability/offline";
+      await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer jumbo_f74c32ed-7cb6-49a8-9963-a21d34e73335`,
+        },
+        body: JSON.stringify({ driverId: "f74c32ed-7cb6-49a8-9963-a21d34e73335" }),
+      });
+    } catch {
+      // safe fallback
+    }
+  };
+
   return (
     <div className="relative flex min-h-full flex-col bg-surface pb-20">
       <StatusBar />
@@ -68,7 +88,7 @@ export function DriverDashboardScreen() {
             </p>
           </div>
           <button
-            onClick={toggleDriverOnline}
+            onClick={handleToggleOnline}
             className={`flex items-center gap-2 rounded-full px-4 py-2 text-[12px] font-bold transition ${
               driverOnline
                 ? "bg-green-500 text-white"
@@ -319,7 +339,6 @@ function DriverBottomNav() {
           );
         })}
       </div>
-      <div className="mx-auto mb-1 h-1 w-28 rounded-full bg-ink/30" />
     </nav>
   );
 }

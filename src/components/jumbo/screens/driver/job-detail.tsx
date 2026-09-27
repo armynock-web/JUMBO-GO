@@ -17,13 +17,56 @@ import {
   Truck,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { SignatureCanvas } from "../../signature-canvas";
+import { PenTool, Image as ImageIcon, Loader2 } from "lucide-react";
 
 export function DriverJobDetailScreen() {
   const go = useJumbo((s) => s.go);
   const back = useJumbo((s) => s.back);
   const job = JOB_HISTORY[0];
-  const [proofUploaded, setProofUploaded] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+  const [signatureUrl, setSignatureUrl] = useState<string | null>(null);
+  const [signerName, setSignerName] = useState<string>("");
+  const [showSignatureModal, setShowSignatureModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isCompleted, setIsCompleted] = useState(false);
+
+  const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setPhotoUrl(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleCompleteJob = async () => {
+    setIsSubmitting(true);
+    try {
+      if (photoUrl || signatureUrl) {
+        await fetch(`/api/driver/jobs/${job.id}/proof`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            proofUrl: photoUrl || "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600",
+            proofType: signatureUrl ? "signature" : "photo",
+            signature: signatureUrl || undefined,
+            note: signerName ? `ลงชื่อโดย: ${signerName}` : "ส่งมอบสินค้าเรียบร้อย",
+          }),
+        }).catch(() => {});
+      }
+    } finally {
+      setIsSubmitting(false);
+      setIsCompleted(true);
+      setTimeout(() => {
+        go("driver-dashboard");
+      }, 1200);
+    }
+  };
 
   return (
     <div className="relative flex h-full flex-col bg-surface">
@@ -190,48 +233,138 @@ export function DriverJobDetailScreen() {
         {/* delivery proof upload */}
         <div className="mt-3 rounded-2xl border border-line bg-white p-3">
           <p className="mb-2 text-[12px] font-bold text-ink">
-            หลักฐานการส่งมอบ
+            หลักฐานการส่งมอบสินค้า (Proof of Delivery)
           </p>
-          <button
-            onClick={() => setProofUploaded(true)}
-            className={`flex h-32 w-full items-center justify-center overflow-hidden rounded-xl border-2 border-dashed transition ${
-              proofUploaded
-                ? "border-jumbo bg-jumbo-light"
-                : "border-line bg-surface"
-            }`}
-          >
-            {proofUploaded ? (
-              <div className="flex flex-col items-center gap-1">
-                <CheckCircle2 className="h-6 w-6 text-jumbo" strokeWidth={2.5} />
-                <span className="text-[11px] font-bold text-jumbo">
-                  อัปโหลดแล้ว
-                </span>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center gap-1">
-                <Camera className="h-6 w-6 text-ink-muted" />
-                <span className="text-[11px] font-medium text-ink-muted">
-                  ถ่ายรูปหลักฐานการส่ง
-                </span>
-              </div>
-            )}
-          </button>
+
+          <input
+            type="file"
+            ref={fileInputRef}
+            accept="image/*"
+            capture="environment"
+            onChange={handlePhotoSelect}
+            className="hidden"
+          />
+
+          <div className="grid grid-cols-2 gap-2.5">
+            {/* 1. Photo Proof */}
+            <div
+              onClick={() => fileInputRef.current?.click()}
+              className={`flex h-28 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-xl border-2 border-dashed p-2 transition ${
+                photoUrl
+                  ? "border-emerald-500 bg-emerald-50/50"
+                  : "border-slate-300 bg-slate-50 hover:bg-slate-100/70"
+              }`}
+            >
+              {photoUrl ? (
+                <div className="flex flex-col items-center gap-1 text-center">
+                  <img
+                    src={photoUrl}
+                    alt="Proof"
+                    className="h-14 w-full rounded-lg object-cover"
+                  />
+                  <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-600">
+                    <CheckCircle2 className="h-3 w-3" /> ถ่ายภาพแล้ว
+                  </span>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center gap-1 text-center">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-200 text-slate-600">
+                    <Camera className="h-4 w-4" />
+                  </div>
+                  <span className="text-[11px] font-bold text-slate-700">
+                    ถ่ายรูปสินค้า
+                  </span>
+                  <span className="text-[9px] text-slate-400">
+                    สินค้า/จุดส่งมอบ
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* 2. Digital Signature */}
+            <div
+              onClick={() => setShowSignatureModal(true)}
+              className={`flex h-28 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-xl border-2 border-dashed p-2 transition ${
+                signatureUrl
+                  ? "border-emerald-500 bg-emerald-50/50"
+                  : "border-slate-300 bg-slate-50 hover:bg-slate-100/70"
+              }`}
+            >
+              {signatureUrl ? (
+                <div className="flex flex-col items-center gap-1 text-center">
+                  <img
+                    src={signatureUrl}
+                    alt="Signature"
+                    className="h-14 w-full rounded-lg object-contain bg-white border border-slate-200"
+                  />
+                  <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-600">
+                    <CheckCircle2 className="h-3 w-3" /> เซ็นรับแล้ว
+                  </span>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center gap-1 text-center">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-200 text-slate-600">
+                    <PenTool className="h-4 w-4" />
+                  </div>
+                  <span className="text-[11px] font-bold text-slate-700">
+                    ลงชื่อผู้รับ
+                  </span>
+                  <span className="text-[9px] text-slate-400">
+                    ลายเซ็นดิจิทัล
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {signerName && (
+            <p className="mt-2 text-[11px] text-slate-600">
+              ผู้รับสินค้า: <strong>{signerName}</strong>
+            </p>
+          )}
         </div>
 
         {/* actions */}
         <div className="mt-3 grid grid-cols-2 gap-3">
           <button
-            className="flex items-center justify-center gap-1 rounded-2xl border border-line bg-white py-3 text-[12px] font-bold text-ink"
+            onClick={() => {
+              if (!photoUrl) fileInputRef.current?.click();
+              else setShowSignatureModal(true);
+            }}
+            className="flex items-center justify-center gap-1 rounded-2xl border border-line bg-white py-3 text-[12px] font-bold text-ink hover:bg-slate-50"
           >
-            <Upload className="h-3.5 w-3.5" /> อัปเดตสถานะ
+            <Upload className="h-3.5 w-3.5" /> เพิ่มหลักฐาน POD
           </button>
           <button
-            onClick={() => go("driver-dashboard")}
-            className="flex items-center justify-center gap-1 rounded-2xl bg-jumbo py-3 text-[12px] font-bold text-white shadow"
+            onClick={handleCompleteJob}
+            disabled={isSubmitting || isCompleted}
+            className="flex items-center justify-center gap-1.5 rounded-2xl bg-jumbo py-3 text-[12px] font-bold text-white shadow-md shadow-jumbo/20 hover:bg-jumbo-dark disabled:opacity-50"
           >
-            <CheckCircle2 className="h-3.5 w-3.5" /> ยืนยันส่งงาน
+            {isSubmitting ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <CheckCircle2 className="h-3.5 w-3.5" />
+            )}
+            <span>{isCompleted ? "ส่งงานเรียบร้อย!" : "ยืนยันส่งงาน"}</span>
           </button>
         </div>
+
+        {/* Signature Modal */}
+        {showSignatureModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
+            <div className="w-full max-w-md">
+              <SignatureCanvas
+                defaultSignerName={signerName}
+                onSave={(sigData, name) => {
+                  setSignatureUrl(sigData);
+                  setSignerName(name);
+                  setShowSignatureModal(false);
+                }}
+                onCancel={() => setShowSignatureModal(false)}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

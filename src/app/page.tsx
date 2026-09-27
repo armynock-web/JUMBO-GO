@@ -2,277 +2,218 @@
 
 import { useEffect, useState } from "react";
 import { AppShell } from "@/components/jumbo/app-shell";
-import { PhoneFrame, DesktopRail } from "@/components/jumbo/phone-frame";
-import { JumboLogo } from "@/components/jumbo/logo";
-import { useJumbo, type ScreenId, type Mode } from "@/store/jumbo";
-import { BRAND, VEHICLES } from "@/lib/brand";
-import { VehicleIcon } from "@/components/jumbo/vehicle-icon";
+import { RealMap } from "@/components/jumbo/real-map";
+import { DesktopOnboarding } from "@/components/jumbo/desktop-onboarding";
+import { CustomerBookingConsole } from "@/components/jumbo/customer-booking-console";
+import { JobsScreen } from "@/components/jumbo/screens/jobs";
+import { ProfileScreen } from "@/components/jumbo/screens/profile";
+import { SearchingScreen } from "@/components/jumbo/screens/searching";
+import { TrackingScreen } from "@/components/jumbo/screens/tracking";
+import { CompletedScreen } from "@/components/jumbo/screens/completed";
+import { useJumbo } from "@/store/jumbo";
+import { BRAND } from "@/lib/brand";
 import {
   Truck,
+  PhoneCall,
+  Briefcase,
+  HelpCircle,
   ShieldCheck,
-  Tag,
-  Navigation,
-  Bell,
-  Clock,
-  MapPin,
-  ChevronRight,
-  Smartphone,
-  Github,
-  Zap,
+  User,
 } from "lucide-react";
 
 export default function Page() {
-  const screen = useJumbo((s) => s.screen);
   const mode = useJumbo((s) => s.mode);
-  const go = useJumbo((s) => s.go);
+  const screen = useJumbo((s) => s.screen);
   const setMode = useJumbo((s) => s.setMode);
+  const go = useJumbo((s) => s.go);
   const [isDesktop, setIsDesktop] = useState(false);
 
   useEffect(() => {
+    setMode("user");
+    // Ensure initial screen is 'home' directly without splash delay
+    if (useJumbo.getState().screen === "splash") {
+      go("home");
+    }
     const mq = window.matchMedia("(min-width: 1024px)");
     const onChange = () => setIsDesktop(mq.matches);
     onChange();
     mq.addEventListener("change", onChange);
     return () => mq.removeEventListener("change", onChange);
-  }, []);
+  }, [setMode, go]);
 
-  // Mobile: render the app shell directly (full screen app)
+  // Mobile View (< 1024px): Full-screen Native Web App (No splash delays, no fake status bar)
   if (!isDesktop) {
-    return <MobileApp />;
-  }
-
-  // Desktop: showcase layout with phone frame + side panels
-  return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-[#0c0c0e] text-white">
-      {/* Background patterns */}
-      <div className="bg-grid pointer-events-none absolute inset-0 opacity-30" />
-      <div
-        className="pointer-events-none absolute -left-32 -top-32 h-96 w-96 rounded-full opacity-40 blur-3xl"
-        style={{ background: "radial-gradient(circle, #ED1C24, transparent)" }}
-      />
-      <div
-        className="pointer-events-none absolute -right-40 top-1/2 h-[500px] w-[500px] rounded-full opacity-30 blur-3xl"
-        style={{
-          background:
-            "radial-gradient(circle, #C91017, transparent)",
-        }}
-      />
-
-      {/* top brand bar */}
-      <header className="relative z-10 flex items-center justify-between px-8 py-4">
-        <div className="flex items-center gap-3">
-          <JumboLogo size={36} showWord={false} />
-          <div>
-            <div className="flex items-center gap-1.5">
-              <span className="text-[15px] font-extrabold italic tracking-tight text-white">
+    return (
+      <div className="flex h-dvh w-full flex-col overflow-hidden bg-white text-slate-900 font-sans">
+        {/* Mobile Clean Commercial Header */}
+        <header className="flex h-14 w-full flex-shrink-0 items-center justify-between border-b border-slate-200 bg-white px-4 shadow-xs z-30">
+          <div
+            onClick={() => go("home")}
+            className="flex cursor-pointer items-center gap-2"
+          >
+            <img
+              src="/images/brand/app-icon.jpg"
+              alt="JUMBO GO"
+              className="h-7 w-7 rounded-lg object-contain shadow-xs"
+            />
+            <div className="flex items-center gap-1">
+              <span className="text-[16px] font-black italic tracking-tight text-slate-900">
                 JUMBO
               </span>
-              <span className="rounded bg-jumbo px-1.5 py-0.5 text-[15px] font-extrabold italic tracking-tight text-white">
+              <span className="rounded bg-jumbo px-1.5 py-0.2 text-[16px] font-black italic tracking-tight text-white">
                 GO
               </span>
-              <span className="ml-2 rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-medium text-white/70">
-                Live Prototype v1.0
+              <span className="ml-1 rounded-full bg-red-100 px-2 py-0.5 text-[9px] font-bold text-jumbo">
+                ออนดีมานด์
               </span>
             </div>
-            <p className="text-[11px] text-white/50">
-              {BRAND.tagline}
-            </p>
           </div>
+
+          <div className="flex items-center gap-2">
+            <a
+              href="tel:021234567"
+              className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-700 hover:bg-slate-200 transition"
+              aria-label="Call center 24h"
+              title="โทร 02-123-4567"
+            >
+              <PhoneCall className="h-4 w-4 text-jumbo" />
+            </a>
+          </div>
+        </header>
+
+        {/* Mobile Content Area */}
+        <main className="flex-1 overflow-hidden bg-white">
+          <AppShell />
+        </main>
+      </div>
+    );
+  }
+
+  // Desktop View (>= 1024px):
+  // 1. If user clicks "แนะนำบริการ (1-2-3)", present the Full-width 1-2-3 Value Showcase
+  if (screen === "onboarding") {
+    return <DesktopOnboarding />;
+  }
+
+  // 2. Commercial Booking Console + Real Live Fleet Map
+  return (
+    <div className="flex h-screen w-screen flex-col overflow-hidden bg-slate-100/70 text-slate-900 font-sans">
+      {/* 1. Top Commercial Navbar (Customer Portal) */}
+      <header className="z-30 flex h-16 w-full flex-shrink-0 items-center justify-between border-b border-slate-200 bg-white px-6 text-slate-900 shadow-xs">
+        <div className="flex items-center gap-6">
+          <div
+            onClick={() => go("home")}
+            className="flex cursor-pointer items-center gap-2.5 transition hover:opacity-90"
+          >
+            <img
+              src="/images/brand/app-icon.jpg"
+              alt="JUMBO GO"
+              className="h-9 w-9 rounded-xl object-contain shadow-xs border border-slate-100"
+            />
+            <div>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[18px] font-black italic tracking-tight text-slate-900">
+                  JUMBO
+                </span>
+                <span className="rounded bg-jumbo px-1.5 py-0.2 text-[18px] font-black italic tracking-tight text-white">
+                  GO
+                </span>
+                <span className="ml-1 rounded-full bg-red-50 border border-red-200 px-2 py-0.5 text-[10px] font-extrabold text-jumbo">
+                  ขนส่งออนดีมานด์
+                </span>
+              </div>
+              <p className="text-[10px] text-slate-500 -mt-0.5">{BRAND.tagline}</p>
+            </div>
+          </div>
+
+          <nav className="hidden lg:flex items-center gap-1.5 pl-4 border-l border-slate-200">
+            <button
+              onClick={() => go("home")}
+              className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-[13px] font-bold transition ${
+                screen !== "jobs" && screen !== "profile"
+                  ? "bg-jumbo/10 text-jumbo"
+                  : "text-slate-600 hover:bg-slate-100"
+              }`}
+            >
+              <Truck className="h-4 w-4" />
+              เรียกรถขนของ
+            </button>
+            <button
+              onClick={() => go("jobs")}
+              className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-[13px] font-bold transition ${
+                screen === "jobs"
+                  ? "bg-jumbo/10 text-jumbo"
+                  : "text-slate-600 hover:bg-slate-100"
+              }`}
+            >
+              <Briefcase className="h-4 w-4" />
+              รายการจองของฉัน
+            </button>
+            <button
+              onClick={() => go("onboarding")}
+              className="flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-[13px] font-semibold text-slate-600 hover:bg-slate-100 transition"
+            >
+              <HelpCircle className="h-4 w-4 text-amber-500" />
+              แนะนำบริการ (1-2-3)
+            </button>
+          </nav>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
+          {/* Link to Driver Portal */}
           <a
-            className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[12px] font-medium text-white/80 transition hover:bg-white/10"
-            href="#features"
+            href="/driver"
+            className="hidden md:inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-1.5 text-[12px] font-bold text-slate-700 hover:bg-slate-100 transition"
           >
-            <Zap className="h-3.5 w-3.5 text-jumbo" />
-            ฟีเจอร์
+            <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
+            <span>ร่วมขับกับเรา</span>
           </a>
-          <a
-            className="flex items-center gap-1.5 rounded-full bg-jumbo px-3 py-1.5 text-[12px] font-bold text-white"
-            href="#screens"
+
+          {/* Hotline */}
+          <div className="hidden xl:flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-1.5 text-[12px] text-slate-600">
+            <PhoneCall className="h-3.5 w-3.5 text-jumbo" />
+            <span>ศูนย์ช่วยเหลือ 24 ชม.: <strong className="text-slate-900">02-123-4567</strong></span>
+          </div>
+
+          {/* User Profile */}
+          <div
+            onClick={() => go("profile")}
+            className="flex cursor-pointer items-center gap-2.5 rounded-full border border-slate-200 bg-white py-1 pl-1 pr-3 text-[12px] font-bold text-slate-800 shadow-xs hover:border-slate-300 transition"
           >
-            <Smartphone className="h-3.5 w-3.5" />
-            ดูทุกหน้า
-          </a>
+            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-jumbo text-[11px] font-black text-white shadow-xs">
+              สญ
+            </span>
+            <span>สมหญิง ใจเย็น</span>
+          </div>
         </div>
       </header>
 
-      {/* main 3-col layout */}
-      <main className="relative z-10 mx-auto grid max-w-[1400px] grid-cols-12 gap-6 px-8 pb-16">
-        {/* Left: hero copy */}
-        <section className="col-span-3 flex flex-col justify-center pt-8">
-          <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-jumbo/20 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-jumbo">
-            <span className="h-1.5 w-1.5 rounded-full bg-jumbo" />
-            พิมพ์เขียว JUMBO GO
-          </span>
-          <h1 className="mt-3 text-[42px] font-extrabold leading-[1.05] tracking-tight text-white">
-            เรียกรถขนของ
-            <br />
-            <span className="text-jumbo">ราคาคนไทย</span>
-          </h1>
-          <p className="mt-3 text-[14px] leading-relaxed text-white/70">
-            {BRAND.promise}
-            <br />
-            {BRAND.slogan}
-          </p>
-
-          <div className="mt-5 flex flex-col gap-2">
-            {[
-              "Splash → Login → OTP → Home",
-              "Booking Flow 5 ขั้น (Pickup → Dropoff → Vehicle → Summary → Confirm)",
-              "Dispatch + Realtime Tracking",
-              "Account / Jobs / Notifications / Support",
-            ].map((t, i) => (
-              <div
-                key={i}
-                className="flex items-start gap-2 rounded-lg bg-white/5 px-3 py-2 text-[12px] text-white/80"
-              >
-                <ChevronRight className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-jumbo" />
-                {t}
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-5 flex items-center gap-2">
-            <button
-              onClick={() => go("splash")}
-              className="flex items-center gap-1.5 rounded-full bg-jumbo px-4 py-2 text-[12px] font-bold text-white shadow-lg shadow-jumbo/30"
-            >
-              <Smartphone className="h-3.5 w-3.5" /> เริ่มต้นใหม่
-            </button>
-            <button
-              onClick={() => go("home")}
-              className="flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-[12px] font-medium text-white/80"
-            >
-              ไปหน้าหลัก
-            </button>
+      {/* 2. Main Commercial Workspace with White-frame Split View */}
+      <main className="relative flex flex-1 overflow-hidden p-3 lg:p-4 gap-3 lg:gap-4">
+        {/* Left Column: Customer Booking Console in Elevated White Container */}
+        <section className="relative z-20 flex h-full w-full lg:w-[510px] flex-shrink-0 flex-col rounded-2xl border border-slate-200/90 bg-white shadow-lg overflow-hidden">
+          <div className="flex-1 overflow-hidden">
+            {screen === "jobs" ? (
+              <JobsScreen />
+            ) : screen === "profile" ? (
+              <ProfileScreen />
+            ) : screen === "searching" ? (
+              <SearchingScreen />
+            ) : screen === "tracking" ? (
+              <TrackingScreen />
+            ) : screen === "completed" ? (
+              <CompletedScreen />
+            ) : (
+              <CustomerBookingConsole />
+            )}
           </div>
         </section>
 
-        {/* Center: phone frame */}
-        <section
-          id="screens"
-          className="col-span-5 flex items-start justify-center pt-4"
-        >
-          <PhoneFrame>
-            <AppShell />
-          </PhoneFrame>
-        </section>
-
-        {/* Right: rail */}
-        <section className="col-span-4 flex flex-col pt-8">
-          <DesktopRail
-            current={screen}
-            mode={mode}
-            onPick={(s) => go(s as ScreenId)}
-            onMode={(m) => setMode(m as Mode)}
-          />
+        {/* Right Column: Commercial Interactive Logistics Map with Real Road Routing */}
+        <section className="relative hidden lg:flex flex-1 h-full overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-sm">
+          <RealMap />
         </section>
       </main>
-
-      {/* features strip */}
-      <section
-        id="features"
-        className="relative z-10 border-t border-white/10 bg-black/30 backdrop-blur"
-      >
-        <div className="mx-auto max-w-[1400px] px-8 py-8">
-          <div className="grid grid-cols-5 gap-4">
-            <FeatureCard
-              icon={Tag}
-              title="ราคาชัดเจน"
-              desc="คำนวณฝั่ง Server ไม่มีค่าซ่อนเร้น"
-            />
-            <FeatureCard
-              icon={Navigation}
-              title="Realtime Tracking"
-              desc="ติดตามพิกัดคนขับสด พร้อม ETA"
-            />
-            <FeatureCard
-              icon={ShieldCheck}
-              title="ปลอดภัย RLS"
-              desc="ข้อมูลผ่าน Supabase RLS ทุกตาราง"
-            />
-            <FeatureCard
-              icon={Truck}
-              title="5 ประเภทรถ"
-              desc="กระบะ • ตู้ทึบ • คอก • จัมโบ้ • 6 ล้อ"
-            />
-            <FeatureCard
-              icon={Bell}
-              title="Thai UI"
-              desc="ภาษาไทยทุกหน้า ใช้ Noto Sans Thai"
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* footer */}
-      <footer className="relative z-10 border-t border-white/10 px-8 py-5">
-        <div className="mx-auto flex max-w-[1400px] flex-col items-center justify-between gap-2 text-center md:flex-row md:text-left">
-          <p className="text-[11px] text-white/50">
-            © 2025 JUMBO GO • สร้างตามพิมพ์เขียว • Next.js 16 + TypeScript +
-            Tailwind 4
-          </p>
-          <div className="flex items-center gap-3 text-[11px] text-white/50">
-            <span className="flex items-center gap-1">
-              <Clock className="h-3 w-3" /> อัปเดตล่าสุด: วันนี้
-            </span>
-            <span className="flex items-center gap-1">
-              <Github className="h-3 w-3" /> MVP
-            </span>
-          </div>
-        </div>
-      </footer>
-    </div>
-  );
-}
-
-// Mobile view - render the app full screen with role switcher overlay
-function MobileApp() {
-  const mode = useJumbo((s) => s.mode);
-  const setMode = useJumbo((s) => s.setMode);
-  return (
-    <div className="fixed inset-0 w-full overflow-hidden bg-white">
-      {/* floating role switcher */}
-      <div className="fixed bottom-3 left-1/2 z-50 flex -translate-x-1/2 items-center gap-1 rounded-full border border-line bg-white/95 p-1 shadow-lg backdrop-blur">
-        {[
-          { m: "user" as const, label: "User" },
-          { m: "driver" as const, label: "Driver" },
-          { m: "admin" as const, label: "Admin" },
-        ].map((r) => (
-          <button
-            key={r.m}
-            onClick={() => setMode(r.m)}
-            className={`rounded-full px-3 py-1 text-[11px] font-bold transition ${
-              mode === r.m ? "bg-jumbo text-white" : "text-ink-muted"
-            }`}
-          >
-            {r.label}
-          </button>
-        ))}
-      </div>
-      <AppShell />
-    </div>
-  );
-}
-
-function FeatureCard({
-  icon: Icon,
-  title,
-  desc,
-}: {
-  icon: React.ElementType;
-  title: string;
-  desc: string;
-}) {
-  return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 p-3 transition hover:bg-white/10">
-      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-jumbo text-white">
-        <Icon className="h-4 w-4" strokeWidth={2.5} />
-      </span>
-      <p className="mt-2 text-[13px] font-bold text-white">{title}</p>
-      <p className="text-[11px] leading-tight text-white/60">{desc}</p>
     </div>
   );
 }

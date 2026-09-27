@@ -3,7 +3,6 @@
 import { useJumbo } from "@/store/jumbo";
 import { StatusBar } from "../../status-bar";
 import {
-  ChevronLeft,
   Lock,
   User,
   Eye,
@@ -16,8 +15,8 @@ import { motion } from "framer-motion";
 
 export function AdminLoginScreen() {
   const go = useJumbo((s) => s.go);
-  const back = useJumbo((s) => s.back);
   const login = useJumbo((s) => s.login);
+  const setAdminAuthenticated = useJumbo((s) => s.setAdminAuthenticated);
   const [email, setEmail] = useState("admin@jumbogo.co.th");
   const [password, setPassword] = useState("admin");
   const [show, setShow] = useState(false);
@@ -26,37 +25,61 @@ export function AdminLoginScreen() {
 
   const submit = () => {
     setError(null);
-    if (!email.includes("@")) {
-      setError("อีเมลไม่ถูกต้อง");
+    const trimmedEmail = email.trim().toLowerCase();
+    const trimmedPass = password.trim();
+
+    if (!trimmedEmail || !trimmedEmail.includes("@")) {
+      setError("กรุณากรอกอีเมลแอดมินให้ถูกต้อง");
       return;
     }
-    if (password.length < 4) {
-      setError("รหัสผ่านไม่ถูกต้อง");
+    if (!trimmedPass) {
+      setError("กรุณากรอกรหัสผ่านผู้ดูแลระบบ");
       return;
     }
+
     setLoading(true);
     setTimeout(() => {
+      const isValidEmail =
+        trimmedEmail === "admin@jumbogo.co.th" ||
+        trimmedEmail === "admin@jumbogo.com" ||
+        trimmedEmail === "superadmin@jumbogo.com" ||
+        (trimmedEmail.startsWith("admin") && (trimmedEmail.endsWith("@jumbogo.co.th") || trimmedEmail.endsWith("@jumbogo.com")));
+
+      const isValidPass =
+        trimmedPass === "admin" ||
+        trimmedPass === "admin1234" ||
+        trimmedPass === "jumbo2025" ||
+        trimmedPass === "jumbogo2025";
+
+      if (!isValidEmail || !isValidPass) {
+        setLoading(false);
+        setError("อีเมลหรือรหัสผ่านผู้ดูแลระบบไม่ถูกต้อง (เฉพาะเจ้าหน้าที่ JUMBO GO)");
+        return;
+      }
+
       setLoading(false);
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem("jumbo_admin_auth", "true");
+      }
+      setAdminAuthenticated(true);
       login();
       go("admin-dashboard");
-    }, 700);
+    }, 500);
   };
 
   return (
     <div className="relative flex h-full flex-col bg-surface">
       <StatusBar />
-      <div className="flex items-center justify-between px-3 py-1">
-        <button
-          onClick={back}
-          className="flex h-9 w-9 items-center justify-center rounded-full bg-white"
-          aria-label="ย้อนกลับ"
-        >
-          <ChevronLeft className="h-5 w-5" />
-        </button>
-        <span className="text-[13px] font-medium text-ink-muted">
-          Admin Login
+      <div className="flex items-center justify-between border-b border-line bg-white px-4 py-3">
+        <div className="flex items-center gap-2">
+          <Shield className="h-4 w-4 text-jumbo" />
+          <span className="text-[13px] font-bold text-ink">
+            JUMBO GO Admin Portal
+          </span>
+        </div>
+        <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] font-semibold text-slate-600 border border-slate-200">
+          ระบบความปลอดภัยเจ้าหน้าที่
         </span>
-        <div className="w-9" />
       </div>
 
       <div className="flex flex-1 flex-col items-center justify-center px-6">
@@ -152,6 +175,11 @@ export function AdminLoginScreen() {
           <p className="text-center text-[11px] text-ink-muted">
             ระบบจะบันทึก Audit Log ทุกการกระทำ
           </p>
+
+          <div className="mt-2 rounded-xl bg-slate-100 p-2.5 border border-slate-200 text-center">
+            <p className="text-[11px] font-semibold text-slate-700">บัญชีเจ้าหน้าที่ (Admin Demo):</p>
+            <p className="text-[11px] text-slate-500 font-mono">admin@jumbogo.co.th / admin</p>
+          </div>
         </div>
       </div>
     </div>

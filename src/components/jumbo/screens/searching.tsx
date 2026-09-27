@@ -88,8 +88,13 @@ export function SearchingScreen() {
           <h1 className="text-[22px] font-extrabold text-ink">
             กำลังค้นหาคนขับ
           </h1>
+          {draft.activeJobNumber ? (
+            <p className="mt-0.5 font-mono text-[12px] font-bold text-jumbo">
+              เลขที่ใบงาน: {draft.activeJobNumber}
+            </p>
+          ) : null}
           <p className="mt-1 text-[13px] text-ink-muted">
-            กรุณารอสักครู่... กำลังหาคนขับที่เหมาะสมที่สุดสำหรับคุณ
+            กรุณารอสักครู่... กำลังกระจายงานให้คนขับที่ใกล้ที่สุด
           </p>
         </div>
 
